@@ -174,7 +174,7 @@
 	<xsl:template match="/tmp:schema/tmp:element[tmp:simpleType]" mode="DATA-CLASS">
 		<xsl:text disable-output-escaping="yes">
 
-#path: ../</xsl:text><xsl:value-of select="@filePath" /><xsl:text disable-output-escaping="yes">.php
+#path: </xsl:text><xsl:value-of select="@filePath" /><xsl:text disable-output-escaping="yes">.php
 &lt;?php
 
 	namespace </xsl:text><xsl:value-of select="@classNS" />;

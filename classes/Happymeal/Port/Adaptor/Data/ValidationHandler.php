@@ -23,6 +23,15 @@ class ValidationHandler {
 	public function hasErrors() {
 		return count( $this->errors ) > 0;
 	}
+	
+	public function throwError( \Happymeal\ErrorHandler $h ) {
+	    if($this->hasErrors()) {
+			$errors = $this->getErrors();
+			foreach($errors as $code=>$err){
+				$h->throwError( new \Exception( implode( ";", $err ), $code ) );
+			}
+		}
+	}
 
 	public function clean () {
 		$this->errors = array();

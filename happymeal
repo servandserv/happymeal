@@ -65,7 +65,7 @@ Command:
         base ресурсов wadl файла.
         генерируется файл api.v[0-9]{1,2}-[0-9]{1,2}.php в каталоге web
 
-        happymeal wadl2code  -o path/to/destination -s path/to/schemas  -vjm \\\\Namespace\\\\Port\\\\Adaptor\\\\Data schema_catalog
+        happymeal wadl2code  -o path/to/destination -s path/to/schemas  -m \\\\Namespace\\\\Port\\\\Adaptor\\\\Data schema_catalog
     
 Command:
   man   Мануал
@@ -124,17 +124,17 @@ if [ "$command" == "xsd2code" ]; then
                 ;;
             j)  jFlag=1
                 ;;
-            s)    sFlag=$(realpath $OPTARG)
+            s)   sFlag=$(realpath $OPTARG)
                 ;;
-            o)    oFlag=$(realpath $OPTARG)
+            o)   oFlag=$(realpath $OPTARG)
                 ;;
-            :)    echo "Option -$OPTARG requires an argument" >&2
+            :)   echo "Option -$OPTARG requires an argument" >&2
                 exit 1
                 ;;
-            ?)    echo "Unknown option -$OPTARG" >&2
+            ?)   echo "Unknown option -$OPTARG" >&2
                 exit 1
                 ;;
-            *)    echo "Unknown error while processing options" >&2
+            *)   echo "Unknown error while processing options" >&2
                 exit 1
         esac
     done
@@ -162,7 +162,7 @@ if [ "$command" == "xsd2code" ]; then
     # каталог классов не чистим
     rm -rf "$tmpBuildDir"/*
 
-    php consolidate_xsd2xml.php "$mFlag" "$sFlag" "$oFlag" $* > "$tmpBuildDir"/consolidated.xml
+    php consolidate_xsd2xml.php "$mFlag" "$sFlag" "$oFlag/classes" $* > "$tmpBuildDir"/consolidated.xml
     
     echo "consolidate xsd schemas ...    OK!"
     echo $vFlag
@@ -197,7 +197,7 @@ if [ "$command" == "xsd2code" ]; then
     fi
     
     chmod -R 755 "$oFlag"
-    rm -rf "$tmpBuildDir"
+    #rm -rf "$tmpBuildDir"
     cd "$invokePath"
     exit 0;
     
@@ -252,7 +252,7 @@ elif [ "$command" == "wadl2code" ]; then
     # каталог классов не чистим
     rm -rf "$tmpBuildDir"/*
 
-    php consolidate_xsd2xml.php "$mFlag" "$sFlag" "$oFlag" $* > "$tmpBuildDir"/consolidated.xml
+    php consolidate_xsd2xml.php "$mFlag" "$sFlag" "$oFlag/classes" $* > "$tmpBuildDir"/consolidated.xml
     
     echo "consolidate xsd schemas ...    OK!"
 

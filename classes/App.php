@@ -1,6 +1,6 @@
 <?php
 
-class App {
+class App implements \Happymeal\ErrorHandler {
 
 	private static $instance=null;
 	private $_container;

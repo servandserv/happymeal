@@ -64,11 +64,12 @@ $app->CONTROLLER = function() use ($app) {
         $app->cacheControl(filemtime($file));
         header("Content-Type: application/xml; charset=utf-8");
         echo(file_get_contents($file));
+        exit();
     });
         </xsl:text>
         <xsl:apply-templates select="wadl:resources//wadl:resource" mode="LOCATOR" />
         <xsl:text disable-output-escaping="yes">
-    if(!$app->isFounded()) $app->throwError(new Exception("Not found",404));
+    $app->throwError(new Exception("Not found",404));
 };
 $app->locate("CONTROLLER");
     </xsl:text>
@@ -106,6 +107,21 @@ $app->locate("CONTROLLER");
             <xsl:variable name="requestEl" select="wadl:request/wadl:representation/@element" />
             <xsl:variable name="requestClass" select="$SCHEMAS//tmp:*[concat(@targetNS,':',@name) = $requestEl]/@class" />
             
+            <xsl:for-each select="wadl:request/wadl:param[@style='query' and @default]">
+                <xsl:text disable-output-escaping="yes">
+                if(!isset( $app->QUERY["</xsl:text>
+                <xsl:value-of select="@name" />
+                <xsl:text disable-output-escaping="yes">"] ) ) { 
+                    $query = $app->QUERY;
+                    $query["</xsl:text>
+                <xsl:value-of select="@name" />
+                <xsl:text disable-output-escaping="yes">"] = "</xsl:text>
+                <xsl:value-of select="@default" />
+                <xsl:text disable-output-escaping="yes">";
+                    $app->QUERY = $query;
+                }</xsl:text>
+            </xsl:for-each>
+            
             <xsl:choose>
                 <xsl:when test="$requestClass">
                     <xsl:text disable-output-escaping="yes">
@@ -118,6 +134,7 @@ $app->locate("CONTROLLER");
                 $app->request( null );</xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
+            
             <xsl:text disable-output-escaping="yes">
                 $usecase = $app->USECASES."\\</xsl:text><xsl:value-of select="@id" /><xsl:text disable-output-escaping="yes">";
                 $usecase = new $usecase();
