@@ -139,7 +139,7 @@ $app->locate("CONTROLLER");
                 $usecase = $app->USECASES."\\</xsl:text><xsl:value-of select="@id" /><xsl:text disable-output-escaping="yes">";
                 $usecase = new $usecase();
                 $result = call_user_func_array(array(&amp;$usecase,"execute"),func_get_args());
-                $app->response($result);
+                $app->responseHtml($result);
             } catch( \Exception $e ) {
                 error_log($e->getLine().":".$e->getFile()." ".$e->getMessage());
                 switch( $e->getCode() ) {</xsl:text>

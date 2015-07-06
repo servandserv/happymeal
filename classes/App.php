@@ -138,7 +138,14 @@ class App implements \Happymeal\ErrorHandler {
 	private function _set($id,$val) {
 		$this->_container[$id] = $val;
 	}
-	
+
+    public function fn($id) {
+        if(isset($this->_container[$id])) {
+            $isInvokable = is_object($this->_container[$id]) && method_exists($this->_container[$id], '__invoke');
+            if($isInvokable) return $this->_container[$id];
+        }
+    }
+
 	public function once($id, $value){
 		$this->_set($id, function () use ($value) {
 			static $object;
@@ -236,7 +243,38 @@ class App implements \Happymeal\ErrorHandler {
 				echo $obj->toXmlStr();
 		}
 		exit;
-	}
+    }
+    /**
+     *
+     *
+     *
+     */
+    public function responseHTML( \Happymeal\Port\Adaptor\Data\XML\Schema\AnyType $obj ) {
+        $output = "html";
+        if( isset( $_SERVER["HTTP_ACCEPT"] ) ) {
+            if( strpos( $_SERVER["HTTP_ACCEPT"], "/json" ) !== FALSE ) {
+                $output = "json";
+            } else if ( strpos( $_SERVER["HTTP_ACCEPT"], "/xml" ) !== FALSE && strpos( $_SERVER["HTTP_ACCEPT"], "text/html" ) === FALSE  ) {
+                $output = "xml";
+            }
+        }
+        header("Vary: Accept");
+        switch( $output ) {
+			case "json":
+				header( "Content-type: application/json; charset: utf-8" );
+                echo $obj->toJSON();
+                exit;
+			case "xml":
+			    //$this->locate( "RESPONSE_ADAPTOR", $obj->toXmlStr(), true );
+			    header( "Content-type: application/xml; charset: utf-8" );
+                echo $obj->toXmlStr();
+                exit;
+            default:
+                header("Content-type: text/html; charset=UTF-8");
+                echo(\Happymeal\Port\Adaptor\Data\Xml2Html::transform($obj->toXmlStr(),$this->fn("REF")));
+                exit;
+		}
+    }
 	/**
 	 * https://svn.net.ilb.ru/viewvc/phplib/bb/HTTP/Request2Xml.php
 	 * Подчищает входные данные - лишние пробелы, переносы и пр.
@@ -269,8 +307,8 @@ class App implements \Happymeal\ErrorHandler {
 	//cache
 	//http://habrahabr.ru/post/44906/
 	//http://www.exlab.net/dev/http-caching.html
-	function cacheControl( $lastmod ) {
-	    if( $this->CACHED === FALSE ) return;
+    function cacheControl( $lastmod ) {
+        if( $this->CACHED !== TRUE ) return;
 		$etag = $lastmod;
 		$expr = 60 * 60 * 24 * 7;
 		$gmtime = gmdate( "D, d M Y H:i:s", $lastmod ) . " GMT";
@@ -279,8 +317,9 @@ class App implements \Happymeal\ErrorHandler {
 		header( "Vary: Accept" );
 		header( "Cache-Control: " );
 		header( "Pragma: " );
-		header( "Expires: " );
-		if( isset( $_SERVER["HTTP_IF_MODIFIED_SINCE"] ) ) {
+        header( "Expires: " );
+        //return;
+		if( isset( $_SERVER["HTTP_IF_MODIFIED_SINCE"] ) && isset( $_SERVER["HTTP_IF_NONE_MATCH"] ) ) {
 			$if_modified_since = preg_replace("/;.*$/", "", $_SERVER["HTTP_IF_MODIFIED_SINCE"]);
 			if( trim( $_SERVER["HTTP_IF_NONE_MATCH"] ) == $etag && $if_modified_since == $gmtime ) {
 				header("HTTP/1.0 304 Not modified");

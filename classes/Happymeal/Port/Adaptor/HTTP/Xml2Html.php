@@ -3,27 +3,16 @@
 namespace Happymeal\Port\Adaptor\HTTP;
 
 /**
- * $Id: Output.php 436 2014-12-10 10:33:58Z dab $
- *
  * Вывод станицы клиенту
  * В зависимости от возможностей клиента xslt-шаблонизация выполняется либо
  * на сервере либо на клиенте
- *
- * В режиме отладки всегда выполняется валидация xml-данных по схеме,
- * трансформация в html на сервере,
- * и проверка полученного результата на валидность xhtml
- *
- * при трансформации на сервере url-ы в xsl-е должны быть указаны относительные:
- * чтоб не усложнять по http он не ходит, и с адресацией от корня тоже не шарит, ибо не знает где корень
- * (чтоб гарантировать доступность как файла,так как url-ная адресация может быть нетривиальной mod_rewrite,alias...)
+ * 
+ * Упощенный вариант без валидации и проверки вывода
+ * подстраиваемся под REST api и подмену путей
  *
  * в вызываемых скриптах надо обеспечить корректную работу с require_once и define
  * И СИНГЛЕТОНАМИ
  *
- * в режиме отладки выполняется профайлинг XSLT-трансформации силами libxslt, доступно только на PHP5.3,
- * результаты раскладываются в файлы /tmp/XML_Output_profiling_ипадресклиента.txt
- *
- * @author dab@bystrobank.ru
  */
 
 class Xml2Html {
@@ -60,25 +49,11 @@ class Xml2Html {
         $xsltResult=NULL;
         $debug=FALSE;
         $xsltProfiler=NULL;
-
         
         if(self::$done==TRUE) {
             trigger_error("Output::tryHTML() called twice?");
         }
         
-        //работаем только в контексте web - определяем местонахождение по url
-        if( ($_SERVER["PHP_SELF"][1]=="~" && $forceValidation!==FALSE) || $forceValidation===TRUE ) {
-            //в домашнем каталоге включаем отладку
-            $debug=FALSE;
-        }
-        if ($_SERVER["PHP_SELF"][1]=="~") {
-            //профайлер XSLT доступен только после 5.3
-            if (version_compare(PHP_VERSION, '5.3.0', '>')) {
-                //разводим файлы по разным хостам - для отладки достаточно
-                $xsltProfiler="/tmp/Output_profiling_".$_SERVER["REMOTE_ADDR"]."_".(isset($_SERVER["USER"])?$_SERVER["USER"]:(isset($_SERVER["UID"])?$_SERVER["UID"]:posix_getuid())).".txt";
-            }
-        }
-        //$debug=FALSE;
         $xsltStart=$xsltStop=0; //минипрофайлер
         if( $html==FALSE && isset($_SERVER["HTTP_ACCEPT"]) ) {
             //тут пока неразбериха с text/xml по старому и application/xml по новому
@@ -139,7 +114,7 @@ class Xml2Html {
                     $xsl_file = dirname($_SERVER["SCRIPT_FILENAME"])."/".str_replace("http://".$_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"]),"",$matches[1]);
                     //error_log(dirname($_SERVER["SCRIPT_FILENAME"]));
                     //error_log($_SERVER["PHP_SELF"]);
-                    //$xsl_file = "/var/www/localhost/htdocs/school30/web/stylesheets/School/Statistics.xsl";
+                    $xsl_file = "/var/www/localhost/htdocs/school30/web/stylesheets/School/DocumentsList.xsl";
                     //$xsl->load($matches[1]);
                     $xsl->load("$xsl_file");
 
@@ -206,8 +181,9 @@ class Xml2Html {
         }
         self::$done=TRUE;
 
+        
         //валидация выходного html с помощью tidy и по dtd-схеме
-        if( $debug && $xsltResult ) {
+        if( 1!=1 && $debug && $xsltResult ) {
             //http://dab.net.ilb.ru/doc/htmltidy-5.10.26-r2/html/quickref.html
             if (strncmp($xsltResult, "<!DOCTYPE html SYSTEM \"about:legacy-compat\">", 44)) {
                 $config=array(
@@ -398,8 +374,18 @@ class Xml2Html {
         $pi=pathinfo($url["path"]);
         //если файл .php - наш клиент - обрабатываем сами
         // если есть в пути подстрока  web/api то тоже наш случай 
+        error_log("Path - ".$path);
+        error_log("PHP_SELF - ".$_SERVER["PHP_SELF"]);
+        error_log("URL - ".print_r($url,true));
+        if(isset($url["query"])) {
+            parse_str($url["query"],$output);
+            error_log("QUERY - ".print_r($output,true));
+        }
         preg_match('/\/web\/api(\/v[0-9]{1,2}\.[0-9]{1,2})?/',$url["path"],$matches);
+         
         if( isset($matches[0]) || ( isset($pi["extension"]) && !strncmp($pi["extension"],"php",3) ) ) {
+            $this->exec();
+            /*
             //сохраняем окружение
             $oldServer=$_SERVER;
             $oldRequest=$_REQUEST;
@@ -468,7 +454,7 @@ class Xml2Html {
 
                 $app->resetPaths();
                 
-            /*} else {
+            } else {
                 //ставим переменные на скрипт, чтоб логика внутри правильно отработала
                 $d1=dirname(__FILE__);
                 $d2=dirname($url["path"]);
@@ -514,13 +500,13 @@ class Xml2Html {
                     }
                 }
                 //trigger_error("ops".print_r(headers_list(),TRUE));
-            }*/
-
+            }
+            */
         } else {
             //остальные файлы открывать как файлы
             $this->handle=fopen($url["path"],$mode);
         }
-
+        
         //снова устанавливаем себя чтоб поймать следующий запрошенный урл
         stream_wrapper_unregister("file") or die(__FILE__.__LINE__);
         stream_wrapper_register("file",static::CLASSNAME) or die(__FILE__.__LINE__);
@@ -563,7 +549,7 @@ class Xml2Html {
         $filename = self::parse_path(parse_url($path,PHP_URL_PATH));
         // если адрес выполняемого скрипта фейковый, то просто подставляем исполняемый файл
         if(file_exists($filename)) {
-            $stat=stat();
+            $stat=stat($filename);
         } else {
             $stat = stat(__FILE__);
         }
@@ -579,11 +565,12 @@ class Xml2Html {
      */
     private function exec() {
         ob_start();
+        echo("<?xml version=\"1.0\" encoding=\"utf-8\"?><path>".$_SERVER["SCRIPT_FILENAME"]."</path>");
         //if(file_exists($_SERVER["SCRIPT_FILENAME"])) {
         //    require($_SERVER["SCRIPT_FILENAME"]);
         //} else {
-            $app = \App::getInstance();
-            $app->locate("CONTROLLER");
+        //    $app = \App::getInstance();
+        //    $app->locate("CONTROLLER");
         //}
         $this->handle=tmpfile();
         $content = ob_get_contents();

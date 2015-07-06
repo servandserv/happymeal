@@ -287,6 +287,7 @@ elif [ "$command" == "wadl2code" ]; then
                 fi
             done
             echo "wadl code to files ...       OK!"
+            xsltproc --stringparam WADL ${j/#*web} --stringparam API $api --stringparam OUTDIR "$oFlag" stylesheets/wadl2sitemap.xsl "$tmpBuildDir"/wadl.xml  > "$oFlag"/web/sitemap.xml
         fi
     done
 
