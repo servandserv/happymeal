@@ -58,6 +58,11 @@ require_once __DIR__.'/../conf/bootstrap.php';
 require_once __DIR__.'/../conf/conf.php';
 
 $app = \App::getInstance();
+$app->REF = function( $url ) use ($app) {</xsl:text>
+        <xsl:apply-templates select="wadl:resources//wadl:resource" mode="REF" />
+        <xsl:text disable-output-escaping="yes">
+    throw new \Exception($url["path"]." not found",404);
+};
 $app->CONTROLLER = function() use ($app) {
     $app->get('/',function() use ($app) {
         $file = dirname(__FILE__)."</xsl:text><xsl:value-of select="$WADL" /><xsl:text disable-output-escaping="yes">";
@@ -69,10 +74,29 @@ $app->CONTROLLER = function() use ($app) {
         </xsl:text>
         <xsl:apply-templates select="wadl:resources//wadl:resource" mode="LOCATOR" />
         <xsl:text disable-output-escaping="yes">
-    $app->throwError(new Exception("Not found",404));
+    $app->throwError(new \Exception("Not found",404));
 };
 $app->locate("CONTROLLER");
     </xsl:text>
+    </xsl:template>
+    
+    <xsl:template match="wadl:resource" mode="REF">
+        <xsl:variable name="path">
+            <xsl:apply-templates select="." mode="PATH" />
+        </xsl:variable>
+        <!--xsl:variable name="resource" select="ancestor-or-self::wadl:resource[position() = last()]/@id" /-->
+        <xsl:for-each select="wadl:method[translate(@name,$uppercase,$smallcase) = 'get']">
+        <xsl:text disable-output-escaping="yes">
+    $args = $app->matchAll( "</xsl:text>
+        <xsl:value-of select="$path" />
+        <xsl:text disable-output-escaping="yes">", $url );
+    if( $args !== NULL ) {
+        $usecase = $app->USECASES."\\</xsl:text><xsl:value-of select="@id" /><xsl:text disable-output-escaping="yes">";
+        $usecase = new $usecase();
+        $result = call_user_func_array(array(&amp;$usecase,"execute"),$args);
+        return $app->handleOutput( $result );
+    }</xsl:text>
+        </xsl:for-each>
     </xsl:template>
     
     <xsl:template match="wadl:resource" mode="LOCATOR">

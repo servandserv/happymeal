@@ -100,18 +100,47 @@ class App implements \Happymeal\ErrorHandler {
 			//$regex = str_replace(['*','(',')',':p'],['[^/]+','(?:',')?','([^/]+)'],$pattern);
 			
 			$regex = preg_replace('#:([\w]+)#', '(?<\\1>[^/]+)',str_replace(['*', ')'],['[^/]+', ')?'],$pattern));
-			//error_log($regex);
 			if (substr($pattern,-1)==='/') $regex .= '?';
+			//error_log($regex);
 			if (!preg_match('#^'.$regex.'$#', $this->PATH_INFO, $values)) {
 				return;
 			}
 			preg_match_all('#:([\w]+)#', $pattern, $params, PREG_PATTERN_ORDER);
 			$args = [];
+			//error_log($pattern);
+			//error_log(print_r($params,true));
 			foreach ($params[1] as $param) {
 				if (isset($values[$param])) $args[] = urldecode(preg_replace ("/[^a-zA-ZА-ЯЁа-яё0-9\-]/", "", $values[$param]));
 			}
 			$this->_exec($fn,$args);
 		} else return;
+	}
+	
+	public function matchAll( $pattern, $url ) {
+	    preg_match( '/\/web\/api(\/v[0-9]{1,2}\.[0-9]{1,2})?(\/.+)/', $url["path"], $matches );
+	    if( !isset( $matches[2] ) ) return NULL;
+	    $regex = preg_replace( '#:([\w]+)#', '(?<\\1>[^/]+)', str_replace( ['*', ')'], ['[^/]+', ')?'], $pattern ) );
+		if ( substr( $pattern, -1 ) === '/' ) $regex .= '?';
+		if ( !preg_match('#^'.$regex.'$#', $matches[2], $values ) ) {
+			return NULL;
+		}
+		preg_match_all('#:([\w]+)#', $pattern, $params, PREG_PATTERN_ORDER);
+		$args = [];
+		foreach ($params[1] as $param) {
+			if (isset($values[$param])) $args[] = urldecode(preg_replace ("/[^a-zA-ZА-ЯЁа-яё0-9\-]/", "", $values[$param]));
+		}
+		return $args;
+	}
+	
+	public function handleOutput( $res ) {
+	    ob_start();
+        echo($res->toXmlStr());
+        $handle=tmpfile();
+        $content = ob_get_contents();
+        fwrite($handle,$content);//сохраняем весь вывод в реальный файл
+        fseek($handle,0);//перематываем на начало файла
+        ob_end_clean();
+        return $handle;
 	}
 	
 	private function _exec(&$fn,&$args) {
