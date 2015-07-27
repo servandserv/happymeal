@@ -27,13 +27,18 @@ class App implements \Happymeal\ErrorHandler {
     private function __construct() {
 	    $this->setPaths( $_SERVER['SCRIPT_URL'] );
 	}
-	
+	/**
+	 *  
+	 * @param $url string SCRIPT_URL
+	 */
 	private function setPaths( $url ) {
+	    // find request path
 	    $path = str_replace(preg_replace('/\/api(\.v[0-9]{1,2}-[0-9]{1,2})?.php/','',$_SERVER['SCRIPT_NAME']),'',$url);
-		// Уберем префикс  api/v? в сроке запроса
+		// remove prefix api/v? in request path
 		$path_info = preg_replace('/\/api(\/v[0-9]{1,2}\.[0-9]{1,2})?/','',$path);
 		$this->_container['PATH_INFO'] = $path_info;
 		preg_match('/\/api(\/v[0-9]{1,2}\.[0-9]{1,2})?/',$path,$matches);
+		// save api version
 		$this->_container['API_VERSION'] = isset( $matches[0] ) ? $matches[0] : "api";
 	}
 	
@@ -52,7 +57,7 @@ class App implements \Happymeal\ErrorHandler {
 	    $this->founded = FALSE;
 	    $this->setPaths( $url ? $url : $_SERVER['SCRIPT_URL'] );
 	}
-	
+	/** not use */
 	public function isFounded() {
 	    return $this->founded;
 	}
@@ -101,14 +106,11 @@ class App implements \Happymeal\ErrorHandler {
 			
 			$regex = preg_replace('#:([\w]+)#', '(?<\\1>[^/]+)',str_replace(['*', ')'],['[^/]+', ')?'],$pattern));
 			if (substr($pattern,-1)==='/') $regex .= '?';
-			//error_log($regex);
 			if (!preg_match('#^'.$regex.'$#', $this->PATH_INFO, $values)) {
 				return;
 			}
 			preg_match_all('#:([\w]+)#', $pattern, $params, PREG_PATTERN_ORDER);
 			$args = [];
-			//error_log($pattern);
-			//error_log(print_r($params,true));
 			foreach ($params[1] as $param) {
 				if (isset($values[$param])) $args[] = urldecode(preg_replace ("/[^a-zA-ZА-ЯЁа-яё0-9\-]/", "", $values[$param]));
 			}
@@ -336,10 +338,10 @@ class App implements \Happymeal\ErrorHandler {
 	//cache
 	//http://habrahabr.ru/post/44906/
 	//http://www.exlab.net/dev/http-caching.html
-    function cacheControl( $lastmod ) {
+    function cacheControl( $lastmod, $expr = NULL ) {
         if( $this->CACHED !== TRUE ) return;
 		$etag = $lastmod;
-		$expr = 60 * 60 * 24 * 7;
+		$expr = $expr ? $expr : 60 * 60 * 24 * 7;
 		$gmtime = gmdate( "D, d M Y H:i:s", $lastmod ) . " GMT";
 		header( "ETag: " . $etag );
 		header( "Last-Modified: " . $gmtime );
