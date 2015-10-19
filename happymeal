@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 usage() { printf "
 Usage: happymeal xsd2code флаги параметры
@@ -189,9 +189,11 @@ if [ "$command" == "xsd2code" ]; then
         jValue=${mFlag//\\/.}
         xsltproc stylesheets/xsd2js.xsl "$tmpBuildDir"/consolidated.xml > "$oFlag"/web/js/${jValue}.js
         #  сожмем
-        uglifyjs "$oFlag"/web/js/${jValue}.js -o "$oFlag"/web/js/${jValue}.min.js -c -m
+        java -jar ~/yuicompressor/yuicompressor-2.4.8.jar --type js "$oFlag"/web/js/${jValue}.js > "$oFlag"/web/js/${jValue}.min.js
+        #uglifyjs "$oFlag"/web/js/${jValue}.js -o "$oFlag"/web/js/${jValue}.min.js -c -m
         cat web/js/Happymeal.js web/js/libs/sax.js > "$oFlag"/web/js/Happymeal.js
-        uglifyjs "$oFlag"/web/js/Happymeal.js -o "$oFlag"/web/js/Happymeal.min.js -c -m
+        java -jar ~/yuicompressor/yuicompressor-2.4.8.jar --type js "$oFlag"/web/js/Happymeal.js > "$oFlag"/web/js/Happymeal.min.js
+        #uglifyjs "$oFlag"/web/js/Happymeal.js -o "$oFlag"/web/js/Happymeal.min.js -c -m
         #cp -p web/js/Happymeal.js "$oFlag"/web/js/Happymeal.js
         #cp -R web/js/libs/sax.js "$oFlag"/web/js/libs
     fi

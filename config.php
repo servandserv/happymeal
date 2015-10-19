@@ -40,6 +40,7 @@ $nss_replacements = array(
 $local_nss = array( 
 	'urn:ru:ilb:meta:', 
 	'urn:ru:mobilsoft:meta:',
-	'urn:ru:battleship:'
+	'urn:ru:battleship:',
+	'urn:com:summerfields'
 );
 
