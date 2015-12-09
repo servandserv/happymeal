@@ -1,24 +1,29 @@
 <?php
-
-namespace Happymeal\Port\Adaptor\HTTP;
-
 /**
+ * $Id: Output.php 436 2014-12-10 10:33:58Z dab $
+ *
  * Вывод станицы клиенту
  * В зависимости от возможностей клиента xslt-шаблонизация выполняется либо
  * на сервере либо на клиенте
- * 
- * Упощенный вариант без валидации и проверки вывода
- * подстраиваемся под REST api и подмену путей
+ *
+ * В режиме отладки всегда выполняется валидация xml-данных по схеме,
+ * трансформация в html на сервере,
+ * и проверка полученного результата на валидность xhtml
+ *
+ * при трансформации на сервере url-ы в xsl-е должны быть указаны относительные:
+ * чтоб не усложнять по http он не ходит, и с адресацией от корня тоже не шарит, ибо не знает где корень
+ * (чтоб гарантировать доступность как файла,так как url-ная адресация может быть нетривиальной mod_rewrite,alias...)
  *
  * в вызываемых скриптах надо обеспечить корректную работу с require_once и define
  * И СИНГЛЕТОНАМИ
  *
+ * в режиме отладки выполняется профайлинг XSLT-трансформации силами libxslt, доступно только на PHP5.3,
+ * результаты раскладываются в файлы /tmp/XML_Output_profiling_ипадресклиента.txt
+ *
+ * @author dab@bystrobank.ru
  */
 
-class Xml2Html {
-
-    const CLASSNAME = "\Happymeal\Port\Adaptor\HTTP\Xml2Html";
-
+class XML_Output {
     /**
      * @var filehandle для file:// streamwrapper-а
      */
@@ -44,16 +49,30 @@ class Xml2Html {
      * @param boolean $forceValidation NULL - валидация если в домашнем каталоге, TRUE: форсировать проверку по схеме/tidy всегда, FALSE - не проверять по схеме/tidy
      * @param string $htmlContentType миме-тип для вывода html, по-умолчанию text/html, для вывода html+xul передать application/xml
      */
-    public static function tryHTML( $data, $html=FALSE, $documentURI=NULL, $forceValidation=NULL, $htmlContentType="text/html" ) {
+    public static function tryHTML( $data, $html=FALSE, $documentURI=NULL, $forceValidation=NULL,$htmlContentType="text/html" ) {
         $outputDom=NULL;
         $xsltResult=NULL;
         $debug=FALSE;
         $xsltProfiler=NULL;
-        
+
         if(self::$done==TRUE) {
-            trigger_error("Output::tryHTML() called twice?");
+            trigger_error("XML_Output::tryHTML() called twice?");
         }
-        
+
+        //работаем только в контексте web - определяем местонахождение по url
+        if( ($_SERVER["PHP_SELF"][1]=="~" && $forceValidation!==FALSE) || $forceValidation===TRUE ) {
+            //в домашнем каталоге включаем отладку
+            $debug=TRUE;
+        }
+        if ($_SERVER["PHP_SELF"][1]=="~") {
+            //профайлер XSLT доступен только после 5.3
+            if (version_compare(PHP_VERSION, '5.3.0', '>')) {
+                //разводим файлы по разным хостам - для отладки достаточно
+                $xsltProfiler="/tmp/XML_Output_profiling_".$_SERVER["REMOTE_ADDR"]."_".(isset($_SERVER["USER"])?$_SERVER["USER"]:(isset($_SERVER["UID"])?$_SERVER["UID"]:posix_getuid())).".txt";
+            }
+        }
+
+        //$debug=FALSE;
         $xsltStart=$xsltStop=0; //минипрофайлер
         if( $html==FALSE && isset($_SERVER["HTTP_ACCEPT"]) ) {
             //тут пока неразбериха с text/xml по старому и application/xml по новому
@@ -86,7 +105,7 @@ class Xml2Html {
         //$html=TRUE;
         //подготовить стили для трансформации на php
         if( $debug || $html ) {
-            $outputDom=new \DOMDocument();
+            $outputDom=new DOMDocument();
             $outputDom->loadXML($data);
             if( $documentURI ){
                 $outputDom->documentURI=$documentURI;
@@ -97,8 +116,8 @@ class Xml2Html {
                 //добываем имя схемы и проверяем по ней (или xmlreader?)
                 if( preg_match("/schemaLocation=\".+\s([a-zA-Z0-9_\/\.\-]+)\"/",$data,$matches) ) {
                     $outputDom->schemaValidate(($documentURI?dirname($documentURI)."/":"").$matches[1]);
-//                } else {
-//                    throw new \Exception("cant find schemaLocation");
+//              } else {
+//                  throw new Exception("cant find schemaLocation");
                 }
             }
             $matches=NULL;
@@ -109,15 +128,10 @@ class Xml2Html {
                     $oldHeaders=headers_list();
                     //время трансформации считаем общее - вместе с загрузкой документов
                     $xsltStart=microtime(TRUE);
-                    $xsl=new \DomDocument();
-                    // надо взять таблицу стилей локально
-                    $xsl_file = dirname($_SERVER["SCRIPT_FILENAME"])."/".str_replace("http://".$_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"]),"",$matches[1]);
-                    //error_log(dirname($_SERVER["SCRIPT_FILENAME"]));
-                    //error_log($_SERVER["PHP_SELF"]);
-                    //$xsl->load($matches[1]);
-                    $xsl->load("$xsl_file");
+                    $xsl=new DomDocument();
+                    $xsl->load($matches[1]);
 
-                    $proc=new \XSLTProcessor();
+                    $proc=new XSLTProcessor();
 
                     if ($xsltProfiler) {
                         $proc->setProfiling($xsltProfiler);
@@ -126,13 +140,13 @@ class Xml2Html {
 
                     //регистрируем на себя обращения к файлам
                     stream_wrapper_unregister("file") or die(__FILE__.__LINE__);
-                    stream_wrapper_register("file",static::CLASSNAME) or die(__FILE__.__LINE__);
+                    stream_wrapper_register("file","\XML_Output") or die(__FILE__.__LINE__);
 
                     //вешаем на обработчик выхода ловушку - если вложенный скрипт попытается сделать exit или die
-                    register_shutdown_function(array(static::CLASSNAME,"checkDone"));
+                    register_shutdown_function(array("\XML_Output","checkDone"));
 
                     //на время трансформации ставим свой специальный обработчик ошибок
-                    set_error_handler(array(static::CLASSNAME,"xsltErrorHandler"));
+                    set_error_handler(array("\XML_Output","xsltErrorHandler"));
                     $xsltResult=$proc->transformToXML($outputDom);
                     restore_error_handler();
 
@@ -180,9 +194,8 @@ class Xml2Html {
         }
         self::$done=TRUE;
 
-        
         //валидация выходного html с помощью tidy и по dtd-схеме
-        if( 1!=1 && $debug && $xsltResult ) {
+        if( $debug && $xsltResult ) {
             //http://dab.net.ilb.ru/doc/htmltidy-5.10.26-r2/html/quickref.html
             if (strncmp($xsltResult, "<!DOCTYPE html SYSTEM \"about:legacy-compat\">", 44)) {
                 $config=array(
@@ -236,13 +249,13 @@ class Xml2Html {
                     foreach($xsltResultLines as $lineNumber=>$line){
                         $xsltResultWithLines.=sprintf("%04d: ",($lineNumber+1)).$line.PHP_EOL;
                     }
-                    throw new \Exception("validator.nu errors: " . PHP_EOL . $out . PHP_EOL . $xsltResultWithLines);
+                    throw new Exception("validator.nu errors: " . PHP_EOL . $out . PHP_EOL . $xsltResultWithLines);
                 }
                 //уберемся за собой
                 unset($ch,$out,$code);
             }
 
-            $xsltResultDoc=new \DOMDocument();
+            $xsltResultDoc=new DOMDocument();
             //поиск схемы для проверки xhtml - ищем по обычным путям как и классы
             $schemasPath=NULL;
             foreach(explode(PATH_SEPARATOR,get_include_path()) as $p){
@@ -271,7 +284,7 @@ class Xml2Html {
             }
             if( $xsltResultDoc->doctype->systemId != "about:legacy-compat" ){
                 if( !$xsltResultDoc->validate() ) {
-                    throw new \Exception("DTD validation errors");
+                    throw new Exception("DTD validation errors");
                 }
             }
             unset($xsltResultDoc, $xsltResultXml, $schemasPath, $p);
@@ -290,8 +303,8 @@ class Xml2Html {
             //результат - сборная солянка из вывода нескольких скриптов и шаблонов
             //явно кешированием управлять не пытаемся: ставим хедеры на текущее время
             //TODO возможно и хитро проанализировать хедеры всех составляющих и вычислить общий
-            //header("Last-Modified: ".gmdate(DATE_RFC1123));
-            //header("Etag: Output_".$_SERVER["UNIQUE_ID"]);
+            header("Last-Modified: ".gmdate(DATE_RFC1123));
+            header("Etag: XML_Output_".$_SERVER["UNIQUE_ID"]);
             echo $xsltResult;
         } else {
             unset($xsltResult);
@@ -300,18 +313,17 @@ class Xml2Html {
             echo $data;
         }
     }
-    
     public static function transform($data) {
-        $outputDom = new \DOMDocument();
+        $outputDom = new DOMDocument();
         $outputDom->loadXML($data);
         $xsltResult=NULL;
         $matches = NULL;
         if ($outputDom->firstChild->nodeType == XML_PI_NODE &&
             $outputDom->firstChild->target == "xml-stylesheet") {
             if (preg_match("/href\s*=\s*\"(.+)\"/", $outputDom->firstChild->data, $matches)) {
-                $xsl = new \DomDocument();
+                $xsl = new DomDocument();
                 $xsl->load($matches[1]);
-                $proc = new \XSLTProcessor();
+                $proc = new XSLTProcessor();
                 $proc->importStyleSheet($xsl);
                 $xsltResult = $proc->transformToXML($outputDom);
             }
@@ -364,27 +376,17 @@ class Xml2Html {
      * @return boolean
      */
     public function stream_open( $path, $mode, $options, &$opened_path ) {
+        //error_log("stream_open( $path, $mode, $options, $opened_path )\n",3,"/tmp/log");
         restore_error_handler();
         //чтобы добраться до реальной файловой системы восстанавливаем дефолтный
         stream_wrapper_restore("file") or die(__FILE__.__LINE__);
+
         $url=parse_url($path);
         $pathinfo=NULL;
         $url["path"]=self::parse_path($url["path"], $pathinfo);
         $pi=pathinfo($url["path"]);
         //если файл .php - наш клиент - обрабатываем сами
-        // если есть в пути подстрока  web/api то тоже наш случай 
-        error_log("Path - ".$path);
-        error_log("PHP_SELF - ".$_SERVER["PHP_SELF"]);
-        error_log("URL - ".print_r($url,true));
-        if(isset($url["query"])) {
-            parse_str($url["query"],$output);
-            error_log("QUERY - ".print_r($output,true));
-        }
-        preg_match('/\/web\/api(\/v[0-9]{1,2}\.[0-9]{1,2})?/',$url["path"],$matches);
-         
-        if( isset($matches[0]) || ( isset($pi["extension"]) && !strncmp($pi["extension"],"php",3) ) ) {
-            $this->exec();
-            /*
+        if( isset($pi["extension"]) && !strncmp($pi["extension"],"php",3) ) {
             //сохраняем окружение
             $oldServer=$_SERVER;
             $oldRequest=$_REQUEST;
@@ -416,100 +418,60 @@ class Xml2Html {
             $_SERVER["REQUEST_METHOD"]="GET";//другого не умем
             $_POST=array();//дожен быть пустым
             $_REQUEST=$_GET;
-            
-            // разный подмены на случай обработки обычного скрипта или подмененной строки api
-            // api
-           // if(isset($matches[0])) {
-            
-                $app = \App::getInstance();
-            
-                $_SERVER["PHP_SELF"]=$url["path"];
-                $_SERVER["SCRIPT_URL"] = "/digests";//$url["path"];
-                $_SERVER["REDIRECT_REDIRECT_SCRIPT_URL"] = "/digests";//$url["path"];
-                $_SERVER["REDIRECT_SCRIPT_URL"] = "/digests";//$url["path"];
-                $_SERVER["REQUEST_URI"] = "/digests";//$url["path"];
-                $_SERVER["HTTP_ACCEPT"] = "application/xml";
-                
-                $app->resetAll();
-                
-                //предотвращаем обработку скриптами заголовках переданных на самом деле головному скрипту
-                unset($_SERVER["HTTP_IF_MODIFIED_SINCE"],$_SERVER["REDIRECT_HTTP_IF_MODIFIED_SINCE"]);
-                unset($_SERVER["HTTP_IF_NONE_MATCH"],$_SERVER["REDIRECT_HTTP_IF_NONE_MATCH"]);
-                unset($_SERVER["HTTP_IF_MATCH"],$_SERVER["REDIRECT_HTTP_IF_MATCH"]);
-                if( isset($_SERVER["UNIQUE_ID"]) ) {
-                    //подменяем "уникальный" идентификатор чтобы у каждого скрипта он был свой
-                    $_SERVER["UNIQUE_ID"]=base_convert(md5(uniqid(rand(),TRUE)),16,36);
-                }
-                
-                //"вызываем" скрипт
-                $this->exec();
-                
-                //восстанавливаем окружение
-                $_SERVER=$oldServer;
-                $_REQUEST=$oldRequest;
-                $_GET=$oldGet;
-                $_POST=$oldPost;
-                set_include_path($oldPath);
-
-                $app->resetPaths();
-                
-            } else {
-                //ставим переменные на скрипт, чтоб логика внутри правильно отработала
-                $d1=dirname(__FILE__);
-                $d2=dirname($url["path"]);
-                $rd="";
-                if( $d1!=$d2 ) {
-                    //пути отличаются - вычисляем относительный путь чтоб подставить в урл
-                    $rd=$this->RelativePath($d1,$d2).DIRECTORY_SEPARATOR;
-                }
-                $_SERVER["PHP_SELF"]=dirname($_SERVER["PHP_SELF"]).DIRECTORY_SEPARATOR.$rd.basename($url["path"]);
-                $_SERVER["SCRIPT_NAME"]=$_SERVER["PHP_SELF"];
-                $_SERVER["SCRIPT_FILENAME"]=$url["path"];
-                $_SERVER["SCRIPT_URL"]=$_SERVER["PHP_SELF"];
-                //SCRIPT_URI
-                $_SERVER["REDIRECT_URL"]=$_SERVER["PHP_SELF"];
-                
-                //предотвращаем обработку скриптами заголовках переданных на самом деле головному скрипту
-                unset($_SERVER["HTTP_IF_MODIFIED_SINCE"],$_SERVER["REDIRECT_HTTP_IF_MODIFIED_SINCE"]);
-                unset($_SERVER["HTTP_IF_NONE_MATCH"],$_SERVER["REDIRECT_HTTP_IF_NONE_MATCH"]);
-                unset($_SERVER["HTTP_IF_MATCH"],$_SERVER["REDIRECT_HTTP_IF_MATCH"]);
-                if( isset($_SERVER["UNIQUE_ID"]) ) {
-                    //подменяем "уникальный" идентификатор чтобы у каждого скрипта он был свой
-                    $_SERVER["UNIQUE_ID"]=base_convert(md5(uniqid(rand(),TRUE)),16,36);
-                }
-                chdir($d2);
-                
-                //"вызываем" скрипт
-                $this->exec();
-                
-                //восстанавливаем окружение
-                $_SERVER=$oldServer;
-                $_REQUEST=$oldRequest;
-                $_GET=$oldGet;
-                $_POST=$oldPost;
-                chdir($oldPwd);
-                set_include_path($oldPath);
-                
-                //проверим не изменил ли вызванный скрипт заголовок Status
-                //это для тех кто не умеет бросать исключения и падать сам при ошибках
-                $hl = headers_list();
-                for ($i = 0; $i < count( $hl ); $i++) {
-                    if (!strncmp($hl[$i], "Status:", 7) && substr($hl[$i], 8) != $oldStatus) {
-                        throw new \Exception("invalid header '" . $hl[$i] . "'");
-                    }
-                }
-                //trigger_error("ops".print_r(headers_list(),TRUE));
+            //ставим переменные на скрипт, чтоб логика внутри правильно отработала
+            $d1=dirname(__FILE__);
+            $d2=dirname($url["path"]);
+            $rd="";
+            if( $d1!=$d2 ) {
+                //пути отличаются - вычисляем относительный путь чтоб подставить в урл
+                $rd=$this->RelativePath($d1,$d2).DIRECTORY_SEPARATOR;
             }
-            */
+            $_SERVER["PHP_SELF"]=dirname($_SERVER["PHP_SELF"]).DIRECTORY_SEPARATOR.$rd.basename($url["path"]);
+            $_SERVER["SCRIPT_NAME"]=$_SERVER["PHP_SELF"];
+            $_SERVER["SCRIPT_FILENAME"]=$url["path"];
+            $_SERVER["SCRIPT_URL"]=$_SERVER["PHP_SELF"];
+            //SCRIPT_URI
+            $_SERVER["REDIRECT_URL"]=$_SERVER["PHP_SELF"];
+            //предотвращаем обработку скриптами заголовках переданных на самом деле головному скрипту
+            unset($_SERVER["HTTP_IF_MODIFIED_SINCE"],$_SERVER["REDIRECT_HTTP_IF_MODIFIED_SINCE"]);
+            unset($_SERVER["HTTP_IF_NONE_MATCH"],$_SERVER["REDIRECT_HTTP_IF_NONE_MATCH"]);
+            unset($_SERVER["HTTP_IF_MATCH"],$_SERVER["REDIRECT_HTTP_IF_MATCH"]);
+            if( isset($_SERVER["UNIQUE_ID"]) ) {
+                //подменяем "уникальный" идентификатор чтобы у каждого скрипта он был свой
+                $_SERVER["UNIQUE_ID"]=base_convert(md5(uniqid(rand(),TRUE)),16,36);
+            }
+
+            chdir($d2);
+            //"вызываем" скрипт
+            $this->exec();
+
+            //восстанавливаем окружение
+            $_SERVER=$oldServer;
+            $_REQUEST=$oldRequest;
+            $_GET=$oldGet;
+            $_POST=$oldPost;
+            chdir($oldPwd);
+            set_include_path($oldPath);
+
+            //проверим не изменил ли вызванный скрипт заголовок Status
+            //это для тех кто не умеет бросать исключения и падать сам при ошибках
+            $hl = headers_list();
+            for ($i = 0; $i < count( $hl ); $i++) {
+                if (!strncmp($hl[$i], "Status:", 7) && substr($hl[$i], 8) != $oldStatus) {
+                    throw new Exception("invalid header '" . $hl[$i] . "'");
+                }
+            }
+
+            //trigger_error("ops".print_r(headers_list(),TRUE));
         } else {
             //остальные файлы открывать как файлы
             $this->handle=fopen($url["path"],$mode);
         }
-        
+
         //снова устанавливаем себя чтоб поймать следующий запрошенный урл
         stream_wrapper_unregister("file") or die(__FILE__.__LINE__);
-        stream_wrapper_register("file",static::CLASSNAME) or die(__FILE__.__LINE__);
-        set_error_handler(array(static::CLASSNAME,"xsltErrorHandler"));
+        stream_wrapper_register("file",get_class($this)) or die(__FILE__.__LINE__);
+        set_error_handler(array("\XML_Output","xsltErrorHandler"));
         return TRUE;
     }
 
@@ -545,16 +507,10 @@ class Xml2Html {
         restore_error_handler();
         //запрос stat проводим к реальной файловой системе
         stream_wrapper_restore("file") or die(__FILE__.__LINE__);
-        $filename = self::parse_path(parse_url($path,PHP_URL_PATH));
-        // если адрес выполняемого скрипта фейковый, то просто подставляем исполняемый файл
-        if(file_exists($filename)) {
-            $stat=stat($filename);
-        } else {
-            $stat = stat(__FILE__);
-        }
+        $stat=stat(self::parse_path(parse_url($path,PHP_URL_PATH)));
         stream_wrapper_unregister("file") or die(__FILE__.__LINE__);
-        stream_wrapper_register("file",static::CLASSNAME) or die(__FILE__.__LINE__);
-        set_error_handler(array(static::CLASSNAME,"xsltErrorHandler"));
+        stream_wrapper_register("file",get_class($this)) or die(__FILE__.__LINE__);
+        set_error_handler(array("\XML_Output","xsltErrorHandler"));
         return $stat;
     }
 
@@ -564,16 +520,9 @@ class Xml2Html {
      */
     private function exec() {
         ob_start();
-        echo("<?xml version=\"1.0\" encoding=\"utf-8\"?><path>".$_SERVER["SCRIPT_FILENAME"]."</path>");
-        //if(file_exists($_SERVER["SCRIPT_FILENAME"])) {
-        //    require($_SERVER["SCRIPT_FILENAME"]);
-        //} else {
-        //    $app = \App::getInstance();
-        //    $app->locate("CONTROLLER");
-        //}
+        require($_SERVER["SCRIPT_FILENAME"]);
         $this->handle=tmpfile();
-        $content = ob_get_contents();
-        fwrite($this->handle,$content);//сохраняем весь вывод в реальный файл
+        fwrite($this->handle,ob_get_contents());//сохраняем весь вывод в реальный файл
         fseek($this->handle,0);//перематываем на начало файла
         ob_end_clean();
     }
@@ -588,7 +537,7 @@ class Xml2Html {
         if(self::$done!=TRUE) {
             error_log("AHTUNG! restart php now!");
             //тут не прокатывает trigger_error() - зовем напрямую
-            UncaughtFatalErrorExceptionHandler(new \FatalErrorException("do not use EXIT() in included script"));
+            UncaughtFatalErrorExceptionHandler(new FatalErrorException("do not use EXIT() in included script"));
         }
     }
     /**
@@ -622,7 +571,7 @@ class Xml2Html {
         }
         //If we didn't find a common prefix then throw
         if( $lastCommonRoot==-1 ) {
-            throw new \Exception("Paths do not have a common base");
+            throw new Exception("Paths do not have a common base");
         }
 
         //Build up the relative path
@@ -655,5 +604,3 @@ class Xml2Html {
     }
 
 }
-
-/* eof */

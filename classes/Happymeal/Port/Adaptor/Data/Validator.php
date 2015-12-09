@@ -14,7 +14,7 @@ abstract class Validator {
 		if( is_object( $this->validationHandler ) ) {
 			$this->validationHandler->handleError( $error, $code );
 		} else {
-			error_log($error);
+			//error_log($error);
 			throw new \Exception( $error, $code );
 		}
 	}

@@ -317,7 +317,7 @@ function create_class_ns ( $package, $ns_path, $val ) {
 			//$class_ns = str_replace("\\".$val,"", $class_ns );
 		}
 	}
-	return $class_ns;
+	return str_replace("\\\\","\\",$class_ns);
 }
 
 /**

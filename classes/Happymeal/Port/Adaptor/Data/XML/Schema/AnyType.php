@@ -50,6 +50,10 @@ class AnyType extends \Adaptor_XMLBase {
     public function setPI( $pi ) {
         $this->PI = $pi;
     }
+    
+    public function getPI() {
+        return $this->PI;
+    }
 	
 	/**
 	* Вывод в XMLWriter

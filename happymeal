@@ -294,7 +294,7 @@ elif [ "$command" == "wadl2code" ]; then
     done
 
     chmod -R 755 "$oFlag"
-    rm -rf "$tmpBuildDir"
+    #rm -rf "$tmpBuildDir"
     cd "$invokePath"
     exit 0;
 

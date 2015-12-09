@@ -16,7 +16,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator {
 			if( isset( $this->simpleTypes[$v] ) ) {
 				$simpleValidator = $this->simpleTypes[$v];
 				$simpleValidator->validate();
-			}elseif( is_object( $obj ) && method_exists( $obj, "validate" ) ) {
+			}elseif( is_object( $obj ) && method_exists( $obj, "validateType" ) ) {
 				$obj->validateType( $this->validationHandler );
 			}
 		}

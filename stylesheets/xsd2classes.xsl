@@ -1164,8 +1164,8 @@
 					<xsl:text>, </xsl:text>
 				</xsl:if>
 			</xsl:for-each>
-		</xsl:variable>
-		<xsl:text disable-output-escaping="yes">
+		    </xsl:variable>
+		    <xsl:text disable-output-escaping="yes">
 			$enum = array( </xsl:text>
 			<xsl:value-of select="$enum" />
 			<xsl:text disable-output-escaping="yes"> );
@@ -1321,6 +1321,8 @@
 				<xsl:value-of select="$source/@fixed"/>
 				<xsl:text>' );</xsl:text>
 			</xsl:if>
+	    </xsl:if>
+	    <!-- minOccurs and maxOccurs проверяем и на компдексных типах -->
 			<xsl:text disable-output-escaping="yes">
 			$this->assertMinOccurs( '</xsl:text>
 			<xsl:value-of select="@propName" />
@@ -1333,7 +1335,6 @@
 			<xsl:text>','</xsl:text>
 			<xsl:value-of select="$maxOccurs"/>
 			<xsl:text>' );</xsl:text>
-		</xsl:if>
 	</xsl:template>
 	
 	<xsl:template match="tmp:*" mode="TYPE_CLASS">

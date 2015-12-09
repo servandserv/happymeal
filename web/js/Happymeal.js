@@ -68,6 +68,18 @@
 	    return hash;
 	}
 	
+	Happymeal.escapeHTML = function (text) {
+        var map = {
+            /*'&': '&amp;',*/
+            '<': '&lt;',
+            '>': '&gt;'/*,
+            '"': '&quot;',
+            "'": '&#039;'*/
+        };
+
+        return text.replace(/[<>]/g, function(m) { return map[m]; });
+    },
+	
 	Happymeal.preserve = function(ns, ns_string) {
 		var parts = ns_string.split("."),
 		parent = ns,
@@ -81,6 +93,53 @@
 		}
 		return parent;
 	};
+	
+	Happymeal.Locator = (function(){
+		var objects = {};
+		
+		var locator =  function(key,f) {
+			if(!f && typeof objects[key] == "function") {
+				return objects[key]();
+			} else if(f) {
+				objects[key] = f;
+			}
+		}
+		return locator;
+	}());
+	
+	Happymeal.Storage = (function(){
+	    return {
+	        prefix: "hm",
+	        length: function() {
+	            return sessionStorage.length;
+	        },
+	        key: function(key) {
+	            var res = sessionStorage.key( key ) 
+                if( res != null ) {
+                    res = JSON.parse( res );
+                }
+                return res;
+	        },
+	        getItem: function( key ) {
+                var res = sessionStorage.getItem( this.prefix+":"+key );
+                if( res != null ) {
+                    res = JSON.parse( res );
+                }
+                return res;
+            },
+            setItem: function( key, data ) {
+                var str = JSON.stringify( data );
+                sessionStorage.removeItem( this.prefix+":"+key );
+                sessionStorage.setItem( this.prefix+":"+key, str );
+            },
+            removeItem: function( key ) {
+                sessionStorage.removeItem( this.prefix+":"+key );
+            },
+            clear: function() {
+                sessionStorage.clear();
+            }
+        }
+	}());
 	
 	Happymeal.Mediator = (function() {
 		// Storage for our topics/events
@@ -129,7 +188,58 @@
 		};
 	}());
 	
-	
+    Happymeal.Locator("Happymeal.PubSub",function(args) {
+        return (function(args) {
+            var topics = {};
+            var subUid = -1;
+            var pubsub = {
+                subscribe: function(topic, func) {
+                    if (!topics[topic]) {
+                        topics[topic] = [];
+                    }
+                    var token = (++subUid).toString();
+                    topics[topic].push({
+                        token: token,
+                        func: func
+                    });
+                    return token;
+                },
+                publish: function(topic, args) {
+                    if (!topics[topic]) {
+                        return false;
+                    }
+                    //setTimeout(function() {
+                        var subscribers = topics[topic],
+                        len = subscribers ? subscribers.length : 0;
+
+                        while (len--) {
+                            subscribers[len].func(topic, args);
+                        }
+                    //}, 0);
+                    return true;
+                },
+                unsubscribe: function(token) {
+                    for (var m in topics) {
+                        if (topics[m]) {
+                            for (var i = 0, j = topics[m].length; i < j; i++) {
+                                if (topics[m][i].token === token) {
+                                    topics[m].splice(i, 1);
+                                    return token;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                },
+                topics: function() {
+                    return topics;
+                },
+                extend: extend
+            };
+            return pubsub;
+        }(args));
+	});
+    
 	Happymeal.preserve(Happymeal,"Port.Adaptor.HTTP");
 	Happymeal.Port.Adaptor.HTTP = (function(){
 		var request = function(args) {
@@ -200,18 +310,7 @@
 		});
 	}());
 	
-	Happymeal.Locator = (function(){
-		var objects = {};
-		
-		var locator =  function(key,f) {
-			if(!f && typeof objects[key] == "function") {
-				return objects[key]();
-			} else if(f) {
-				objects[key] = f;
-			}
-		}
-		return locator;
-	}());
+	
 	
 	Happymeal.preserve(Happymeal,"Port.Adaptor.Data.XML.Schema");
 	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexType = {
@@ -260,6 +359,50 @@
 		},
 	};
 	
+	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator = {
+	    simpleTypes: [],
+	    complexTypes: [],
+	    validate: function() {
+	        return true;
+	    },
+	    assertType: function(uri,type,pubsub) {
+	        if(type.URI != uri) {
+	            return false;
+	        } else return true;
+	    },
+	    assertMinOccurs: function(occurence,prop,pubsub) {
+	        var valid = true;
+	        switch(occurence) {
+	            case "0":
+	                break;
+	            case "1":
+	                if(prop === null || (prop instanceof Array && prop.length === 0)) valid = false;
+	                break;
+	            default:
+	                if(!prop instanceof Array && prop.length < occurence) valid = false;
+	        }
+	        return valid;
+	    },
+	    assertMaxOccurs: function(occurence,prop,pubsub) {
+	        var valid = true;
+	        switch(occurence) {
+	            case "1":
+	                if(prop instanceof Array) valid = false;
+	                break;
+	            case "unbounded":
+	                if(!prop instanceof Array) valid = false;
+	                break;
+	            default:
+	                if(!prop instanceof Array && prop.length > occurence) valid = false;
+	        
+	        }
+	        return valid;
+	    },
+	    assertFixed: function(fixed,prop,pubsub) {
+	        return prop == fixed;
+	    }
+	}
+	
 	Happymeal.Port.Adaptor.Data.XML.Schema.AnySimpleType = {
 		toJSON: function() {
 			this.JSON = {};
@@ -278,7 +421,55 @@
 		},
 	}
 	
-	Happymeal.XMLView = (function(){
+	Happymeal.Port.Adaptor.Data.XML.Schema.AnySimpleTypeValidator = {
+	    assertSimple: function(type,val,pubsub) {
+	        switch( type ) {
+	            case "Int":
+	            case "Integer":
+	                return parseInt(val,10)==val;
+	            case "Float":
+	            case "Double":
+	                return parseFloat(val,10)==val;
+	            case "Boolean":
+	                return val == "true" || val == "false" || val == 0 || val == 1;
+	            default:
+	                return true;
+	        }
+	    },
+	    assertEnumeration: function(arr,val,pubsub) {
+	        return arr.indexOf(val) >= 0;
+	    },
+	    assertMinInclusive: function(min,val,pubsub) {
+	        return parseFloat(min) <= parseFloat(val);
+	    },
+	    assertMinExclusive: function(min,val,pubsub) {
+	        return parseFloat(min) < parseFloat(val);
+	    },
+	    assertMaxInclusive: function(max,val,pubsub) {
+	        return parseFloat(max) >= parseFloat(val);
+	    },
+	    assertMaxExclusive: function(max,val,pubsub) {
+	        return parseFloat(max) > parseFloat(val);
+	    },
+	    assertMinLength: function(len,val,pubsub) {
+	        return String(val).length >= len;
+	    },
+	    assertMaxLength: function(len,val,pubsub) {
+	        return String(val).length <= len;
+	    },
+	    assertLength: function(len,val,pubsub) {
+	        return String(val).length == len;
+	    },
+	    assertPattern: function(reg,val,pubsub) {
+	        var expr = new RegExp(reg);
+	        return expr.test(val);
+	    },
+	    assertNull: function(val,pubsub) {
+	        return val === null || val === '';
+	    }
+	}
+
+    Happymeal.XMLView = (function(){
 		var templates = {};
 		var waits = {};
 		
@@ -294,28 +485,30 @@
 				return resultDocument;
 			} else {
 				Happymeal.Mediator.publish("ErrorOccured",{
-					msg:"Преобразование XML не поддерживается браузером"}
+					msg:"XSLT Transformation error"}
 				);
 				return null;
 			}  
 		};
 		
-		var render = function(xml) {
+		var render = function(model) {
+		    this.model = model;
+		    var xml = model.toXmlStr();
 			if(!templates[this.template]) {
 				if(!waits[this.template]) waits[this.template] = [];
-				waits[this.template].push({view:this,data:xml});
+				waits[this.template].push({view:this,data:xml,model:model});
 			} else {
 				var temp = templates[this.template];
-				var el = document.getElementById(this.elementId);
+				var el = this.element || document.getElementById(this.elementId);
 				el.innerHTML = transformXslt(xml,temp).documentElement.innerHTML;
-				this.bind(el,xml);
+				this.bind(el,model);
 			}
 		};
 		
 		var initialize = function() {
 			// подписываемся на события
 			for (prop in this.events) {
-				this.subscribe(prop,this.events[prop]);
+				this.subscribe(prop,this.events[prop],this);
 			}
 			// подгружаем шаблон, если он еще не был подгружен
 			if(!templates[this.template]) {
@@ -327,7 +520,7 @@
 						templates[this.url] = http.responseXML;
 						if(waits[this.url]) {
 							for(var i=0; i<waits[this.url].length; i++) {
-								waits[this.url][i].view.render(waits[this.url][i].data);
+								waits[this.url][i].view.render(waits[this.url][i].model);
 							}
 							waits[this.url] = [];
 						}
@@ -351,16 +544,21 @@
 		var waits = {};
 		
 		/** отрисовка интерфейса */
-		var render = function(data) {
-			if(!templates[this.template]) {
+		var render = function(model) {
+		    var data = model.toJSON();
+		    this.model = model;
+		    if(typeof this.template == "function"){
+		        var el = this.element || document.getElementById(this.elementId);
+		        el.innerHTML = this.template(data);
+		        this.bind(el,data);
+			} else if(!templates[this.template]) {
 				if(!waits[this.template]) waits[this.template] = [];
-				waits[this.template].push({view:this,data:data});
+				waits[this.template].push({view:this,data:data,model:model});
 			} else {
 				var tmpl = _.template(templates[this.template]);
-				var el = document.getElementById(this.elementId);
-				var html = tmpl(data);
-				el.innerHTML = html;
-				this.bind(el,data);
+				var el = this.element || document.getElementById(this.elementId);
+				el.innerHTML = tmpl(data);
+				this.bind(el,model);
 			}
 		}
 		/** тут регистрируемся на всякие события модели/адапторов*/
@@ -371,7 +569,7 @@
 				this.subscribe(prop,this.events[prop]);
 			}
 			// подгружаем шаблон, если он еще не был подгружен
-			if(!templates[this.template]) {
+			if(typeof this.template != "function" && !templates[this.template]) {
 				// если локальная ссылка то получаем ее содержимое через дом
 				if(this.template.substr(0,1) === "#") {
 					templates[this.template] = document.getElementById(this.template.substr(1)).innerHTML;
@@ -383,7 +581,7 @@
 							templates[this.url] = http.responseText;
 							if(waits[this.url]) {
 								for(var i=0; i<waits[this.url].length; i++) {
-									waits[this.url][i].view.render(waits[this.url][i].data);
+									waits[this.url][i].view.render(waits[this.url][i].model);
 								}
 								waits[this.url] = [];
 							}
@@ -404,12 +602,15 @@
 		
 	}());
 	
-	Happymeal.Model = (function(){
-		return Happymeal.Mediator.toObject({});
+	Happymeal.Model = (function() {
+	    return {}
 	}());
 	
 	Happymeal.Mediator.extend = Happymeal.Port.Adaptor.HTTP.extend = Happymeal.XMLView.extend = Happymeal.HTMLView.extend = Happymeal.Model.extend = extend;
+	Happymeal.Storage.extend = extend;
 	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexType.extend = extend;
+	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.extend = extend;
 	Happymeal.Port.Adaptor.Data.XML.Schema.AnySimpleType.extend = extend;
+	Happymeal.Port.Adaptor.Data.XML.Schema.AnySimpleTypeValidator.extend = extend;
 	
 }(window));

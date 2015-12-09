@@ -35,8 +35,8 @@
 	<xsl:template match="tmp:schema">;(function(h) {
 		<!--xsl:apply-templates select="tmp:*" mode="DATA-CLASS" /-->
 		<!-- 
-			Изменяем логику построения. строим объекты от базовых типов.
-			В основе всегда дежат базовые типы. назолим узлы которые потроены на них
+			Изменяем логику построения, в отличие от php генерации строим объекты от базовых типов.
+			В основе всегда дежат базовые типы. находим узлы которые потроены на них
 			затем раскручиваем в обратную сторону
 		-->
 		<!--xsl:apply-templates select="//tmp:*[@typeClass='Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType']" mode="OBJECT" /-->
@@ -67,16 +67,15 @@
 		<xsl:variable name="class" select="@class" />
 		<xsl:variable name="object" select="translate(@class,'\','.')" />
 		<xsl:variable name="prototype">Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType</xsl:variable>
-	h.Locator( "<xsl:value-of select="$object" />", function() {
 		<xsl:variable name="props">
 			<xsl:apply-templates select="." mode="TYPE" />
 		</xsl:variable>
 		<xsl:variable name="props-set" select="exsl:node-set($props)" />
-		<xsl:text disable-output-escaping="yes">
-		return (function(){
-		
+	h.Locator( "<xsl:value-of select="$object" /><xsl:text disable-output-escaping="yes">", function(args) {
+		return (function(args){
 			var NS="</xsl:text><xsl:value-of select="@targetNS" /><xsl:text>";
 			var ROOT="</xsl:text><xsl:value-of select="@name" /><xsl:text>";
+			var URI="</xsl:text><xsl:value-of select="@targetNS" />:<xsl:value-of select="@name" /><xsl:text>";
 			var anyComplexType = {</xsl:text>
 			<xsl:apply-templates select="$props-set/tmp:property" mode="ECHO_PROPERTIES" />
 			<xsl:text disable-output-escaping="yes">
@@ -90,6 +89,7 @@
 		<xsl:text disable-output-escaping="yes">
 				getAll: function() { return anyComplexType; },
 				setAll: function(obj) { anyComplexType=obj; },
+				URI: URI,
 				fromXmlParser: function(parser,parent,callback) {
 					this.parent = parent;
 					var self = this;
@@ -132,12 +132,35 @@
 					<xsl:text disable-output-escaping="yes">
 					str += "&lt;/"+ROOT+"&gt;";
 					return str;
+				},
+				validate: function(pubsub) {
+				    var validator = h.Locator('</xsl:text>
+				    <xsl:value-of select="$object" />
+				    <xsl:text disable-output-escaping="yes">Validator');
+				    validator.validate(this,pubsub);
 				}
 			});
-			return h.Model.extend(</xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes">);
-		}());
+			var pubsub = h.Locator("Happymeal.PubSub");
+			return pubsub.extend(</xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes">);
+		}(args));
 	});
-</xsl:text>
+	// Validator
+	h.Locator( "</xsl:text><xsl:value-of select="$object" /><xsl:text disable-output-escaping="yes">Validator", function(args) {
+	    return (function(args) {
+	        var </xsl:text>
+	        <xsl:value-of select="@name"/>
+	        <xsl:text disable-output-escaping="yes">Validator = h.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.extend({
+	            validate: function(m,pubsub) {
+	                h.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.validate(m,pubsub);</xsl:text>
+	                <xsl:apply-templates select="$props-set/tmp:property" mode="COMPLEX_TYPE_VALIDATOR" />
+	                <xsl:text disable-output-escaping="yes">
+	            }
+	        });
+	        var pubsub = h.Locator("Happymeal.PubSub");
+	        return pubsub.extend(</xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes">Validator);
+	    }(args));
+	});
+    </xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="tmp:element[@name]" mode="SIMPLE">
@@ -152,6 +175,7 @@
 			var </xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes"> = h.Port.Adaptor.Data.XML.Schema.AnySimpleType.extend({
 				ROOT: "</xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes">",
 				NS: "</xsl:text><xsl:value-of select="@targetNS"/><xsl:text disable-output-escaping="yes">",
+				URI: "</xsl:text><xsl:value-of select="@targetNS" />:<xsl:value-of select="@name" /><xsl:text>",
 				get: function() { return value; },
 				set: function(v) { value = v; },
 				fromXmlParser: function(parser,parent,callback) {
@@ -172,8 +196,10 @@
 					str += "&lt;/"+this.ROOT+"&gt;";
 					return str;
 				}
+				
 			});
-			return h.Model.extend(</xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes">);
+			var pubsub = h.Locator("Happymeal.PubSub");
+			return pubsub.extend(</xsl:text><xsl:value-of select="@name"/><xsl:text disable-output-escaping="yes">);
 		}());
 	});
 </xsl:text>
@@ -217,17 +243,49 @@
 		<xsl:text>: function(val) { </xsl:text>
 		<xsl:choose>
 			<xsl:when test="@array">
-				<xsl:text>anyComplexType.</xsl:text>
+			    <xsl:text>if (</xsl:text>
+			    <xsl:apply-templates select="." mode="VALIDATION_RULE" />
+			    <xsl:text>) {
+				        anyComplexType.</xsl:text>
 				<xsl:value-of select="@name" />
-				<xsl:text>.push(val);</xsl:text>
+				<xsl:text>.push(val);
+				        this.publish("</xsl:text><xsl:value-of select="@name" /><xsl:text>ValidationSuccessOccured",{});
+				        return true;
+				    } else {
+				        anyComplexType.</xsl:text>
+				<xsl:value-of select="@name" />
+				<xsl:text>.push(val);
+				        this.publish("</xsl:text><xsl:value-of select="@name" /><xsl:text>ValidationErrorOccured",{});
+				        return false;
+				    }</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:text>anyComplexType.</xsl:text>
+			    <xsl:text>
+			        if ( val === null ) {
+			            anyComplexType.</xsl:text>
 				<xsl:value-of select="@name" />
-				<xsl:text> = val;</xsl:text>
+				<xsl:text> = val;
+				        this.publish("</xsl:text><xsl:value-of select="@name" /><xsl:text>ValidationSuccessOccured",{});
+				        return true;
+			        } else if (</xsl:text>
+			    <xsl:apply-templates select="." mode="VALIDATION_RULE" />
+			    <xsl:text>) {
+    				    anyComplexType.</xsl:text>
+				<xsl:value-of select="@name" />
+				<xsl:text> = val;
+				        this.publish("</xsl:text><xsl:value-of select="@name" /><xsl:text>ValidationSuccessOccured",{});
+				        return true;
+				    } else {
+				        anyComplexType.</xsl:text>
+				<xsl:value-of select="@name" />
+				<xsl:text> = val;
+				        this.publish("</xsl:text><xsl:value-of select="@name" /><xsl:text>ValidationErrorOccured",{});
+				        return false;
+				    }</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
-		<xsl:text> },</xsl:text>
+		<xsl:text>
+		        },</xsl:text>
 	</xsl:template>
 	
 	<xsl:template match="tmp:property[not(@class) and not(@attribute)]" mode="ECHO_UNSERIALIZE">
@@ -270,7 +328,7 @@
 					var len = prop.length;
 					for(var i=0;i &lt; len;i++ ) {
 						str += "&lt;</xsl:text><xsl:value-of select="@name" />
-						<xsl:text disable-output-escaping="yes">&gt;"+prop[i]+"&lt;/</xsl:text>
+						<xsl:text disable-output-escaping="yes">&gt;"+h.escapeHTML(prop[i])+"&lt;/</xsl:text>
 						<xsl:value-of select="@name" /><xsl:text disable-output-escaping="yes">&gt;";
 					}</xsl:text>
 	</xsl:template>
@@ -280,7 +338,7 @@
 					prop = this.</xsl:text><xsl:value-of select="@getter" /><xsl:text disable-output-escaping="yes">();
 					if( prop !== null ) {
 						str += "&lt;</xsl:text><xsl:value-of select="@name" />
-						<xsl:text disable-output-escaping="yes">&gt;"+this.</xsl:text><xsl:value-of select="@getter" /><xsl:text disable-output-escaping="yes">()+"&lt;/</xsl:text>
+						<xsl:text disable-output-escaping="yes">&gt;"+h.escapeHTML(this.</xsl:text><xsl:value-of select="@getter" /><xsl:text disable-output-escaping="yes">())+"&lt;/</xsl:text>
 						<xsl:value-of select="@name" /><xsl:text disable-output-escaping="yes">&gt;";
 					}</xsl:text>
 	</xsl:template>
@@ -301,6 +359,49 @@
 						str += this.</xsl:text><xsl:value-of select="@getter" /><xsl:text disable-output-escaping="yes">().toXmlStr();
 					}</xsl:text>
 	</xsl:template>
+	
+	<xsl:template match="tmp:property" mode="COMPLEX_TYPE_VALIDATOR">
+	    <xsl:text disable-output-escaping="yes">
+	                if((!h.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.assertMinOccurs("</xsl:text>
+	    <xsl:value-of select="@minOccurs" />
+	    <xsl:text disable-output-escaping="yes">",m.</xsl:text>
+	    <xsl:value-of select="@getter" />
+	    <xsl:text disable-output-escaping="yes">(), pubsub) ||
+	                    !h.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.assertMaxOccurs("</xsl:text>
+	    <xsl:value-of select="@maxOccurs" />
+	    <xsl:text disable-output-escaping="yes">",m.</xsl:text>
+	    <xsl:value-of select="@getter" />
+	    <xsl:if test="@fixed">
+	        <xsl:text disable-output-escaping="yes">(), pubsub) ||
+	                    !h.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.assertFixed("</xsl:text>
+	        <xsl:value-of select="@fixed" />
+	        <xsl:text disable-output-escaping="yes">",m.</xsl:text>
+	        <xsl:value-of select="@getter" />
+	    </xsl:if>
+	    <xsl:text disable-output-escaping="yes">(), pubsub))</xsl:text>
+	    <xsl:if test="not(@array)">
+	        <xsl:text disable-output-escaping="yes"> || 
+	                    (m.</xsl:text>
+	        <xsl:value-of select="@getter" />
+	        <xsl:text disable-output-escaping="yes">() !== null &amp;&amp; m.</xsl:text>
+	        <xsl:value-of select="@setter" />(m.<xsl:value-of select="@getter" />
+	        <xsl:text disable-output-escaping="yes">()) == false )</xsl:text>
+	    </xsl:if>
+	    <xsl:text disable-output-escaping="yes">) {
+	                    pubsub.publish("</xsl:text><xsl:value-of select="@name" /><xsl:text>ValidationErrorOccured",{});
+	                    pubsub.publish("validationErrorOccured",{prop: "</xsl:text>
+	                    <xsl:value-of select="@name"/>
+	                    <xsl:text>",val:m.</xsl:text>
+	                    <xsl:value-of select="@getter" />
+	                    <xsl:text>()});
+	                }</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="tmp:*" mode="COMPLEX_TYPE_VALIDATOR">
+	    <xsl:apply-templates select="tmp:*" mode="COMPLEX_TYPE_VALIDATOR" />
+	</xsl:template>
+	
+	
 
 	<!-- PROPERTIES
 		 свойствами класса выступают элементы и атрибуты дерева
@@ -382,6 +483,9 @@
 			<xsl:if test="not($maxOccurs='1')">
 				<xsl:attribute name="array">true</xsl:attribute>
 			</xsl:if>
+		    <xsl:if test="@fixed">
+    			<xsl:attribute name="fixed"><xsl:value-of select="$source/@fixed"/></xsl:attribute>
+    	    </xsl:if>
 			<xsl:element name="default">
 				<xsl:choose>
 					<xsl:when test="$source/@default">"<xsl:value-of select="$source/@default"/>"</xsl:when>
@@ -390,7 +494,41 @@
 					<xsl:otherwise>null</xsl:otherwise>
 				</xsl:choose>
 			</xsl:element>
+			<xsl:element name="restriction">
+			    <xsl:apply-templates select="." mode="RESTRICTIONS" />
+			    <xsl:choose>
+  			        <xsl:when test="starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema') and not($first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+    			        <xsl:element name="simple">
+	                        <xsl:attribute name="value"><xsl:value-of select="substring-after($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema\')" /></xsl:attribute>
+	                    </xsl:element>
+	                </xsl:when>
+	                <xsl:otherwise>
+	                    <xsl:element name="complex">
+	                        <xsl:attribute name="value"><xsl:value-of select="translate(@class,'\',':')" /></xsl:attribute>
+	                    </xsl:element>
+	                </xsl:otherwise>
+	            </xsl:choose>
+			</xsl:element>
 		</xsl:element>
+	</xsl:template>
+	
+	<xsl:template match="tmp:*" mode="RESTRICTIONS">
+	    <xsl:apply-templates select="tmp:*" mode="RESTRICTIONS" />
+	</xsl:template>
+	
+	<xsl:template match="tmp:*[@class]" mode="RESTRICTIONS">
+	    <xsl:variable name="typeClass">
+	        <xsl:apply-templates select="." mode="TYPE_CLASS" />
+	    </xsl:variable>
+	    <xsl:apply-templates select="//tmp:*[@class = $typeClass]" mode="RESTRICTIONS" />
+	    <xsl:choose>
+	        <xsl:when test="tmp:simpleType/tmp:restriction">
+	            <xsl:copy-of select="tmp:simpleType/tmp:restriction/tmp:*" />
+	        </xsl:when>
+	        <xsl:when test="tmp:restriction">
+	            <xsl:copy-of select="tmp:restriction/tmp:*" />
+	        </xsl:when>
+	    </xsl:choose>
 	</xsl:template>
 	
 	<xsl:template match="tmp:*" mode="TYPE_CLASS">
@@ -496,6 +634,51 @@
 			<xsl:when test="parent::*/@minOccurs"><xsl:value-of select="parent::*/@minOccurs" /></xsl:when>
 			<xsl:otherwise>1</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	
+	<xsl:template match="tmp:*" mode="VALIDATION_RULE">
+	    <xsl:apply-templates select="tmp:*" mode="VALIDATION_RULE" />
+	</xsl:template>
+	
+	<xsl:template match="tmp:restriction" mode="VALIDATION_RULE">
+	    <xsl:variable name="name" select="parent::tmp:property/@name" />
+	    <xsl:if test="tmp:enumeration">
+	        <xsl:variable name="enum">
+			<xsl:for-each select="tmp:enumeration">
+				<xsl:text>"</xsl:text>
+				<xsl:value-of select="@value" />
+				<xsl:text>"</xsl:text>
+				<xsl:if test="not(position() = last())">
+					<xsl:text>, </xsl:text>
+				</xsl:if>
+			</xsl:for-each>
+		    </xsl:variable>
+			<xsl:text>h.Port.Adaptor.Data.XML.Schema.AnySimpleTypeValidator.assertEnumeration([</xsl:text><xsl:value-of select="$enum" /><xsl:text>],val,this)</xsl:text>
+			<xsl:if test="tmp:*[not(local-name()='enumeration')]"><xsl:text disable-output-escaping="yes"> &amp;&amp;
+	                    </xsl:text>
+	                </xsl:if>
+	    </xsl:if>
+	    <xsl:for-each select="tmp:*[not(local-name()='enumeration')]">
+	        <xsl:apply-templates select="." mode="VALIDATION_RULE" />
+	        <xsl:if test="not(position()=last())"><xsl:text disable-output-escaping="yes"> &amp;&amp;
+	                    </xsl:text></xsl:if>
+	    </xsl:for-each>
+	</xsl:template>
+	
+	<xsl:template match="tmp:minExclusive | tmp:maxExclusive | tmp:minInclusive | tmp:maxInclusive | tmp:length | tmp:minLength | tmp:maxLength | tmp:pattern | tmp:simple" mode="VALIDATION_RULE">
+	    <xsl:variable name="name" select="ancestor::tmp:property[1]/@name" />
+		<xsl:text disable-output-escaping="yes">h.Port.Adaptor.Data.XML.Schema.AnySimpleTypeValidator.assert</xsl:text>
+			<xsl:value-of select="translate(substring(local-name(),1,1),$smallcase,$uppercase)"/>
+			<xsl:value-of select="substring(local-name(),2)"/>
+			<xsl:text disable-output-escaping="yes">("</xsl:text>
+			<xsl:value-of select="@value" />
+			<xsl:text>",val,this)</xsl:text>
+	</xsl:template>
+	
+	<xsl:template match="tmp:complex" mode="VALIDATION_RULE">
+	    <xsl:text disable-output-escaping="yes">h.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.assertType("</xsl:text>
+	    <xsl:value-of select="@value" />
+	    <xsl:text>",val,this)</xsl:text>
 	</xsl:template>
 	
 	<xsl:template name="REPLACE">
