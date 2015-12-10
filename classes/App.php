@@ -34,6 +34,7 @@ class App implements \Happymeal\ErrorHandler {
 	private function setPaths( $url ) {
 	    // find request path
 	    $path = str_replace(preg_replace('/\/api(\.v[0-9]{1,2}-[0-9]{1,2})?.php/','',$_SERVER['SCRIPT_NAME']),'',$url);
+	    //print $_SERVER['SCRIPT_URL'];exit;
 		// remove prefix api/v? in request path
 		$path_info = preg_replace('/\/api(\/v[0-9]{1,2}\.[0-9]{1,2})?/','',$path);
 		$this->_container['PATH_INFO'] = $path_info;
@@ -302,6 +303,7 @@ class App implements \Happymeal\ErrorHandler {
                 exit;
             default:
                 header("Content-type: text/html; charset=UTF-8");
+                if(!$obj->getPI()) $obj->setPI("/stylesheets/xml2html.xsl");
                 echo(\Happymeal\Port\Adaptor\Data\Xml2Html::transform($obj->toXmlStr(),$this->fn("REF")));
                 exit;
 		}
@@ -349,7 +351,7 @@ class App implements \Happymeal\ErrorHandler {
 		header( "Cache-Control: " );
 		header( "Pragma: " );
         header( "Expires: " );
-        //return;
+        return;
 		if( isset( $_SERVER["HTTP_IF_MODIFIED_SINCE"] ) && isset( $_SERVER["HTTP_IF_NONE_MATCH"] ) ) {
 			$if_modified_since = preg_replace("/;.*$/", "", $_SERVER["HTTP_IF_MODIFIED_SINCE"]);
 			if( trim( $_SERVER["HTTP_IF_NONE_MATCH"] ) == $etag && $if_modified_since == $gmtime ) {

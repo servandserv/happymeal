@@ -244,7 +244,7 @@
 	Happymeal.Port.Adaptor.HTTP = (function(){
 		var request = function(args) {
 			var body;
-			if(args.method === "POST" && args.accept === "application/xml") {
+			if(args.method === "POST" && (args.content === "application/xml"||args.content === "text/xml")) {
 				body = "<?xml version='1.0' encoding='utf-8'?>";
 				body += args.entity.toXmlStr();
 			} else if( args.method === "POST" ) {
@@ -550,7 +550,7 @@
 		    if(typeof this.template == "function"){
 		        var el = this.element || document.getElementById(this.elementId);
 		        el.innerHTML = this.template(data);
-		        this.bind(el,data);
+		        this.bind(el,model);
 			} else if(!templates[this.template]) {
 				if(!waits[this.template]) waits[this.template] = [];
 				waits[this.template].push({view:this,data:data,model:model});
@@ -602,11 +602,52 @@
 		
 	}());
 	
+	Happymeal.SXSLTView = (function(){
+		var templates = {};// шаблоны
+		var waits = {};
+		
+		/** отрисовка интерфейса */
+		var render = function(model) {
+		    var self = this;
+		    var el = this.element || document.getElementById(this.elementId);
+		    var adaptor = Happymeal.Port.Adaptor.HTTP.extend({});
+			adaptor.post({
+				url: this.template,
+				content: "application/xml",
+				entity: model,
+				callback: function(http) {
+				    var body = getXMLFromString(http.responseText);
+				    el.innerHTML = body.documentElement.innerHTML;
+				    self.bind(el,model);
+				}
+			});
+		}
+		/** тут регистрируемся на всякие события модели/адапторов*/
+		var initialize = function() {
+			var self = this;
+			// подписываемся на события
+			for (prop in this.events) {
+				this.subscribe(prop,this.events[prop]);
+			}
+		};
+		/** стандартный метод в котором навешиваем всякие события на интерфейс после того как отрисовали его */
+		var bind = function() {};
+		
+		return Happymeal.Mediator.toObject({
+			events: {},
+			render: render,
+			bind: bind,
+			initialize: initialize
+		});
+		
+	}());
+	
 	Happymeal.Model = (function() {
 	    return {}
 	}());
 	
 	Happymeal.Mediator.extend = Happymeal.Port.Adaptor.HTTP.extend = Happymeal.XMLView.extend = Happymeal.HTMLView.extend = Happymeal.Model.extend = extend;
+	Happymeal.SXSLTView.extend = extend;
 	Happymeal.Storage.extend = extend;
 	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexType.extend = extend;
 	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.extend = extend;
