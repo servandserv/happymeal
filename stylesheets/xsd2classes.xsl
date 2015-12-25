@@ -160,7 +160,7 @@
 			</xsl:text>
 			<xsl:for-each select="tmp:restriction/tmp:enumeration">
 				<xsl:text disable-output-escaping="yes">
-		const </xsl:text>
+		const _</xsl:text>
 					<xsl:value-of select="translate(@value, '.-', '__')" />
 					<xsl:text> = "</xsl:text>
 					<xsl:value-of select="@value" />
