@@ -349,13 +349,15 @@
 				<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
 			</xsl:when>
 			<xsl:when test="$p/@abstract">
+			    <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
 				<xsl:value-of select="$p/@abstract" />
 			</xsl:when>
 			<xsl:otherwise>
+			    <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
 				<xsl:value-of select="$p/@class" />
 			</xsl:otherwise>
 		</xsl:choose>
-		<xsl:if test="$p/@array = 'true'">[]</xsl:if>
+		<!--xsl:if test="$p/@array = 'true'">[]</xsl:if-->
 		<xsl:text disable-output-escaping="yes">
 		 */
 		protected $</xsl:text>
@@ -1105,9 +1107,11 @@
 				</xsl:otherwise>
 			</xsl:choose>
 			<xsl:text disable-output-escaping="yes"> $tdo = NULL, \Happymeal\Port\Adaptor\Data\ValidationHandler $handler = NULL ) {
-			parent::__construct( $tdo, $handler);</xsl:text>
-			<xsl:apply-templates select="tmp:*" mode="SIMPLE_TYPE_VALIDATOR" />
+			parent::__construct( $tdo, $handler);
+			if($tdo !== NULL) {</xsl:text>
+			    <xsl:apply-templates select="tmp:*" mode="SIMPLE_TYPE_VALIDATOR" />
 			<xsl:text disable-output-escaping="yes">
+			}
 		}
 				
 		public function validate() {
