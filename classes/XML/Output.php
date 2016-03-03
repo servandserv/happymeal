@@ -304,7 +304,9 @@ class XML_Output {
             //явно кешированием управлять не пытаемся: ставим хедеры на текущее время
             //TODO возможно и хитро проанализировать хедеры всех составляющих и вычислить общий
             header("Last-Modified: ".gmdate(DATE_RFC1123));
-            header("Etag: XML_Output_".$_SERVER["UNIQUE_ID"]);
+            if( isset( $_SERVER["UNIQUE_ID"] ) ) {
+                header("Etag: XML_Output_".$_SERVER["UNIQUE_ID"]);
+            }
             echo $xsltResult;
         } else {
             unset($xsltResult);

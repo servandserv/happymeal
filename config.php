@@ -34,13 +34,15 @@ $nss_replacements = array(
 	"http://www.w3.org/1999/xhtml" => "urn:ru:ilb:meta:XML:XHTML",
 	"http://www.w3.org/2001/XMLSchema" => "urn:ru:ilb:meta:XML:Schema",
 	"http://www.together.at/2006/XPIL1.0" => "urn:ru:ilb:meta:XPIL",
-	"http://www.wfmc.org/2002/XPDL1.0" => "urn:ru:ilb:meta:XPDL"
+	"http://www.wfmc.org/2002/XPDL1.0" => "urn:ru:ilb:meta:XPDL",
+	"http://www.w3.org/2005/Atom" => "urn:ru:ilb:meta:XML:Atom"
 );
 
 $local_nss = array( 
 	'urn:ru:ilb:meta:', 
 	'urn:ru:mobilsoft:meta:',
 	'urn:ru:battleship:',
-	'urn:com:summerfields'
+	'urn:com:summerfields',
+	'urn:com:servandserv'
 );
 

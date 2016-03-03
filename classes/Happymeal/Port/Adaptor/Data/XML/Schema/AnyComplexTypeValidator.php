@@ -13,8 +13,9 @@ class AnyComplexTypeValidator extends AnyTypeValidator {
 	public function validate () {
 		$vars = $this->tdo->_properties();
 		foreach( $vars as $v=>$obj ) {
-			if( isset( $this->simpleTypes[$v] ) ) {
-				$simpleValidator = $this->simpleTypes[$v];
+		    $prop = strtoupper(substr($v,0,1)).substr($v,1);
+			if( isset( $this->simpleTypes[$prop] ) ) {
+				$simpleValidator = $this->simpleTypes[$prop];
 				$simpleValidator->validate();
 			}elseif( is_object( $obj ) && method_exists( $obj, "validateType" ) ) {
 				$obj->validateType( $this->validationHandler );
@@ -27,11 +28,11 @@ class AnyComplexTypeValidator extends AnyTypeValidator {
 		if( !method_exists( $this->tdo, $method ) ) return;
 		$val = $this->tdo->{$method}();
 		if ( $val === NULL && $minOccurs != 0 ) {
-			$this->handleError( "Ошибка свойства '".$prop."' объекта '".get_class( $this->tdo ).
+			$this->handleError( "Ошибка свойства '".$prop."' объекта '".($this->className ? $this->className : get_class( $this->tdo )).
 					"', свойство должно иметь значение.", 450 );
 		}
 		if ( is_array( $val ) && $minOccurs > count( $val ) ) {
-			$this->handleError( "Ошибка свойства '".$prop."' объекта '".get_class( $this->tdo ).
+			$this->handleError( "Ошибка свойства '".$prop."' объекта '".($this->className ? $this->className : get_class( $this->tdo )).
 					"', свойство должно содержать как минимум {".$minOccurs."} значений.", 450 );
 		}
 	}
@@ -41,7 +42,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator {
 		if( !method_exists( $this->tdo, $method ) ) return;
 		$val = $this->tdo->{$method}();
 		if ( is_array( $val ) && $maxOccurs != "unbounded" && count( $val ) > $maxOccurs  ) {
-			$this->handleError( "Ошибка свойства '".$prop."' объекта '".get_class( $this->tdo ).
+			$this->handleError( "Ошибка свойства '".$prop."' объекта '".($this->className ? $this->className : get_class( $this->tdo )).
 					"', свойство не может содержать более чем {".$maxOccurs."} значений.", 450 );
 		}
 	}
@@ -55,7 +56,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator {
 			if( $this->tdo->{$method}() ) $choice++;
 		}
 		if ( $choice > 1  ) {
-			$this->handleError( "Ошибка свойств объекта '".get_class( $this->tdo ).
+			$this->handleError( "Ошибка свойств объекта '".($this->className ? $this->className : get_class( $this->tdo )).
 					"', объект не может иметь одновременно более чем одно из значений {".implode(",", $props)."}.", 450 );
 		}
 	}
@@ -65,7 +66,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator {
 		if( !method_exists( $this->tdo, $method ) ) return;
 		$val = $this->tdo->{$method}();
 		if ( $val !== $fixed ) {
-			$this->handleError( "Ошибка свойства '".$prop."' объекта '".get_class( $this->tdo ).
+			$this->handleError( "Ошибка свойства '".$prop."' объекта '".($this->className ? $this->className : get_class( $this->tdo )).
 					"', значение {".$val."} должно быть равным {".$fixed."}", 450 );
 		}
 	}

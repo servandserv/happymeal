@@ -1112,6 +1112,7 @@
 			    <xsl:apply-templates select="tmp:*" mode="SIMPLE_TYPE_VALIDATOR" />
 			<xsl:text disable-output-escaping="yes">
 			}
+			$this->className = "</xsl:text><xsl:value-of select="@className" /><xsl:text disable-output-escaping="yes">";
 		}
 				
 		public function validate() {
