@@ -105,7 +105,7 @@ class XML_Output {
         //$html=TRUE;
         //подготовить стили для трансформации на php
         if( $debug || $html ) {
-            $outputDom=new DOMDocument();
+            $outputDom=new \DOMDocument();
             $outputDom->loadXML($data);
             if( $documentURI ){
                 $outputDom->documentURI=$documentURI;
@@ -128,10 +128,10 @@ class XML_Output {
                     $oldHeaders=headers_list();
                     //время трансформации считаем общее - вместе с загрузкой документов
                     $xsltStart=microtime(TRUE);
-                    $xsl=new DomDocument();
+                    $xsl= new \DomDocument();
                     $xsl->load($matches[1]);
 
-                    $proc=new XSLTProcessor();
+                    $proc= new \XSLTProcessor();
 
                     if ($xsltProfiler) {
                         $proc->setProfiling($xsltProfiler);
@@ -212,7 +212,7 @@ class XML_Output {
                     foreach($xsltResultLines as $lineNumber=>$line){
                         $xsltResultWithLines.=sprintf("%04d: ",($lineNumber+1)).$line.PHP_EOL;
                     }
-                    throw new Exception("tidy validation errors: ".$tidy->errorBuffer.PHP_EOL.$xsltResultWithLines);
+                    throw new \Exception("tidy validation errors: ".$tidy->errorBuffer.PHP_EOL.$xsltResultWithLines);
                 }
                 //уберемся за собой
                 unset($tidy,$config);
@@ -249,13 +249,13 @@ class XML_Output {
                     foreach($xsltResultLines as $lineNumber=>$line){
                         $xsltResultWithLines.=sprintf("%04d: ",($lineNumber+1)).$line.PHP_EOL;
                     }
-                    throw new Exception("validator.nu errors: " . PHP_EOL . $out . PHP_EOL . $xsltResultWithLines);
+                    throw new \Exception("validator.nu errors: " . PHP_EOL . $out . PHP_EOL . $xsltResultWithLines);
                 }
                 //уберемся за собой
                 unset($ch,$out,$code);
             }
 
-            $xsltResultDoc=new DOMDocument();
+            $xsltResultDoc=new \DOMDocument();
             //поиск схемы для проверки xhtml - ищем по обычным путям как и классы
             $schemasPath=NULL;
             foreach(explode(PATH_SEPARATOR,get_include_path()) as $p){
@@ -284,7 +284,7 @@ class XML_Output {
             }
             if( $xsltResultDoc->doctype->systemId != "about:legacy-compat" ){
                 if( !$xsltResultDoc->validate() ) {
-                    throw new Exception("DTD validation errors");
+                    throw new \Exception("DTD validation errors");
                 }
             }
             unset($xsltResultDoc, $xsltResultXml, $schemasPath, $p);
@@ -316,16 +316,16 @@ class XML_Output {
         }
     }
     public static function transform($data) {
-        $outputDom = new DOMDocument();
+        $outputDom = new \DOMDocument();
         $outputDom->loadXML($data);
         $xsltResult=NULL;
         $matches = NULL;
         if ($outputDom->firstChild->nodeType == XML_PI_NODE &&
             $outputDom->firstChild->target == "xml-stylesheet") {
             if (preg_match("/href\s*=\s*\"(.+)\"/", $outputDom->firstChild->data, $matches)) {
-                $xsl = new DomDocument();
+                $xsl = new \DomDocument();
                 $xsl->load($matches[1]);
-                $proc = new XSLTProcessor();
+                $proc = new \XSLTProcessor();
                 $proc->importStyleSheet($xsl);
                 $xsltResult = $proc->transformToXML($outputDom);
             }
@@ -460,7 +460,7 @@ class XML_Output {
             $hl = headers_list();
             for ($i = 0; $i < count( $hl ); $i++) {
                 if (!strncmp($hl[$i], "Status:", 7) && substr($hl[$i], 8) != $oldStatus) {
-                    throw new Exception("invalid header '" . $hl[$i] . "'");
+                    throw new \Exception("invalid header '" . $hl[$i] . "'");
                 }
             }
 
@@ -539,7 +539,7 @@ class XML_Output {
         if(self::$done!=TRUE) {
             error_log("AHTUNG! restart php now!");
             //тут не прокатывает trigger_error() - зовем напрямую
-            UncaughtFatalErrorExceptionHandler(new FatalErrorException("do not use EXIT() in included script"));
+            UncaughtFatalErrorExceptionHandler(new \FatalErrorException("do not use EXIT() in included script"));
         }
     }
     /**
@@ -573,7 +573,7 @@ class XML_Output {
         }
         //If we didn't find a common prefix then throw
         if( $lastCommonRoot==-1 ) {
-            throw new Exception("Paths do not have a common base");
+            throw new \Exception("Paths do not have a common base");
         }
 
         //Build up the relative path
