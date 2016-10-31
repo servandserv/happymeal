@@ -1,7 +1,7 @@
 <?php
 
 //define( "SCHEMAS_PATH", "/web/schemas" );
-define( "XML_SCHEMA_NS", "Happymeal\Port\Adaptor\Data\XML\Schema" );
+define( "XML_SCHEMA_NS", "com\happymeal\XML\Schema" );
 define( "XML_SCHEMA_TARGET_NS", "XML\Schema" );
 
 $class_name_restrictions = array(
@@ -29,20 +29,16 @@ $class_name_restrictions = array(
 );
 
 $nss_replacements = array(
-	"http://www.w3.org/1999/XSL/Transform" => "urn:ru:ilb:meta:XML:XSL",
-	"http://www.w3.org/1999/xlink" => "urn:ru:ilb:meta:XML:XLink",
-	"http://www.w3.org/1999/xhtml" => "urn:ru:ilb:meta:XML:XHTML",
-	"http://www.w3.org/2001/XMLSchema" => "urn:ru:ilb:meta:XML:Schema",
-	"http://www.together.at/2006/XPIL1.0" => "urn:ru:ilb:meta:XPIL",
-	"http://www.wfmc.org/2002/XPDL1.0" => "urn:ru:ilb:meta:XPDL",
-	"http://www.w3.org/2005/Atom" => "urn:ru:ilb:meta:XML:Atom"
+	"http://www.w3.org/1999/XSL/Transform" => "com:happymeal:XML:XSL",
+	"http://www.w3.org/1999/xlink" => "com:happymeal:XML:XLink",
+	"http://www.w3.org/1999/xhtml" => "com:happymeal:XML:XHTML",
+	"http://www.w3.org/2001/XMLSchema" => "com:happymeal:XML:Schema",
+	"http://www.together.at/2006/XPIL1.0" => "com:happymeal:XPIL",
+	"http://www.wfmc.org/2002/XPDL1.0" => "com:happymeal:XPDL",
+	"http://www.w3.org/2005/Atom" => "com:happymeal:XML:Atom"
 );
 
 $local_nss = array( 
-	'urn:ru:ilb:meta:', 
-	'urn:ru:mobilsoft:meta:',
-	'urn:ru:battleship:',
-	'urn:com:summerfields',
-	'urn:com:servandserv'
+    "urn:"
 );
 

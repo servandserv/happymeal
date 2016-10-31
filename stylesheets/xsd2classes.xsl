@@ -6,11 +6,11 @@
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-				xmlns:tmp="urn:ru:ilb:tmp"
+				xmlns:tmp="urn:ru:happymeal:tmp"
 				xmlns:exsl="http://exslt.org/common"
 				extension-element-prefixes="exsl"
 				exclude-result-prefixes="tmp"
-				xmlns="urn:ru:ilb:tmp"
+				xmlns="urn:ru:happymeal:tmp"
 				version="1.0">
 
 	<xsl:output
@@ -35,17 +35,16 @@
 
 	<!-- CLASSES -->
 	
-	<!-- все элементы пропускаем -->
+	<!--  -->
 	<xsl:template match="tmp:*" mode="DATA-CLASS">
 		<xsl:apply-templates select="tmp:*" mode="DATA-CLASS" />
 	</xsl:template>
 
 	<!-- 
-		для именованных узлов элемент и комплексный тип строим файл класса 
-		для атрибутов и простых типов классы не строим
+	    for nodes with @class create class file
+	    except attributes and simple class nodes
 	-->
 	<xsl:template match="tmp:element[@class] | tmp:complexType[@class]" mode="DATA-CLASS">
-		<!--  определяем прототип элемента. Если в основе элемента лежит простой тип, то класс не строим -->
 		<xsl:variable name="props-set">
 			<xsl:apply-templates select="tmp:*" mode="PROPS" />
 		</xsl:variable>
@@ -53,8 +52,8 @@
 		<xsl:variable name="first-ancestor">
 			<xsl:apply-templates select="." mode="FIRST_ANCESTOR" />
 		</xsl:variable>
-		<xsl:if test="not(starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema')) or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType'">
-			<!--  только сложные типы -->
+		<xsl:if test="not(starts-with($first-ancestor,'urn\ru\happymeal\XML\Schema')) or $first-ancestor = 'urn\ru\happymeal\XML\Schema\AnyComplexType'">
+			<!--  only complex types  -->
 			<xsl:text disable-output-escaping="yes">
 
 #path: </xsl:text><xsl:value-of select="@filePath" /><xsl:text disable-output-escaping="yes">.php
@@ -210,8 +209,8 @@
 		* Вывод в XMLWriter
 		* @codegen true
 		* @param XMLWriter $xw
-		* @param string $xmlname Имя корневого узла
-		* @param string $xmlns Пространство имен
+		* @param string $xmlname node name
+		* @param string $xmlns namespace
 		* @param int $mode
 		*/
 		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = \Adaptor_XML::ELEMENT ) {
@@ -294,7 +293,7 @@
 			<xsl:attribute name="getter"><xsl:value-of select="@getter" /></xsl:attribute>
 			<xsl:attribute name="setter"><xsl:value-of select="@setter" /></xsl:attribute>
 			<xsl:choose>
-				<xsl:when test="not(starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema')) or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType'">
+				<xsl:when test="not(starts-with($first-ancestor,'urn\ru\happymeal\XML\Schema')) or $first-ancestor = 'urn\ru\happymeal\XML\Schema\AnyComplexType'">
 					<xsl:attribute name="class">
 						<xsl:value-of select="@class" />
 					</xsl:attribute>
@@ -346,7 +345,7 @@
 		 * @var </xsl:text>
 		<xsl:choose>
 			<xsl:when test="not($p/@class)">
-				<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
+				<xsl:value-of select="substring-after($p/@prototype,'urn\ru\happymeal\XML\Schema')" />
 			</xsl:when>
 			<xsl:when test="$p/@abstract">
 			    <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
@@ -373,7 +372,7 @@
 		 * @param </xsl:text>
 		<xsl:choose>
 			<xsl:when test="not($p/@class)">
-				<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
+				<xsl:value-of select="substring-after($p/@prototype,'urn\ru\happymeal\XML\Schema')" />
 			</xsl:when>
 			<xsl:when test="$p/@abstract">
 				<xsl:value-of select="$p/@abstract" />
@@ -388,7 +387,7 @@
 		<xsl:value-of select="$p/@setter" />
 		<xsl:text> ( </xsl:text>
 		<xsl:choose>
-            <xsl:when test="$p/@prototype = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyType'">
+            <xsl:when test="$p/@prototype = 'urn\ru\happymeal\XML\Schema\AnyType'">
 				<xsl:text>\</xsl:text><xsl:value-of select="$p/@prototype" />
 			</xsl:when>
 			<xsl:when test="$p/@abstract">
@@ -420,7 +419,7 @@
 		 * @param </xsl:text>
 			<xsl:choose>
 				<xsl:when test="not($p/@class)">
-					<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
+					<xsl:value-of select="substring-after($p/@prototype,'urn\ru\happymeal\XML\Schema')" />
 				</xsl:when>
 				<xsl:when test="$p/@abstract">
 					<xsl:value-of select="$p/@abstract" />
@@ -439,6 +438,7 @@
 			<xsl:value-of select="$p/@propName" />
 			<xsl:text disable-output-escaping="yes"> = $vals;
 			$this->_properties["</xsl:text><xsl:value-of select="$p/@nodeName" /><xsl:text>"]["text"] = $vals;
+			return $this;
 		}</xsl:text>
 		</xsl:if>
 	</xsl:template>
@@ -451,7 +451,7 @@
 		 * @return </xsl:text>
 		 <xsl:choose>
 			<xsl:when test="not($p/@class)">
-				<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
+				<xsl:value-of select="substring-after($p/@prototype,'urn\ru\happymeal\XML\Schema')" />
 			</xsl:when>
 			<xsl:when test="$p/@abstract">
 				<xsl:value-of select="$p/@abstract" />
@@ -507,7 +507,7 @@
 		<xsl:if test="$MODE='WITH_VALIDATORS'">
 			<xsl:text disable-output-escaping="yes">
 		
-		public function validateType( \Happymeal\Port\Adaptor\Data\ValidationHandler $handler ) {
+		public function validateType( \urn\ru\happymeal\ValidationHandler $handler ) {
 			$validator = new \</xsl:text>
 			<xsl:value-of select="@class" />
 			<xsl:text disable-output-escaping="yes">Validator( $this, $handler );
@@ -528,7 +528,7 @@
 			<xsl:apply-templates select="." mode="FIRST_ANCESTOR" />
 		</xsl:variable>
 		<!--xsl:variable name="prototype" select="//tmp:*[@typeClass = $first-ancestor]" /-->
-		<xsl:if test="not(starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema')) or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType'">
+		<xsl:if test="not(starts-with($first-ancestor,'urn\ru\happymeal\XML\Schema')) or $first-ancestor = 'urn\ru\happymeal\XML\Schema\AnyComplexType'">
 			<xsl:text disable-output-escaping="yes">
 		
 		public function toXmlStr( $xmlns=self::NS, $xmlname=self::ROOT ) {
@@ -700,7 +700,7 @@
 		</xsl:variable>
 		<!--xsl:variable name="prototype" select="//tmp:*[@typeClass = $first-ancestor]" /-->
 		<xsl:choose>
-			<xsl:when test="not(starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema')) or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType' or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyType'">
+			<xsl:when test="not(starts-with($first-ancestor,'urn\ru\happymeal\XML\Schema')) or $first-ancestor = 'urn\ru\happymeal\XML\Schema\AnyComplexType' or $first-ancestor = 'urn\ru\happymeal\XML\Schema\AnyType'">
                 <xsl:choose>
         			<xsl:when test="$source/@mode = '\Adaptor_XML::CONTENTS'">
         				<xsl:text disable-output-escaping="yes">
@@ -862,7 +862,7 @@
 		</xsl:variable>
 		<!--xsl:variable name="prototype" select="//tmp:*[@typeClass = $first-ancestor]" /-->
 		<xsl:choose>
-			<xsl:when test="starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema') and not($first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+			<xsl:when test="starts-with($first-ancestor,'urn\ru\happymeal\XML\Schema') and not($first-ancestor = 'urn\ru\happymeal\XML\Schema\AnyComplexType')">
 				<xsl:text disable-output-escaping="yes">
 				case "</xsl:text>
 				<xsl:value-of select="@name" />
@@ -1077,7 +1077,7 @@
 			<xsl:when test="/tmp:schema/tmp:simpleType[@class = $self/@typeClass]">
 				<xsl:apply-templates select="." mode="TYPE_CLASS" />
 			</xsl:when>
-			<xsl:when test="starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema') and not($first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+			<xsl:when test="starts-with($first-ancestor,'urn\ru\happymeal\XML\Schema') and not($first-ancestor = 'urn\ru\happymeal\XML\Schema\AnyComplexType')">
 				<xsl:value-of select="$first-ancestor" />
 			</xsl:when>
 			<xsl:otherwise>
@@ -1098,7 +1098,7 @@
 		<xsl:text disable-output-escaping="yes">
 		public function __construct( \</xsl:text>
 			<xsl:choose>
-				<xsl:when test="not($first-ancestor='Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+				<xsl:when test="not($first-ancestor='urn\ru\happymeal\XML\Schema\AnyComplexType')">
 					<xsl:value-of select="$first-ancestor" />
 				</xsl:when>
 				<xsl:otherwise>
@@ -1106,13 +1106,14 @@
 					<!--xsl:apply-templates select="." mode="TYPE_CLASS" /-->
 				</xsl:otherwise>
 			</xsl:choose>
-			<xsl:text disable-output-escaping="yes"> $tdo = NULL, \Happymeal\Port\Adaptor\Data\ValidationHandler $handler = NULL ) {
+			<xsl:text disable-output-escaping="yes"> $tdo = NULL, \urn\ru\happymeal\ValidationHandler $handler = NULL ) {
 			parent::__construct( $tdo, $handler);
 			if($tdo !== NULL) {</xsl:text>
 			    <xsl:apply-templates select="tmp:*" mode="SIMPLE_TYPE_VALIDATOR" />
 			<xsl:text disable-output-escaping="yes">
 			}
 			$this->className = "</xsl:text><xsl:value-of select="@className" /><xsl:text disable-output-escaping="yes">";
+			$this->targetNS = "</xsl:text><xsl:value-of select="@targetNS" /><xsl:text disable-output-escaping="yes">";
 		}
 				
 		public function validate() {
@@ -1234,7 +1235,7 @@
 			<xsl:apply-templates select="$source" mode="OCCURENCE_MAX" />
 		</xsl:variable>
 		<!-- проверяем только простые типы maxOccurs=1  --> 
-		<xsl:if test="not($first-ancestor='Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType') and $maxOccurs='1'">
+		<xsl:if test="not($first-ancestor='urn\ru\happymeal\XML\Schema\AnyComplexType') and $maxOccurs='1'">
 			<xsl:text disable-output-escaping="yes">
 			$this->addSimpleValidator( '</xsl:text>
 			<xsl:value-of select="@propName" />
@@ -1317,7 +1318,7 @@
 		<xsl:variable name="minOccurs">
 			<xsl:apply-templates select="$source" mode="OCCURENCE_MIN" />
 		</xsl:variable>
-		<xsl:if test="starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema') and not($first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+		<xsl:if test="starts-with($first-ancestor,'urn\ru\happymeal\XML\Schema') and not($first-ancestor = 'urn\ru\happymeal\XML\Schema\AnyComplexType')">
 			<xsl:if test="$source/@fixed">
 				<xsl:text disable-output-escaping="yes">
 			$this->assertFixed( '</xsl:text>
@@ -1383,11 +1384,11 @@
 			<!-- Это затычка на случай когда элемент объявлен в схеме без типа и внутри него не ничего что бы указывало
 			на сложный тип делаем их по умолчанию наследниками простой строки -->
 			<xsl:when test="not(descendant::tmp:element) and not(descendant::tmp:attribute) and not(descendant::tmp:complexType)">
-				<xsl:text>Happymeal\Port\Adaptor\Data\XML\Schema\AnySimpleType</xsl:text>
+				<xsl:text>urn\ru\happymeal\XML\Schema\AnySimpleType</xsl:text>
 			</xsl:when>
 			<!--  все остальыне наследники комплексного типа -->
 			<xsl:otherwise>
-				<xsl:text>Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType</xsl:text>
+				<xsl:text>urn\ru\happymeal\XML\Schema\AnyComplexType</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -1467,7 +1468,7 @@
 		
 		<xsl:text>$</xsl:text>
 		<xsl:value-of select="$varName" />
-		<xsl:text disable-output-escaping="yes"> = \Adaptor_Bindings::create("\\</xsl:text>
+		<xsl:text disable-output-escaping="yes"> = \com\happymeal\Bindings::create("\\</xsl:text>
 		<xsl:call-template name="REPLACE">
 			<xsl:with-param name="input" select="$className"/>
 			<xsl:with-param name="from" select="'\'"/>

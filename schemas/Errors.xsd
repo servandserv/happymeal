@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="com:happymeal:errors"
+	targetNamespace="com:happymeal:errors">
+
+<xsd:element name="Error">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element name="targetNS" type="xsd:string" />
+            <xsd:element name="name" type="xsd:string" />
+            <xsd:element name="value" type="xsd:string" />
+            <xsd:element name="rule" type="xsd:string" />
+            <xsd:element name="code" type="xsd:integer" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="Errors">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element ref="Error" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:element>
+
+</xsd:schema>

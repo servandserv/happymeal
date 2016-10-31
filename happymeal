@@ -1,7 +1,12 @@
 #!/bin/bash
 
+realp() {
+    echo `perl -e 'use Cwd "abs_path";print abs_path(shift)' $1`
+}
+
 usage() { printf "
-Usage: happymeal xsd2code флаги параметры
+Usage: happymeal xsd2code -vj -s path_to_schemas -o path_to_project
+       happymeal wadl2code
        happymeal man
 
 Сommand:
@@ -31,31 +36,20 @@ Usage: happymeal xsd2code флаги параметры
         - sax.js (для распарсивания xml документов)
         - Happymeal.js (минифреймворк на клиенте)
 
-  флаги:
+  flags:
     -v
-       создание классов валидаторов
-    -t 
-       создание скрипта тестов сгенерированных классов
+       set flag to generate validation code for classes
     -j 
-       создание js адапторов
-    -m пространство имен
-       задает пространство имен для генерируемых классов.
-    -s путь
-       путь к папке с файлами схем (по умолчанию ../web/schemas)
-    -o путь
-       путь к папке с файлами создаваемых классов (по умолчанию ../generated)
+       set flag to generate js code
+    -m 
+       target namespace for php classes
+    -s 
+       relative path to xsd schemas
+    -o 
+       target path to generated classes
 
-  параметры:
-    путь [путь ...]
-       папки или отдельные файлы схем данных.
-       Сссылка на файл дается относительно папки (-s путь)
-       например 'ContactsHistory/Event.xsd', или 'ContactsHistory'
-
-  пример:
-    happymeal xsd2code -m ARM\\Port\\Adaptor\\Data /ContactsHistory/Event.xsd
-       создает классы адапторов данных
-    happymeal xsd2code -vtm ARM\\Port\\Adaptor\\Data /ContactsHistory/Event.xsd
-       создает классы адапторов, валидаторы к ним и тестовый скрипт.
+  examples:
+    happymeal xsd2code -vj -s ../web/schemas -o ../project
 
 Command:
     wadl2code Генерируем код скрипта роутера по данным wadl.
@@ -99,70 +93,77 @@ mkfile() {
     chmod 775 $f
 }
 
-sFlag=
-oFlag=
-tmpBuildDir="../happymeal_build_tmp"
 invokePath=$(pwd)
-happymealPath=$(dirname $(realpath $0))
+happymealPath=$(dirname $(realp $0))
 
 if [ "$command" == "xsd2code" ]; then
 
-    tFlag=
-    mFlag=
-    vFlag="WITHOUT_VALIDATORS"
     jFlag=
+    vFlag="WITHOUT_VALIDATORS"
+    sFlag=
+    oFlag=
 
     OPTIND=2
-    while getopts ":m:vtjs:o:" optname
+    while getopts "vjs:o:" optname
         do
         case "$optname" in
-            m)  mFlag=$OPTARG
-                ;;
-            v)  vFlag="WITH_VALIDATORS" 
-                   ;;
-            t)  tFlag=1
+            v)  vFlag="WITH_VALIDATORS"
                 ;;
             j)  jFlag=1
                 ;;
-            s)   sFlag=$(realpath $OPTARG)
+            s)  sFlag=$(realp $OPTARG)
                 ;;
-            o)   oFlag=$(realpath $OPTARG)
+            o)  oFlag=$(realp $OPTARG)
                 ;;
-            :)   echo "Option -$OPTARG requires an argument" >&2
+            :)  echo "Option -$OPTARG requires an argument" >&2
                 exit 1
                 ;;
-            ?)   echo "Unknown option -$OPTARG" >&2
+            ?)  echo "Unknown option -$OPTARG" >&2
                 exit 1
                 ;;
-            *)   echo "Unknown error while processing options" >&2
+            *)  echo "Unknown error while processing options" >&2
                 exit 1
         esac
     done
     shift $((OPTIND-1))
-    
-    if [ -z "${mFlag}" ]; then
+
+    if [ -z "${sFlag}" ]; then
         usage
     fi
-
-    cd "$happymealPath"
-
-    if [ -z "$sFlag" ]; then
-        sFlag=$(realpath "../web/schemas")
+    if [ -z "${oFlag}" ]; then
+        usage
     fi
-    if [ -z "$oFlag" ]; then
-        oFlag=$(realpath "../generated")
-    fi
-    if [ ! -d "$sFlag" ]; then
-        echo "Ошибка: не найден каталог схем" >&2
+    if [ ! -d "${sFlag}" ]; then
+        echo "Error: schemas path not found" >&2
         exit 1
     fi
 
-    mkdir -p "$oFlag"
+    echo "Path to schemas: $sFlag"
+    echo "Path to generated php classes code: $oFlag"
+
+    mkdir -p "$oFlag/generated/com"
+    tmpBuildDir=$oFlag"/tmp"
+    #  clean
+    trap 'rm -rf -- $tmpBuildDir' EXIT
     mkdir -p "$tmpBuildDir"
     # каталог классов не чистим
     rm -rf "$tmpBuildDir"/*
-
-    php consolidate_xsd2xml.php "$mFlag" "$sFlag" "$oFlag/classes" $* > "$tmpBuildDir"/consolidated.xml
+    
+    # create happymeals classes
+    php consolidate_xsd2xml.php $happymealPath"/schemas" "$oFlag/generated" $* > "$tmpBuildDir"/consolidated.xml
+    xsltproc --stringparam MODE "$vFlag" stylesheets/xsd2classes.xsl "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/classes.txt
+    cat "$tmpBuildDir"/classes.txt | while IFS= read -r s; do
+        if [[ "$s" = "#path:"* ]]
+            then
+            mkfile $s
+        else
+            echo "$s" >>$f
+        fi
+    done
+    cp -pR $happymealPath"/classes/com/happymeal" $oFlag"/generated/com"
+    
+    # create project classes
+    php consolidate_xsd2xml.php "$sFlag" "$oFlag/generated" $* > "$tmpBuildDir"/consolidated.xml
     
     echo "consolidate xsd schemas ...    OK!"
     echo $vFlag
@@ -178,6 +179,8 @@ if [ "$command" == "xsd2code" ]; then
         fi
     done
     echo "classes code to files ...       OK!"
+
+    exit
 
     if [ "${tFlag}" == 1 ]; then
         xsltproc stylesheets/xsd2tests.xsl "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/xsd2code_tests.php

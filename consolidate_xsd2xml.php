@@ -2,49 +2,32 @@
 
 /*
  *
- * Скрипт отвечает за формирование сводного нормализованного xsd документа
- * в котором каждому комплексному типу привязан его namespace. (не нашел как это сделать через
- * xslt, он не читает атрибуты xmlns:.. файлов).
- * Из получившихся данных формируем временный файл.
+ * create united normalized schema document
  *
  */
 
 include_once "config.php";
 
 $code = "";
-$counter = 0;//Счетчик для уникальный идишников узлов
+$counter = 0;//nodes counter
 $nss = $uniques = array();
 
 if(count($argv) < 2 || !$argv[1]) {
-	throw new Exception("Undefined namespace");
-}
-$namespace = $argv[1];
-
-if(count($argv) < 3 || !$argv[2]) {
 	throw new Exception("Undefined schema path");
 }
-// каталог схем
-$base = realpath($argv[2]);
-//$base = dirname( dirname( __FILE__ ) ).SCHEMAS_PATH;
+// schemas dir
+$base = realpath($argv[1]);
 
-if(count($argv) < 4 || !$argv[3]) {
+if(count($argv) < 3 || !$argv[2]) {
 	throw new Exception("Undefined build directory");
 }
-// каталог созданных классов
-$buildDir = $argv[3];
+// generated classes dir
+$buildDir = $argv[2];
+// imported xsd schema files 
+$imports = array();
 
-$imports = array(); // импортированные файлы
-/*
-printf("namespace = %s %s\n", $namespace, $base);
-for($i = 0; $i < count( $argv ); $i++) {
-	printf("arg %d = %s\n", $i, $argv[$i]);
-}
-exit(0);
- */
-
-
-if( count( $argv ) > 4 ) {
-	$i = 4;
+if( count( $argv ) > 3 ) {
+	$i = 3;
 	while( isset( $argv[$i] ) ) {
 		$fullname = $base.DIRECTORY_SEPARATOR.$argv[$i];
 		$fullname = preg_replace("/\/{2,}/","/",$fullname);//убираем двойные слэши чтобы однозначно идентифицировать адрес импортируемого ресурса
@@ -68,20 +51,12 @@ if( count( $argv ) > 4 ) {
 		$i++;
 	}
 } else {
-	/**
-	 * 
-	 * Если не передан список файлов или директорий то строим по всем схемам внутри каталога схем
-	 * Так делать не стоит. если проект большой то все умрет
-	 * 
-	 */
-	
-	//if( is_dir( $base ) ) {
-	//	foreach ( glob( $base."/*/*.xsd" ) as $filename ) {
-	//		if( !file_exists( $filename ) ) throw new Exception( "File ".$filename." doesn"t exist" ); 
-	//		$imports[$filename] = FALSE;
-	//	}
-	//}
-	
+	if( is_dir( $base ) ) {
+		foreach ( glob( $base."/*.xsd" ) as $filename ) {
+			if( !file_exists( $filename ) ) throw new Exception( "File ".$filename." doesn't exist" ); 
+			$imports[$filename] = FALSE;
+		}
+	}
 }
 
 //print_r( $imports ); exit;
@@ -91,32 +66,30 @@ $xw->openMemory();
 $xw->setIndent( true );
 $xw->setIndentString( " " );
 $xw->startDocument( "1.0", "UTF-8" );
-$xw->startElementNS( NULL, "schema", "urn:ru:ilb:tmp" );
-$xw->writeAttribute( "namespace", $namespace );
+$xw->startElementNS( NULL, "schema", "urn:ru:happymeal:tmp" );
+//$xw->writeAttribute( "namespace", $namespace );
 
 $notImported = getNotImported( $imports );
 
 while( $notImported ) {
 	$tree = array();
 	import2assoc( $notImported, $xw );
+	/**
 	foreach( $tree as $file ) {
 		foreach( $file as $class ) {
 			//$code .= class2code( $class );
 		}
 	}
-
+    */
 	$notImported = getNotImported( $imports );
 }
 $xw->endElement();
 $xw->endDocument();
 $xml = $xw->flush();
-//file_put_contents( dirname( __FILE__ )."/tmp/schemas.xml", $xml );
-//file_put_contents( dirname( __FILE__ )."/tmp/code.txt", $code );
 print( $xml );
 exit;
 
 /* functions */
-
 function getNotImported ( $imports ) {
 	foreach( $imports as $k => $v ) {
 		if( $v === FALSE ) return $k;
@@ -125,10 +98,9 @@ function getNotImported ( $imports ) {
 }
 
 // parse schema files
-
 function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_path = "" ) {
 
-	global $uniques, $namespace, $nss, $nss_replacements, $counter, $buildDir;
+	global $uniques, $nss, $nss_replacements, $counter, $buildDir;
 
 	$tree = null;
 	while( $xr->read() )
@@ -141,15 +113,15 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 			case XMLReader::ELEMENT:
 				switch( $xr->localName ) {
 					case "schema":
-						// каждую новую схему добавляем в дерево
+						// add every new schema to the tree
 						$tree = schema2assoc( $xr, $path, $xw );
 						break;
 					case "import":
 					case "include":
+					    // import included schemas
 						import2assoc( realpath( dirname( $path )."/".$xr->getAttribute( "schemaLocation" ) ), $xw );
 						break;
 					default:
-						// обычные узлы дополняем атрибутами
 						$node = array(
 							"tag" => $xr->name,
 							"prefix" => $xr->prefix,
@@ -162,30 +134,19 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 							$node["attributes"] = array();
 							while( $xr->moveToNextAttribute() ) {
 								if( $node["localName"] == "pattern" && !$xr->prefix ) {
-									// если узел представляет из себя pattern рестрикшена,
-									// то надо заменить в нем некоторые символы, чтобы обеспечить валидность выражения
+									// for regex restriction nodes replace some symbols 
 									$val = str_replace( "/", "\/", $xr->value );
 									$node["attributes"][$xr->name] = htmlentities( $val );
 								} else if( !$xr->prefix ) {
 									$node["attributes"][$xr->name] = $xr->value;
 								}
-								// элементы и типы элементов
+								// elements and types
 								if( $xr->localName == "name" && !$xr->prefix ) {
 									$node["attributes"]["schemaName"] = $xr->value;
-									/**
-									 * 
-									 * Один проблемный момент
-									 * могут запутаться классы атрибутов и классы элементов
-									 * в случае если атрибуты и элементы находятся в одном узле
-									 * дерева и при этом имеют одинаковые названия
-									 * 
-									 * @todo решить как уходить от такого рода конфликтов
-									 *  и на каком этапе проектирования
-									 */
 									
 									$packagename = create_package_ns( $xr->value, $target );
 									$classname = create_class_name( $xr->value );
-									$propname = create_prop_name( $xr->value );
+									$propname = create_prop_name( $xr->value, $target, $node["localName"] );
 									//$node["attributes"]["package"] = $packagename;
 									$node["attributes"]["getter"] = "get".$propname;
 									$node["attributes"]["setter"] = "set".$propname;
@@ -257,22 +218,9 @@ function import2assoc ( $path, \XMLWriter &$xw ) {
 
 	if( isset( $imports[$path] ) && $imports[$path] !== FALSE ) return array();
 
-	try {
-		$xr = new XMLReader();
-		$xr->XML( file_get_contents( $path ) );
-
-		$tree[] = xml2assoc( $xr, $path, $xw );
-	} catch ( Exception $e ) {
-		throw new Exception( $path.":".$e->getMessage() );
-		/*$xw->startElementNS( NULL, "importError", "urn:ru:ilb:tmp:error" );
-		$xw->writeAttribute( "path", $path );
-		$xw->text( $e->getMessage() );
-		$xw->endElement();
-		$xw->endDocument();
-		exit();
-		 * 
-		 */
-	}
+	$xr = new XMLReader();
+	$xr->XML( file_get_contents( $path ) );
+	$tree[] = xml2assoc( $xr, $path, $xw );
 }
 
 function schema2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = null ) {
@@ -303,11 +251,10 @@ function replace_ns ( $ns ) {
  * 
  */
 function create_class_ns ( $package, $ns_path, $val ) {
-	global $namespace, $nss, $local_nss;
+	global $nss, $local_nss;
 	
 	if( strtoupper( substr( $package, -( strlen( "\\".$ns_path ) ) ) ) == strtoupper( "\\".$ns_path ) ) {
 		$package = substr( $package, 0, strlen( $package ) - ( strlen( "\\".$ns_path ) ) );
-		//$package = str_replace( "\\".$ns_path,"", $package );
 	}
 	$class_ns = $package.( $ns_path != "" ? "\\".$ns_path : "" );
 	// Предотвращаем двойное усечение
@@ -330,7 +277,7 @@ function create_class_ns ( $package, $ns_path, $val ) {
  */
 function create_package_ns ( $val, $target ) {
 	
-	global $namespace, $nss, $local_nss;
+	global $nss, $local_nss;
 
 	$comma = strpos( $val, ":" );
 	if( $comma !== false ) {
@@ -358,7 +305,7 @@ function create_package_ns ( $val, $target ) {
 	if( $target == XML_SCHEMA_TARGET_NS ) {
 		return XML_SCHEMA_NS;
 	} else {
-		return $namespace."\\".$target;
+		return $target;
 	}
 }
 
@@ -390,9 +337,9 @@ function create_class_name ( $val ) {
  * используем префикс для указания имени
  * 
  */
-function create_prop_name ( $val ) {
+function create_prop_name ( $val, $target, $ln ) {
 	
-	global $namespace, $class_name_restrictions;
+	global $class_name_restrictions;
 	
 	$comma = strpos( $val, ":" );
 	if( $comma ) {
