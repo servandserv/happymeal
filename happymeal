@@ -141,17 +141,17 @@ if [ "$command" == "xsd2code" ]; then
     echo "Path to schemas: $sFlag"
     echo "Path to generated php classes code: $oFlag"
 
-    mkdir -p "$oFlag/generated/com"
-    tmpBuildDir=$oFlag"/tmp"
+    mkdir -p "$oFlag/classes.codegen/com"
+    tmpBuildDir=$oFlag"/tmp_happymeal"
     #  clean
-    trap 'rm -rf -- $tmpBuildDir' EXIT
+    #trap 'rm -rf -- $tmpBuildDir' EXIT
     mkdir -p "$tmpBuildDir"
     # каталог классов не чистим
     rm -rf "$tmpBuildDir"/*
     
     # create happymeals classes
-    php consolidate_xsd2xml.php $happymealPath"/schemas" "$oFlag/generated" $* > "$tmpBuildDir"/consolidated.xml
-    xsltproc --stringparam MODE "$vFlag" stylesheets/xsd2classes.xsl "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/classes.txt
+    php $happymealPath"/consolidate_xsd2xml.php" $happymealPath"/schemas" "$oFlag/classes.codegen" $* > "$tmpBuildDir"/consolidated.xml
+    xsltproc --stringparam MODE "$vFlag" $happymealPath"/stylesheets/xsd2classes.xsl" "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/classes.txt
     cat "$tmpBuildDir"/classes.txt | while IFS= read -r s; do
         if [[ "$s" = "#path:"* ]]
             then
@@ -160,14 +160,14 @@ if [ "$command" == "xsd2code" ]; then
             echo "$s" >>$f
         fi
     done
-    cp -pR $happymealPath"/classes/com/happymeal" $oFlag"/generated/com"
+    cp -pR $happymealPath"/classes/com/servandserv" $oFlag"/classes.codegen/com"
     
     # create project classes
-    php consolidate_xsd2xml.php "$sFlag" "$oFlag/generated" $* > "$tmpBuildDir"/consolidated.xml
+    php $happymealPath"/consolidate_xsd2xml.php" "$sFlag" "$oFlag/classes.codegen" $* > "$tmpBuildDir"/consolidated.xml
     
     echo "consolidate xsd schemas ...    OK!"
     echo $vFlag
-    xsltproc --stringparam MODE "$vFlag" stylesheets/xsd2classes.xsl "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/classes.txt
+    xsltproc --stringparam MODE "$vFlag" $happymealPath"/stylesheets/xsd2classes.xsl" "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/classes.txt
     echo "xsd to classes code ...        OK!"
 
     cat "$tmpBuildDir"/classes.txt | while IFS= read -r s; do
@@ -180,25 +180,19 @@ if [ "$command" == "xsd2code" ]; then
     done
     echo "classes code to files ...       OK!"
 
-    exit
-
-    if [ "${tFlag}" == 1 ]; then
-        xsltproc stylesheets/xsd2tests.xsl "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/xsd2code_tests.php
-        php "$tmpBuildDir"/xsd2code_tests.php "$oFlag"
-    fi
+    #if [ "${tFlag}" == 1 ]; then
+    #    xsltproc stylesheets/xsd2tests.xsl "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/xsd2code_tests.php
+    #    php "$tmpBuildDir"/xsd2code_tests.php "$oFlag"
+    #fi
     
     if [ "${jFlag}" == 1 ]; then
-        mkdir -p "$oFlag"/web/js/libs
-        jValue=${mFlag//\\/.}
-        xsltproc stylesheets/xsd2js.xsl "$tmpBuildDir"/consolidated.xml > "$oFlag"/web/js/${jValue}.js
+        appname=${oFlag##*/}
+        mkdir -p ${oFlag}/web.codegen/js
+        xsltproc ${happymealPath}/stylesheets/xsd2js.xsl ${tmpBuildDir}/consolidated.xml > ${oFlag}/web.codegen/js/${appname}.js
         #  сожмем
-        java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js "$oFlag"/web/js/${jValue}.js > "$oFlag"/web/js/${jValue}.min.js
-        #uglifyjs "$oFlag"/web/js/${jValue}.js -o "$oFlag"/web/js/${jValue}.min.js -c -m
-        cat web/js/Happymeal.js web/js/libs/sax.js > "$oFlag"/web/js/Happymeal.js
-        java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js "$oFlag"/web/js/Happymeal.js > "$oFlag"/web/js/Happymeal.min.js
-        #uglifyjs "$oFlag"/web/js/Happymeal.js -o "$oFlag"/web/js/Happymeal.min.js -c -m
-        #cp -p web/js/Happymeal.js "$oFlag"/web/js/Happymeal.js
-        #cp -R web/js/libs/sax.js "$oFlag"/web/js/libs
+        java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js ${oFlag}/web.codegen/js/${appname}.js > ${oFlag}/web.codegen/js/${appname}.min.js
+        cat ${happymealPath}/web/js/Happymeal.js ${happymealPath}/web/js/libs/sax.js > ${oFlag}/web.codegen/js/Happymeal.js
+        java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js ${oFlag}/web.codegen/js/Happymeal.js > ${oFlag}/web.codegen/js/Happymeal.min.js
     fi
     
     chmod -R 755 "$oFlag"
@@ -209,14 +203,12 @@ if [ "$command" == "xsd2code" ]; then
 elif [ "$command" == "wadl2code" ]; then
 
     OPTIND=2
-    while getopts ":o:s:m:" optname
+    while getopts "s:o:" optname
         do
         case "$optname" in
-            m)  mFlag=$OPTARG
+            s)    sFlag=$(realp $OPTARG)
                 ;;
-            s)    sFlag=$(realpath $OPTARG)
-                ;;
-            o)    oFlag=$(realpath $OPTARG)
+            o)    oFlag=$(realp $OPTARG)
                 ;;
             :)    echo "Option -$OPTARG requires an argument" >&2
                 exit 1
@@ -230,17 +222,11 @@ elif [ "$command" == "wadl2code" ]; then
     done
     shift $((OPTIND-1))
 
-    cd "$happymealPath"
-
-    if [ -z "${mFlag}" ]; then
+    if [ -z "$oFlag" ]; then
         usage
     fi
-
     if [ -z "$sFlag" ]; then
-        sFlag=$(realpath "../web/schemas")
-    fi
-    if [ -z "$oFlag" ]; then
-        oFlag=$(realpath "../generated")
+        usage
     fi
     if [ ! -d "$sFlag" ]; then
         echo "Ошибка: не найден каталог схем" >&2
@@ -251,15 +237,16 @@ elif [ "$command" == "wadl2code" ]; then
         exit 1
     fi
 
-    #  Строим консолидированный файл схемы данных
-    mkdir -p "$oFlag"
+    echo "Path to schemas: $sFlag"
+    echo "Path to generated php classes code: $oFlag"
+
+    mkdir -p "$oFlag/web.codegen/api"
+    tmpBuildDir=$oFlag"/tmp_happymeal"
+    #  clean
+    #trap 'rm -rf -- $tmpBuildDir' EXIT
     mkdir -p "$tmpBuildDir"
     # каталог классов не чистим
     rm -rf "$tmpBuildDir"/*
-
-    php consolidate_xsd2xml.php "$mFlag" "$sFlag" "$oFlag/classes" $* > "$tmpBuildDir"/consolidated.xml
-    
-    echo "consolidate xsd schemas ...    OK!"
 
     find "$sFlag"/$2 -type f -name *.wadl | while read j; do
         # манипуляции с исходным wadl
@@ -276,24 +263,27 @@ elif [ "$command" == "wadl2code" ]; then
                 sed -i -e "s/element=\"${pref}\:/element=\"${namespace}\:/g"  "$tmpBuildDir"/wadl.xml
             fi
         done
+        
         # выкусим номер версии api и составим по нему имя скрипта который связан с этой версией
         # версии в адресах записываются таким образом .../api/v[1-9]\.[0-9]{1,2}/... превращаем это в файл api\.v{0-9}-{0-9}{1,2}.php
         base=$( cat $j | grep "resources *base" | sed -e 's/^[^"]*"//; s/".*//' )
+        api="test"
         if [[ $base =~ api(\/v[0-9]{1,2}\.[0-9]{1,2}\/)? ]]
             then
             api=$( echo $base | sed -e 's/.*\(api\)/\1/; s/\/$//' | tr "." "-" | tr "/" "." )".php"
-            xsltproc --stringparam WADL ${j/#*web} --stringparam API $api --stringparam OUTDIR "$oFlag" stylesheets/wadl2code.xsl "$tmpBuildDir"/wadl.xml  > "$tmpBuildDir"/wadl2code.txt
-            cat "$tmpBuildDir"/wadl2code.txt | while IFS= read -r s; do
-                if [[ "$s" = "#path:"* ]]
-                    then
-                    mkfile $s
-                else
-                    echo "$s" >>$f
-                fi
-            done
-            echo "wadl code to files ...       OK!"
-            xsltproc --stringparam WADL ${j/#*web} --stringparam API $api --stringparam OUTDIR "$oFlag" stylesheets/wadl2sitemap.xsl "$tmpBuildDir"/wadl.xml  > "$oFlag"/web/sitemap.xml
         fi
+        
+        xsltproc --stringparam WADL ${j/#*web} --stringparam API $api --stringparam DEST ${oFlag}/web.codegen/api ${happymealPath}/stylesheets/wadl2code.xsl "$tmpBuildDir"/wadl.xml  > "$tmpBuildDir"/wadl2code.txt
+        cat "$tmpBuildDir"/wadl2code.txt | while IFS= read -r s; do
+            if [[ "$s" = "#path:"* ]]
+                then
+                mkfile $s
+            else
+                echo "$s" >>$f
+            fi
+        done
+        #echo "wadl code to files ...       OK!"
+        #xsltproc --stringparam WADL ${j/#*web} --stringparam API $api --stringparam OUTDIR "$oFlag" stylesheets/wadl2sitemap.xsl "$tmpBuildDir"/wadl.xml  > "$oFlag"/web/sitemap.xml
     done
 
     chmod -R 755 "$oFlag"

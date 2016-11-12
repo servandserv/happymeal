@@ -240,8 +240,7 @@
         }(args));
 	});
     
-	Happymeal.preserve(Happymeal,"Port.Adaptor.HTTP");
-	Happymeal.Port.Adaptor.HTTP = (function(){
+	Happymeal.HTTP = (function(){
 		var request = function(args) {
 			var body;
 			if(args.method === "POST" && (args.content === "application/xml"||args.content === "text/xml")) {
@@ -312,8 +311,8 @@
 	
 	
 	
-	Happymeal.preserve(Happymeal,"Port.Adaptor.Data.XML.Schema");
-	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexType = {
+	Happymeal.preserve(Happymeal,"XML.Schema");
+	Happymeal.XML.Schema.AnyComplexType = {
 		toJSON: function() {
 			var anyComplexType = this.getAll();
 			this.JSON = this.JSON || {};
@@ -357,9 +356,16 @@
   			}
   			parser.write(xmlstr).close();
 		},
+		isValid: function(rule,msg) {
+		    if( !rule ) ev = "ValidationErrorOccured";
+		    else ev = "ValidationSuccessOccured";
+		    this.publish(ev,msg);
+		    
+		    return rule;
+		}
 	};
 	
-	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator = {
+	Happymeal.XML.Schema.AnyComplexTypeValidator = {
 	    simpleTypes: [],
 	    complexTypes: [],
 	    validate: function() {
@@ -403,7 +409,7 @@
 	    }
 	}
 	
-	Happymeal.Port.Adaptor.Data.XML.Schema.AnySimpleType = {
+	Happymeal.XML.Schema.AnySimpleType = {
 		toJSON: function() {
 			this.JSON = {};
 			this.JSON[this.ROOT] = this.get();
@@ -419,9 +425,16 @@
   			}
   			parser.write(xmlstr).close();
 		},
+		isValid: function(rule,msg) {
+		    if( !rule ) ev = "ValidationErrorOccured";
+		    else ev = "ValidationSuccessOccured";
+		    this.publish(ev,msg);
+		    
+		    return rule;
+		}
 	}
 	
-	Happymeal.Port.Adaptor.Data.XML.Schema.AnySimpleTypeValidator = {
+	Happymeal.XML.Schema.AnySimpleTypeValidator = {
 	    assertSimple: function(type,val,pubsub) {
 	        switch( type ) {
 	            case "Int":
@@ -662,12 +675,12 @@
 	    return {}
 	}());
 	
-	Happymeal.Mediator.extend = Happymeal.Port.Adaptor.HTTP.extend = Happymeal.XMLView.extend = Happymeal.HTMLView.extend = Happymeal.Model.extend = extend;
+	Happymeal.Mediator.extend = Happymeal.HTTP.extend = Happymeal.XMLView.extend = Happymeal.HTMLView.extend = Happymeal.Model.extend = extend;
 	Happymeal.SXSLTView.extend = extend;
 	Happymeal.Storage.extend = extend;
-	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexType.extend = extend;
-	Happymeal.Port.Adaptor.Data.XML.Schema.AnyComplexTypeValidator.extend = extend;
-	Happymeal.Port.Adaptor.Data.XML.Schema.AnySimpleType.extend = extend;
-	Happymeal.Port.Adaptor.Data.XML.Schema.AnySimpleTypeValidator.extend = extend;
+	Happymeal.XML.Schema.AnyComplexType.extend = extend;
+	Happymeal.XML.Schema.AnyComplexTypeValidator.extend = extend;
+	Happymeal.XML.Schema.AnySimpleType.extend = extend;
+	Happymeal.XML.Schema.AnySimpleTypeValidator.extend = extend;
 	
 }(window));

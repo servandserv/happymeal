@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Model xmlns="urn:com:servandserv:Example:Model" ID="1">
+    <product>AZFG</product>
+    <Price>
+        <value>100</value>
+        <units>USD</units>
+    </Price>
+    <str>sdsdsds</str>
+    <byte>120</byte>
+    <Link xmlns="urn:com:servandserv:XML:Atom:Link">
+        <rel>1</rel>
+        <href>fwfergergerger</href>
+    </Link>
+    <Link xmlns="urn:com:servandserv:XML:Atom:Link">
+        <rel>2</rel>
+        <href>fwfergergerger</href>
+    </Link>
+</Model>

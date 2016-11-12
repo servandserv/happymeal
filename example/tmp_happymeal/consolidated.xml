@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="com:servandserv:happymeal:tmp">
+ <element name="Link" schemaName="Link" getter="getLink" setter="setLink" className="Link" propName="Link" targetNS="urn:com:servandserv:XML:Atom:Link" classNS="com\servandserv\XML\Atom" class="com\servandserv\XML\Atom\Link" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/XML/Atom/Link" _ID="cfcd208495d565ef66e7dff9f98764da">
+  <complexType>
+   <sequence>
+    <element name="rel" schemaName="rel" getter="getRel" setter="setRel" className="Rel" propName="Rel" targetNS="urn:com:servandserv:XML:Atom:Link" classNS="com\servandserv\XML\Atom\Link" class="com\servandserv\XML\Atom\Link\Rel" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/XML/Atom/Link/Rel" type="xsd:string" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="String" typeClass="com\servandserv\happymeal\XML\Schema\String" mode="\Adaptor_XML::CONTENTS" _ID="c4ca4238a0b923820dcc509a6f75849b"/>
+    <element name="href" schemaName="href" getter="getHref" setter="setHref" className="Href" propName="Href" targetNS="urn:com:servandserv:XML:Atom:Link" classNS="com\servandserv\XML\Atom\Link" class="com\servandserv\XML\Atom\Link\Href" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/XML/Atom/Link/Href" type="xsd:string" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="String" typeClass="com\servandserv\happymeal\XML\Schema\String" mode="\Adaptor_XML::CONTENTS" _ID="c81e728d9d4c2f636f067f89cc14862c"/>
+    <element name="type" schemaName="type" getter="getType" setter="setType" className="Type" propName="Type" targetNS="urn:com:servandserv:XML:Atom:Link" classNS="com\servandserv\XML\Atom\Link" class="com\servandserv\XML\Atom\Link\Type" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/XML/Atom/Link/Type" type="typeType" typeClassNS="com\servandserv\XML\Atom\Link" typeClassName="TypeType" typeClass="com\servandserv\XML\Atom\Link\TypeType" mode="\Adaptor_XML::CONTENTS" minOccurs="0" _ID="eccbc87e4b5ce2fe28308fd9f2a7baf3"/>
+    <element name="method" schemaName="method" getter="getMethod" setter="setMethod" className="Method" propName="Method" targetNS="urn:com:servandserv:XML:Atom:Link" classNS="com\servandserv\XML\Atom\Link" class="com\servandserv\XML\Atom\Link\Method" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/XML/Atom/Link/Method" type="methodType" typeClassNS="com\servandserv\XML\Atom\Link" typeClassName="MethodType" typeClass="com\servandserv\XML\Atom\Link\MethodType" mode="\Adaptor_XML::CONTENTS" minOccurs="0" _ID="a87ff679a2f3e71d9181a67b7542122c"/>
+   </sequence>
+  </complexType>
+ </element>
+ <simpleType name="methodType" schemaName="methodType" getter="getMethodType" setter="setMethodType" className="MethodType" propName="MethodType" targetNS="urn:com:servandserv:XML:Atom:Link" classNS="com\servandserv\XML\Atom\Link" class="com\servandserv\XML\Atom\Link\MethodType" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/XML/Atom/Link/MethodType" _ID="e4da3b7fbbce2345d7772b0674a318d5">
+  <restriction base="xsd:string" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="String" typeClass="com\servandserv\happymeal\XML\Schema\String" mode="\Adaptor_XML::CONTENTS" _ID="1679091c5a880faf6fb5e6087eb1b2dc">
+   <enumeration value="GET" _ID="8f14e45fceea167a5a36dedd4bea2543"/>
+   <enumeration value="POST" _ID="c9f0f895fb98ab9159f51fd0297e236d"/>
+  </restriction>
+ </simpleType>
+ <simpleType name="typeType" schemaName="typeType" getter="getTypeType" setter="setTypeType" className="TypeType" propName="TypeType" targetNS="urn:com:servandserv:XML:Atom:Link" classNS="com\servandserv\XML\Atom\Link" class="com\servandserv\XML\Atom\Link\TypeType" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/XML/Atom/Link/TypeType" _ID="45c48cce2e2d7fbdea1afc51c7c6ad26">
+  <restriction base="xsd:string" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="String" typeClass="com\servandserv\happymeal\XML\Schema\String" mode="\Adaptor_XML::CONTENTS" _ID="d3d9446802a44259755d38e6d163e820">
+   <enumeration value="text/html" _ID="6512bd43d9caa6e02c990b0a82652dca"/>
+  </restriction>
+ </simpleType>
+ <element name="Model" schemaName="Model" getter="getModel" setter="setModel" className="Model" propName="Model" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example" class="com\servandserv\Example\Model" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model" _ID="c20ad4d76fe97759aa27a0c99bff6710">
+  <complexType>
+   <annotation>
+    <documentation>Form model example</documentation>
+   </annotation>
+   <sequence>
+    <element name="product" schemaName="product" getter="getProduct" setter="setProduct" className="Product" propName="Product" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model" class="com\servandserv\Example\Model\Product" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/Product" type="productType" typeClassNS="com\servandserv\Example\Model" typeClassName="ProductType" typeClass="com\servandserv\Example\Model\ProductType" mode="\Adaptor_XML::CONTENTS" _ID="c51ce410c124a10e0db5e4b97fc2af39"/>
+    <element name="Price" schemaName="Price" getter="getPrice" setter="setPrice" className="Price" propName="Price" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model" class="com\servandserv\Example\Model\Price" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/Price" type="priceType" typeClassNS="com\servandserv\Example\Model" typeClassName="PriceType" typeClass="com\servandserv\Example\Model\PriceType" mode="\Adaptor_XML::CONTENTS" _ID="aab3238922bcc25a6f606eb525ffdc56"/>
+    <element name="str" schemaName="str" getter="getStr" setter="setStr" className="Str" propName="Str" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model" class="com\servandserv\Example\Model\Str" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/Str" type="xsd:string" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="String" typeClass="com\servandserv\happymeal\XML\Schema\String" mode="\Adaptor_XML::CONTENTS" _ID="9bf31c7ff062936a96d3c8bd1f8f2ff3"/>
+    <element name="byte" schemaName="byte" getter="getByte" setter="setByte" className="Byte" propName="Byte" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model" class="com\servandserv\Example\Model\Byte" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/Byte" type="xsd:byte" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="Byte" typeClass="com\servandserv\happymeal\XML\Schema\Byte" mode="\Adaptor_XML::CONTENTS" _ID="c74d97b01eae257e44aa9d5bade97baf"/>
+    <element ref="atom:Link" refClassNS="com\servandserv\XML\Atom" refClassName="Link" refClass="com\servandserv\XML\Atom\Link" mode="\Adaptor_XML::ELEMENT" minOccurs="0" maxOccurs="unbounded" _ID="70efdf2ec9b086079795c442636b55fb"/>
+   </sequence>
+   <attribute name="ID" schemaName="ID" getter="getID" setter="setID" className="ID" propName="ID" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model" class="com\servandserv\Example\Model\ID" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/ID" type="xsd:string" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="String" typeClass="com\servandserv\happymeal\XML\Schema\String" mode="\Adaptor_XML::CONTENTS" _ID="6f4922f45568161a8cdf4ad2299f6d23"/>
+  </complexType>
+ </element>
+ <complexType name="priceType" schemaName="priceType" getter="getPriceType" setter="setPriceType" className="PriceType" propName="PriceType" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model" class="com\servandserv\Example\Model\PriceType" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/PriceType" _ID="1f0e3dad99908345f7439f8ffabdffc4">
+  <sequence>
+   <element name="value" schemaName="value" getter="getValue" setter="setValue" className="Value" propName="Value" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model\PriceType" class="com\servandserv\Example\Model\PriceType\Value" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/PriceType/Value" type="xsd:decimal" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="Decimal" typeClass="com\servandserv\happymeal\XML\Schema\Decimal" mode="\Adaptor_XML::CONTENTS" _ID="98f13708210194c475687be6106a3b84"/>
+   <element name="units" schemaName="units" getter="getUnits" setter="setUnits" className="Units" propName="Units" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model\PriceType" class="com\servandserv\Example\Model\PriceType\Units" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/PriceType/Units" type="unitsType" typeClassNS="com\servandserv\Example\Model" typeClassName="UnitsType" typeClass="com\servandserv\Example\Model\UnitsType" mode="\Adaptor_XML::CONTENTS" _ID="3c59dc048e8850243be8079a5c74d079"/>
+   <element ref="atom:Link" refClassNS="com\servandserv\XML\Atom" refClassName="Link" refClass="com\servandserv\XML\Atom\Link" mode="\Adaptor_XML::ELEMENT" minOccurs="0" maxOccurs="unbounded" _ID="b6d767d2f8ed5d21a44b0e5886680cb9"/>
+  </sequence>
+ </complexType>
+ <simpleType name="unitsType" schemaName="unitsType" getter="getUnitsType" setter="setUnitsType" className="UnitsType" propName="UnitsType" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model" class="com\servandserv\Example\Model\UnitsType" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/UnitsType" _ID="37693cfc748049e45d87b8c7d8b9aacd">
+  <restriction base="xsd:string" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="String" typeClass="com\servandserv\happymeal\XML\Schema\String" mode="\Adaptor_XML::CONTENTS" _ID="1ff1de774005f8da13f42943881c655f">
+   <enumeration value="USD" _ID="8e296a067a37563370ded05f5a3bf3ec"/>
+   <enumeration value="EUR" _ID="4e732ced3463d06de0ca9a15b6153677"/>
+   <enumeration value="GBP" _ID="02e74f10e0327ad868d138f2b4fdd6f0"/>
+   <enumeration value="RUB" _ID="33e75ff09dd601bbe69f351039152189"/>
+  </restriction>
+ </simpleType>
+ <simpleType name="productType" schemaName="productType" getter="getProductType" setter="setProductType" className="ProductType" propName="ProductType" targetNS="urn:com:servandserv:Example:Model" classNS="com\servandserv\Example\Model" class="com\servandserv\Example\Model\ProductType" filePath="/var/www/localhost/htdocs/vendor/happymeal/example/classes.codegen/com/servandserv/Example/Model/ProductType" _ID="6ea9ab1baa0efb9e19094440c317e21b">
+  <restriction base="xsd:string" typeClassNS="com\servandserv\happymeal\XML\Schema" typeClassName="String" typeClass="com\servandserv\happymeal\XML\Schema\String" mode="\Adaptor_XML::CONTENTS" _ID="34173cb38f07f89ddbebc2ac9128303f">
+   <pattern value="^[a-zA-Z]{1,5}$" _ID="c16a5320fa475530d9583c34fd356ef5"/>
+  </restriction>
+ </simpleType>
+</schema>

@@ -1,7 +1,7 @@
 <?php
 
 //define( "SCHEMAS_PATH", "/web/schemas" );
-define( "XML_SCHEMA_NS", "com\happymeal\XML\Schema" );
+define( "XML_SCHEMA_NS", "com\servandserv\happymeal\XML\Schema" );
 define( "XML_SCHEMA_TARGET_NS", "XML\Schema" );
 
 $class_name_restrictions = array(
@@ -29,13 +29,14 @@ $class_name_restrictions = array(
 );
 
 $nss_replacements = array(
-	"http://www.w3.org/1999/XSL/Transform" => "com:happymeal:XML:XSL",
-	"http://www.w3.org/1999/xlink" => "com:happymeal:XML:XLink",
-	"http://www.w3.org/1999/xhtml" => "com:happymeal:XML:XHTML",
-	"http://www.w3.org/2001/XMLSchema" => "com:happymeal:XML:Schema",
-	"http://www.together.at/2006/XPIL1.0" => "com:happymeal:XPIL",
-	"http://www.wfmc.org/2002/XPDL1.0" => "com:happymeal:XPDL",
-	"http://www.w3.org/2005/Atom" => "com:happymeal:XML:Atom"
+	"http://www.w3.org/1999/XSL/Transform" => "com:servandserv:happymeal:XML:XSL",
+	"http://www.w3.org/1999/xlink" => "com:servandserv:happymeal:XML:XLink",
+	"http://www.w3.org/1999/xhtml" => "com:servandserv:happymeal:XML:XHTML",
+	"http://www.w3.org/2001/XMLSchema" => "com:servandserv:happymeal:XML:Schema",
+	"http://www.together.at/2006/XPIL1.0" => "com:servandserv:happymeal:XPIL",
+	"http://www.wfmc.org/2002/XPDL1.0" => "com:servandserv:happymeal:XPDL",
+	"http://www.w3.org/2005/Atom" => "com:servandserv:happymeal:XML:Atom",
+	"http://wadl.dev.java.net/2009/02" => "com:servandserv:happymeal:WADL"
 );
 
 $local_nss = array( 

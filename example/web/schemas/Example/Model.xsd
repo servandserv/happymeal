@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type='text/xsl' href="../../stylesheets/Form/Prices.Form.xsl"?>
+<xsd:schema elementFormDefault="qualified"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="urn:com:servandserv:Example:Model"
+	xmlns:atom="urn:com:servandserv:XML:Atom:Link"
+	targetNamespace="urn:com:servandserv:Example:Model">
+
+<xsd:import schemaLocation="../XML/Atom/Link.xsd" namespace="urn:com:servandserv:XML:Atom:Link" /> 
+
+<xsd:element name="Model">
+	<xsd:complexType>
+		<xsd:annotation>
+			<xsd:documentation>Form model example</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="product" type="productType" />
+			<xsd:element name="Price" type="priceType" />
+			<xsd:element name="str" type="xsd:string" />
+			<xsd:element name="byte" type="xsd:byte" />
+			<xsd:element ref="atom:Link" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="ID" type="xsd:string" />
+	</xsd:complexType>
+</xsd:element>
+
+<xsd:complexType name="priceType">
+    <xsd:sequence>
+        <xsd:element name="value" type="xsd:decimal" />
+        <xsd:element name="units" type="unitsType" />
+        <xsd:element ref="atom:Link" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+</xsd:complexType>
+
+<xsd:simpleType name="unitsType">
+    <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="USD" />
+        <xsd:enumeration value="EUR" />
+        <xsd:enumeration value="GBP" />
+        <xsd:enumeration value="RUB" />
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="productType">
+    <xsd:restriction base="xsd:string">
+        <xsd:pattern value="^[a-zA-Z]{1,5}$" />
+    </xsd:restriction>
+</xsd:simpleType>
+
+</xsd:schema>

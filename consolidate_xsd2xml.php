@@ -66,7 +66,7 @@ $xw->openMemory();
 $xw->setIndent( true );
 $xw->setIndentString( " " );
 $xw->startDocument( "1.0", "UTF-8" );
-$xw->startElementNS( NULL, "schema", "urn:ru:happymeal:tmp" );
+$xw->startElementNS( NULL, "schema", "com:servandserv:happymeal:tmp" );
 //$xw->writeAttribute( "namespace", $namespace );
 
 $notImported = getNotImported( $imports );
