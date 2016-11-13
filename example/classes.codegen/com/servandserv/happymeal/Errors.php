@@ -11,16 +11,16 @@
 		 * @minOccurs 0 
 		 * @var Array of com\servandserv\happymeal\errors\Error
 		 */
-		protected $Error = [];
+		protected $_Error = [];
 		public function __construct() {
 			parent::__construct();
 			$this->__props["c9f0f895fb98ab9159f51fd0297e236d"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Error",
-			    "class"=>"com\servandserv\happymeal\errors\Error",
-			    "classNS"=>"com\servandserv\happymeal\errors",
-			    "prototype"=>"com\servandserv\happymeal\XML\Schema\AnyComplexType",
-				"prop"=>"Error",
+			    "class"=>'com\servandserv\happymeal\errors\Error',
+			    "classNS"=>'com\servandserv\happymeal\errors',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\AnyComplexType',
+				"prop"=>"_Error",
 				"getter"=>"getError",
 				"setter"=>"setError",
 				"default"=>"",
@@ -34,15 +34,14 @@
 		 * @param com\servandserv\happymeal\errors\Error $val
 		 */
 		public function setError ( \com\servandserv\happymeal\errors\Error $val ) {
-			$this->Error[] = $val;
+			$this->_Error[] = $val;
 			return $this;
 		}
 		/**
 		 * @param com\servandserv\happymeal\errors\Error[]
 		 */
 		public function setErrorArray ( array $vals ) {
-			$this->Error = $vals;
-			//$this->_properties["Error"]["text"] = $vals;
+			$this->_Error = $vals;
 			return $this;
 		}
 		/**
@@ -50,11 +49,11 @@
 		 */
 		public function getError($index = NULL, callable $cb = NULL) {
 			if( $index !== NULL ) {
-				$res = isset($this->Error[$index]) ? $this->Error[$index] : NULL;
+				$res = isset($this->_Error[$index]) ? $this->_Error[$index] : NULL;
 			} elseif( $cb ) {
-			    return array_values(array_filter($this->Error, $cb));
+			    return array_values(array_filter($this->_Error, $cb));
 			} else {
-				$res = $this->Error;
+				$res = $this->_Error;
 			}
 			return $res;
 		}

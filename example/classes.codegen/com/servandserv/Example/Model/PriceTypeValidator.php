@@ -12,14 +12,14 @@
 			
 			parent::__construct( $tdo, $handler);
 			    
-			$this->__props["98f13708210194c475687be6106a3b84"] = array(
+			$this->__props["182be0c5cdcd5072bb1864cdee4d3d6e"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"value",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\Example\Model\PriceType",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\Example\Model\PriceType',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\Decimal",
 			    "validator"=>"com\servandserv\Example\Model\PriceType\ValueValidator",
-				"prop"=>"Value",
+				"prop"=>"_Value",
 				"getter"=>"getValue",
 				"setter"=>"setValue",
 				"default"=>"",
@@ -30,14 +30,14 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["3c59dc048e8850243be8079a5c74d079"] = array(
+			$this->__props["e369853df766fa44e1ed0ff613f563bd"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"units",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\Example\Model\PriceType",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\Example\Model\PriceType',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\Example\Model\PriceType\UnitsValidator",
-				"prop"=>"Units",
+				"prop"=>"_Units",
 				"getter"=>"getUnits",
 				"setter"=>"setUnits",
 				"default"=>"",
@@ -48,14 +48,14 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["b6d767d2f8ed5d21a44b0e5886680cb9"] = array(
+			$this->__props["1c383cd30b7c298ab50293adfecb7b18"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Link",
-			    "class"=>"com\servandserv\XML\Atom\Link",
-			    "classNS"=>"com\servandserv\XML\Atom",
+			    "class"=>'com\servandserv\XML\Atom\Link',
+			    "classNS"=>'com\servandserv\XML\Atom',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\AnyComplexType",
 			    "validator"=>"com\servandserv\XML\Atom\LinkValidator",
-				"prop"=>"Link",
+				"prop"=>"_Link",
 				"getter"=>"getLink",
 				"setter"=>"setLink",
 				"default"=>"",
@@ -70,12 +70,12 @@
 		}
 		public function validate() {
 			parent::validate();
-			$this->assertMinOccurs( 'Value','1' );
-			$this->assertMaxOccurs( 'Value','1' );
-			$this->assertMinOccurs( 'Units','1' );
-			$this->assertMaxOccurs( 'Units','1' );
-			$this->assertMinOccurs( 'Link','0' );
-			$this->assertMaxOccurs( 'Link','unbounded' );
+			$this->assertMinOccurs( '_Value','1' );
+			$this->assertMaxOccurs( '_Value','1' );
+			$this->assertMinOccurs( '_Units','1' );
+			$this->assertMaxOccurs( '_Units','1' );
+			$this->assertMinOccurs( '_Link','0' );
+			$this->assertMaxOccurs( '_Link','unbounded' );
 		}
 	}
 	

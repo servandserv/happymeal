@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema elementFormDefault="qualified"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="urn:ru:bystrobank:data:currency_bankiru"
+	targetNamespace="urn:ru:bystrobank:data:currency_bankiru">
+
+<xsd:element name="group">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element ref="office" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+        <xsd:attribute name="version" type="xsd:string" />
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="office">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element ref="currencies" />
+        </xsd:sequence>
+        <xsd:attribute name="code" type="codeType" />
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:simpleType name="codeType">
+    <xsd:restriction base="xsd:int">
+        <xsd:enumeration value="186" />
+        <xsd:enumeration value="273" />
+        <xsd:enumeration value="286" />
+        <xsd:enumeration value="351" />
+        <xsd:enumeration value="461" />
+        <xsd:enumeration value="1028" />
+        <xsd:enumeration value="1386" />
+        <xsd:enumeration value="1514" />
+        <xsd:enumeration value="1560" />
+        <xsd:enumeration value="1561" />
+        <xsd:enumeration value="1569" />
+        <xsd:enumeration value="1574" />
+        <xsd:enumeration value="1830" />
+        <xsd:enumeration value="1851" />
+        <xsd:enumeration value="1852" />
+        <xsd:enumeration value="2141" />
+        <xsd:enumeration value="2173" />
+        <xsd:enumeration value="2296" />
+        <xsd:enumeration value="2301" />
+        <xsd:enumeration value="2302" />
+        <xsd:enumeration value="2305" />
+        <xsd:enumeration value="3098" />
+        <xsd:enumeration value="3253" />
+        <xsd:enumeration value="3273" />
+        <xsd:enumeration value="3336" />
+        <xsd:enumeration value="3580" />
+        <xsd:enumeration value="3623" />
+        <xsd:enumeration value="3662" />
+        <xsd:enumeration value="3692" />
+        <xsd:enumeration value="3784" />
+        <xsd:enumeration value="3808" />
+        <xsd:enumeration value="3829" />
+        <xsd:enumeration value="3867" />
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:element name="currencies">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element ref="currency" minOssurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="currency">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element ref="exchanges" />
+        </xsd:sequence>
+        <xsd:attribute name="id" type="idType" />
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:simpleType name="idType">
+    <xsd:restriction base="xsd:int">
+        <xsd:enumeration value="840" />
+        <xsd:enumeration value="978" />
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:element name="exchanges">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element ref="exchange" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="exchange">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element name="amount" type="xsd:int" />
+            <xsd:element name="buy" type="xsd:double" />
+            <xsd:element name="sale" type="xsd:double" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:element>
+
+</xsd:schema>

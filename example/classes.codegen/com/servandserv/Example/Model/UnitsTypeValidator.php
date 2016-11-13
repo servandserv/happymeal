@@ -16,8 +16,8 @@
 		}
 		public function validate() {
 			parent::validate();
-			$enum = array( 'USD', 'EUR', 'GBP', 'RUB' );
-			$this->assertEnumeration( $this->tdo->_text() , $enum );
+			$enum = array( 'USD', 'EUR', 'GBP' );
+			$this->assertEnumeration( $this->tdo->__text() , $enum );
 		}
 	}
 	

@@ -7,7 +7,6 @@
 		const _USD = "USD";
 		const _EUR = "EUR";
 		const _GBP = "GBP";
-		const _RUB = "RUB";
 	}
 		
 

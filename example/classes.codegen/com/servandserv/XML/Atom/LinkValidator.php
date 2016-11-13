@@ -15,11 +15,11 @@
 			$this->__props["c4ca4238a0b923820dcc509a6f75849b"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"rel",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\XML\Atom\Link",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\XML\Atom\Link',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\XML\Atom\Link\RelValidator",
-				"prop"=>"Rel",
+				"prop"=>"_Rel",
 				"getter"=>"getRel",
 				"setter"=>"setRel",
 				"default"=>"",
@@ -33,11 +33,11 @@
 			$this->__props["c81e728d9d4c2f636f067f89cc14862c"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"href",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\XML\Atom\Link",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\XML\Atom\Link',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\XML\Atom\Link\HrefValidator",
-				"prop"=>"Href",
+				"prop"=>"_Href",
 				"getter"=>"getHref",
 				"setter"=>"setHref",
 				"default"=>"",
@@ -51,11 +51,11 @@
 			$this->__props["eccbc87e4b5ce2fe28308fd9f2a7baf3"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"type",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\XML\Atom\Link",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\XML\Atom\Link',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\XML\Atom\Link\TypeValidator",
-				"prop"=>"Type",
+				"prop"=>"_Type",
 				"getter"=>"getType",
 				"setter"=>"setType",
 				"default"=>"",
@@ -69,11 +69,11 @@
 			$this->__props["a87ff679a2f3e71d9181a67b7542122c"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"method",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\XML\Atom\Link",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\XML\Atom\Link',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\XML\Atom\Link\MethodValidator",
-				"prop"=>"Method",
+				"prop"=>"_Method",
 				"getter"=>"getMethod",
 				"setter"=>"setMethod",
 				"default"=>"",
@@ -88,14 +88,14 @@
 		}
 		public function validate() {
 			parent::validate();
-			$this->assertMinOccurs( 'Rel','1' );
-			$this->assertMaxOccurs( 'Rel','1' );
-			$this->assertMinOccurs( 'Href','1' );
-			$this->assertMaxOccurs( 'Href','1' );
-			$this->assertMinOccurs( 'Type','0' );
-			$this->assertMaxOccurs( 'Type','1' );
-			$this->assertMinOccurs( 'Method','0' );
-			$this->assertMaxOccurs( 'Method','1' );
+			$this->assertMinOccurs( '_Rel','1' );
+			$this->assertMaxOccurs( '_Rel','1' );
+			$this->assertMinOccurs( '_Href','1' );
+			$this->assertMaxOccurs( '_Href','1' );
+			$this->assertMinOccurs( '_Type','0' );
+			$this->assertMaxOccurs( '_Type','1' );
+			$this->assertMinOccurs( '_Method','0' );
+			$this->assertMaxOccurs( '_Method','1' );
 		}
 	}
 	

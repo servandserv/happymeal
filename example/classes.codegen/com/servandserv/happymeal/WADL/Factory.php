@@ -2,7 +2,7 @@
 
 namespace \com\servandserv\happymeal\WADL;
 
-abstract class AbstractFactory
+interface class Factory
 {
     
     /**

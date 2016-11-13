@@ -15,7 +15,7 @@ class NameValidator extends TokenValidator
 	public function validateType () 
 	{
 		parent::validate();
-		$this->assertPattern( $this->tdo->_text(), $this::PATTERN );
+		$this->assertPattern( $this->tdo->__text(), $this::PATTERN );
 	}
 
 }

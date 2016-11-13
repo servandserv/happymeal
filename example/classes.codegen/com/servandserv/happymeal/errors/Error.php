@@ -11,46 +11,46 @@
 		 * @minOccurs 1 Every error could linked to object with the same namespace
 		 * @var \String
 		 */
-		protected $TargetNS = null;
+		protected $_TargetNS = null;
 		/**
 		 * @maxOccurs 1 
 		 * @minOccurs 0 Every error could linked to object property with the same name and namespace
 		 * @var \String
 		 */
-		protected $Name = null;
+		protected $_Name = null;
 		/**
 		 * @maxOccurs 1 
 		 * @minOccurs 0 Property value. NULL if value object
 		 * @var \String
 		 */
-		protected $Value = null;
+		protected $_Value = null;
 		/**
 		 * @maxOccurs 1 
 		 * @minOccurs 1 Validation rule code.
 		 * @var \String
 		 */
-		protected $Rule = null;
+		protected $_Rule = null;
 		/**
 		 * @maxOccurs 1 
 		 * @minOccurs 0 Compared value with.
 		 * @var \String
 		 */
-		protected $Assertion = null;
+		protected $_Assertion = null;
 		/**
 		 * @maxOccurs 1 
 		 * @minOccurs 0 Readable error description.
 		 * @var \String
 		 */
-		protected $Description = null;
+		protected $_Description = null;
 		public function __construct() {
 			parent::__construct();
 			$this->__props["c4ca4238a0b923820dcc509a6f75849b"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"targetNS",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
-			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
-				"prop"=>"TargetNS",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\String',
+				"prop"=>"_TargetNS",
 				"getter"=>"getTargetNS",
 				"setter"=>"setTargetNS",
 				"default"=>"",
@@ -62,10 +62,10 @@
 			$this->__props["c81e728d9d4c2f636f067f89cc14862c"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"name",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
-			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
-				"prop"=>"Name",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\String',
+				"prop"=>"_Name",
 				"getter"=>"getName",
 				"setter"=>"setName",
 				"default"=>"",
@@ -77,10 +77,10 @@
 			$this->__props["eccbc87e4b5ce2fe28308fd9f2a7baf3"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"value",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
-			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
-				"prop"=>"Value",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\String',
+				"prop"=>"_Value",
 				"getter"=>"getValue",
 				"setter"=>"setValue",
 				"default"=>"",
@@ -92,10 +92,10 @@
 			$this->__props["a87ff679a2f3e71d9181a67b7542122c"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"rule",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
-			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
-				"prop"=>"Rule",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\String',
+				"prop"=>"_Rule",
 				"getter"=>"getRule",
 				"setter"=>"setRule",
 				"default"=>"",
@@ -107,10 +107,10 @@
 			$this->__props["e4da3b7fbbce2345d7772b0674a318d5"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"assertion",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
-			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
-				"prop"=>"Assertion",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\String',
+				"prop"=>"_Assertion",
 				"getter"=>"getAssertion",
 				"setter"=>"setAssertion",
 				"default"=>"",
@@ -122,10 +122,10 @@
 			$this->__props["1679091c5a880faf6fb5e6087eb1b2dc"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"description",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
-			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
-				"prop"=>"Description",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\String',
+				"prop"=>"_Description",
 				"getter"=>"getDescription",
 				"setter"=>"setDescription",
 				"default"=>"",
@@ -139,79 +139,79 @@
 		 * @param \String $val
 		 */
 		public function setTargetNS (  $val ) {
-			$this->TargetNS = $val;
+			$this->_TargetNS = $val;
 			return $this;
 		}
 		/**
 		 * @param \String $val
 		 */
 		public function setName (  $val ) {
-			$this->Name = $val;
+			$this->_Name = $val;
 			return $this;
 		}
 		/**
 		 * @param \String $val
 		 */
 		public function setValue (  $val ) {
-			$this->Value = $val;
+			$this->_Value = $val;
 			return $this;
 		}
 		/**
 		 * @param \String $val
 		 */
 		public function setRule (  $val ) {
-			$this->Rule = $val;
+			$this->_Rule = $val;
 			return $this;
 		}
 		/**
 		 * @param \String $val
 		 */
 		public function setAssertion (  $val ) {
-			$this->Assertion = $val;
+			$this->_Assertion = $val;
 			return $this;
 		}
 		/**
 		 * @param \String $val
 		 */
 		public function setDescription (  $val ) {
-			$this->Description = $val;
+			$this->_Description = $val;
 			return $this;
 		}
 		/**
 		 * @return \String
 		 */
 		public function getTargetNS() {
-			return $this->TargetNS;
+			return $this->_TargetNS;
 		}
 		/**
 		 * @return \String
 		 */
 		public function getName() {
-			return $this->Name;
+			return $this->_Name;
 		}
 		/**
 		 * @return \String
 		 */
 		public function getValue() {
-			return $this->Value;
+			return $this->_Value;
 		}
 		/**
 		 * @return \String
 		 */
 		public function getRule() {
-			return $this->Rule;
+			return $this->_Rule;
 		}
 		/**
 		 * @return \String
 		 */
 		public function getAssertion() {
-			return $this->Assertion;
+			return $this->_Assertion;
 		}
 		/**
 		 * @return \String
 		 */
 		public function getDescription() {
-			return $this->Description;
+			return $this->_Description;
 		}
 		
 		public function validateType( \com\servandserv\happymeal\ValidationHandler $handler ) {

@@ -15,11 +15,11 @@
 			$this->__props["c4ca4238a0b923820dcc509a6f75849b"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"targetNS",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\happymeal\errors\Error\TargetNSValidator",
-				"prop"=>"TargetNS",
+				"prop"=>"_TargetNS",
 				"getter"=>"getTargetNS",
 				"setter"=>"setTargetNS",
 				"default"=>"",
@@ -33,11 +33,11 @@
 			$this->__props["c81e728d9d4c2f636f067f89cc14862c"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"name",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\happymeal\errors\Error\NameValidator",
-				"prop"=>"Name",
+				"prop"=>"_Name",
 				"getter"=>"getName",
 				"setter"=>"setName",
 				"default"=>"",
@@ -51,11 +51,11 @@
 			$this->__props["eccbc87e4b5ce2fe28308fd9f2a7baf3"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"value",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\happymeal\errors\Error\ValueValidator",
-				"prop"=>"Value",
+				"prop"=>"_Value",
 				"getter"=>"getValue",
 				"setter"=>"setValue",
 				"default"=>"",
@@ -69,11 +69,11 @@
 			$this->__props["a87ff679a2f3e71d9181a67b7542122c"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"rule",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\happymeal\errors\Error\RuleValidator",
-				"prop"=>"Rule",
+				"prop"=>"_Rule",
 				"getter"=>"getRule",
 				"setter"=>"setRule",
 				"default"=>"",
@@ -87,11 +87,11 @@
 			$this->__props["e4da3b7fbbce2345d7772b0674a318d5"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"assertion",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\happymeal\errors\Error\AssertionValidator",
-				"prop"=>"Assertion",
+				"prop"=>"_Assertion",
 				"getter"=>"getAssertion",
 				"setter"=>"setAssertion",
 				"default"=>"",
@@ -105,11 +105,11 @@
 			$this->__props["1679091c5a880faf6fb5e6087eb1b2dc"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"description",
-			    "class"=>"",
-			    "classNS"=>"com\servandserv\happymeal\errors\Error",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\errors\Error',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\String",
 			    "validator"=>"com\servandserv\happymeal\errors\Error\DescriptionValidator",
-				"prop"=>"Description",
+				"prop"=>"_Description",
 				"getter"=>"getDescription",
 				"setter"=>"setDescription",
 				"default"=>"",
@@ -124,18 +124,18 @@
 		}
 		public function validate() {
 			parent::validate();
-			$this->assertMinOccurs( 'TargetNS','1' );
-			$this->assertMaxOccurs( 'TargetNS','1' );
-			$this->assertMinOccurs( 'Name','0' );
-			$this->assertMaxOccurs( 'Name','1' );
-			$this->assertMinOccurs( 'Value','0' );
-			$this->assertMaxOccurs( 'Value','1' );
-			$this->assertMinOccurs( 'Rule','1' );
-			$this->assertMaxOccurs( 'Rule','1' );
-			$this->assertMinOccurs( 'Assertion','0' );
-			$this->assertMaxOccurs( 'Assertion','1' );
-			$this->assertMinOccurs( 'Description','0' );
-			$this->assertMaxOccurs( 'Description','1' );
+			$this->assertMinOccurs( '_TargetNS','1' );
+			$this->assertMaxOccurs( '_TargetNS','1' );
+			$this->assertMinOccurs( '_Name','0' );
+			$this->assertMaxOccurs( '_Name','1' );
+			$this->assertMinOccurs( '_Value','0' );
+			$this->assertMaxOccurs( '_Value','1' );
+			$this->assertMinOccurs( '_Rule','1' );
+			$this->assertMaxOccurs( '_Rule','1' );
+			$this->assertMinOccurs( '_Assertion','0' );
+			$this->assertMaxOccurs( '_Assertion','1' );
+			$this->assertMinOccurs( '_Description','0' );
+			$this->assertMaxOccurs( '_Description','1' );
 		}
 	}
 	

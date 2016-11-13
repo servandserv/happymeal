@@ -15,7 +15,7 @@ class QNameValidator extends AnySimpleTypeValidator
 	public function validate () 
 	{
 		parent::validate();
-		$this->assertPattern( $this->tdo->_text(), $this::PATTERN );
+		$this->assertPattern( $this->tdo->__text(), $this::PATTERN );
 	}
 
 }

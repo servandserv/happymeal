@@ -7,8 +7,8 @@
 	 * Валидатор класса com\servandserv\Example\Model\ID
 	 *
 	 */
-	class IDValidator extends \com\servandserv\happymeal\XML\Schema\StringValidator {
-		public function __construct( \com\servandserv\happymeal\XML\Schema\String $tdo = NULL, \com\servandserv\happymeal\ValidationHandler $handler = NULL ) {
+	class IDValidator extends \com\servandserv\happymeal\XML\Schema\IDValidator {
+		public function __construct( \com\servandserv\happymeal\XML\Schema\ID $tdo = NULL, \com\servandserv\happymeal\ValidationHandler $handler = NULL ) {
 			
 			parent::__construct( $tdo, $handler);
 			$this->className = "ID";

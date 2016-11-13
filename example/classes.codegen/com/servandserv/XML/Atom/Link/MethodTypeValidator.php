@@ -17,7 +17,7 @@
 		public function validate() {
 			parent::validate();
 			$enum = array( 'GET', 'POST' );
-			$this->assertEnumeration( $this->tdo->_text() , $enum );
+			$this->assertEnumeration( $this->tdo->__text() , $enum );
 		}
 	}
 	

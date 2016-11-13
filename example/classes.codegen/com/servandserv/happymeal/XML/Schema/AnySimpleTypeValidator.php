@@ -25,7 +25,7 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 
 	public function validate () 
 	{
-		$this->assertSimple( $this->tdo->_text() );
+		$this->assertSimple( $this->tdo->__text() );
 	}
 
 	protected function assertSimple( $value ) 
@@ -56,7 +56,7 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 	protected function assertMinInclusive( $value, $minInclusive = self::MININCLUSIVE ) 
 	{
 	    $normalized = $this->whitespace($value);
-	    if( $normalized===NULL || (string)doubleval($normalized)===$normalized && doubleval($normalized) >= doubleval($minInclusive) ) return;
+	    if( $normalized===NULL || doubleval($normalized) >= doubleval($minInclusive) ) return;
 		$this->handleError(
 			Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
@@ -69,7 +69,7 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 	protected function assertMinExclusive( $value, $minExclusive = self::MINEXCLUSIVE ) 
 	{
 	    $normalized = $this->whitespace($value);
-	    if( $normalized===NULL || (string)doubleval($normalized)===$normalized && doubleval($normalized) > doubleval($minExclusive) ) return;
+	    if( $normalized===NULL || doubleval($normalized) > doubleval($minExclusive) ) return;
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
@@ -82,7 +82,7 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 	protected function assertMaxInclusive( $value, $maxInclusive = self::MAXINCLUSIVE ) 
 	{
 	    $normalized = $this->whitespace($value);
-	    if( $normalized===NULL || (string)doubleval($normalized)===$normalized && doubleval($normalized) <= doubleval($maxInclusive) ) return;
+	    if( $normalized===NULL || doubleval($normalized) <= doubleval($maxInclusive) ) return;
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
@@ -95,7 +95,7 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 	protected function assertMaxExclusive( $value, $maxExclusive = self::MAXEXCLUSIVE ) 
 	{
 	    $normalized = $this->whitespace($value);
-	    if( $normalized===NULL || (string)doubleval($normalized)===$normalized && doubleval($normalized) < doubleval($maxExclusive) ) return;
+	    if( $normalized===NULL || doubleval($normalized) < doubleval($maxExclusive) ) return;
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)

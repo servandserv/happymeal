@@ -15,11 +15,11 @@
 			$this->__props["c9f0f895fb98ab9159f51fd0297e236d"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Error",
-			    "class"=>"com\servandserv\happymeal\errors\Error",
-			    "classNS"=>"com\servandserv\happymeal\errors",
+			    "class"=>'com\servandserv\happymeal\errors\Error',
+			    "classNS"=>'com\servandserv\happymeal\errors',
 			    "prototype"=>"com\servandserv\happymeal\XML\Schema\AnyComplexType",
 			    "validator"=>"com\servandserv\happymeal\errors\ErrorValidator",
-				"prop"=>"Error",
+				"prop"=>"_Error",
 				"getter"=>"getError",
 				"setter"=>"setError",
 				"default"=>"",
@@ -34,7 +34,7 @@
 		}
 		public function validate() {
 			parent::validate();
-			$this->assertMinOccurs( 'Error','0' );
-			$this->assertMaxOccurs( 'Error','unbounded' );
+			$this->assertMinOccurs( '_Error','0' );
+			$this->assertMaxOccurs( '_Error','unbounded' );
 		}
 	}

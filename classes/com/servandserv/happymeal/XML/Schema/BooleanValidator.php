@@ -30,7 +30,6 @@ class BooleanValidator extends \com\servandserv\happymeal\XML\Schema\AnySimpleTy
 			   ->setName($this->className)
 			   ->setRule(self::ASSERT_BOOLEAN)
 			   ->setValue($value));
-		}
 	}
 
 }
