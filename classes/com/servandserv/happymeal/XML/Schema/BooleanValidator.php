@@ -17,7 +17,7 @@ class BooleanValidator extends \com\servandserv\happymeal\XML\Schema\AnySimpleTy
 
 	public function validate () 
 	{
-		$this->assertBoolean( $this->tdo->_text() );
+		$this->assertBoolean( $this->tdo->__text() );
 	}
 	
 	private function assertBoolean( $value ) 

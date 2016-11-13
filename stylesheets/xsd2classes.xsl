@@ -101,9 +101,9 @@
 			    </xsl:choose>
 			    <xsl:text disable-output-escaping="yes">,
 			    "nodeName"=>"</xsl:text><xsl:value-of select="@nodeName"/><xsl:text disable-output-escaping="yes">",
-			    "class"=>"</xsl:text><xsl:value-of select="@class"/><xsl:text disable-output-escaping="yes">",
-			    "classNS"=>"</xsl:text><xsl:value-of select="@classNS"/><xsl:text disable-output-escaping="yes">",
-			    "prototype"=>"</xsl:text><xsl:value-of select="@prototype"/><xsl:text disable-output-escaping="yes">",
+			    "class"=>'</xsl:text><xsl:value-of select="@class"/><xsl:text disable-output-escaping="yes">',
+			    "classNS"=>'</xsl:text><xsl:value-of select="@classNS"/><xsl:text disable-output-escaping="yes">',
+			    "prototype"=>'</xsl:text><xsl:value-of select="@prototype"/><xsl:text disable-output-escaping="yes">',
 				"prop"=>"</xsl:text><xsl:value-of select="@propName"/><xsl:text disable-output-escaping="yes">",
 				"getter"=>"</xsl:text><xsl:value-of select="@getter"/><xsl:text disable-output-escaping="yes">",
 				"setter"=>"</xsl:text><xsl:value-of select="@setter"/><xsl:text disable-output-escaping="yes">",
@@ -421,16 +421,10 @@
 			<xsl:when test="$p/@array">
 				<xsl:text disable-output-escaping="yes">
 			$this-></xsl:text><xsl:value-of select="$p/@propName" /><xsl:text disable-output-escaping="yes">[] = $val;</xsl:text>
-			<!--
-			$this->_properties["</xsl:text><xsl:value-of select="$p/@nodeName" /><xsl:text>"]["text"][] = $val;/xsl:text
-			-->
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text disable-output-escaping="yes">
 			$this-></xsl:text><xsl:value-of select="$p/@propName" /><xsl:text disable-output-escaping="yes"> = $val;</xsl:text>
-			<!--
-			$this->_properties["</xsl:text><xsl:value-of select="$p/@nodeName" /><xsl:text>"]["text"] = $val;/xsl:text
-			-->
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:text disable-output-escaping="yes">
@@ -460,7 +454,6 @@
 			$this-></xsl:text>
 			<xsl:value-of select="$p/@propName" />
 			<xsl:text disable-output-escaping="yes"> = $vals;
-			//$this->_properties["</xsl:text><xsl:value-of select="$p/@nodeName" /><xsl:text>"]["text"] = $vals;
 			return $this;
 		}</xsl:text>
 		</xsl:if>
@@ -1153,8 +1146,8 @@
 			    </xsl:choose>
 			    <xsl:text disable-output-escaping="yes">,
 			    "nodeName"=>"</xsl:text><xsl:value-of select="@nodeName"/><xsl:text disable-output-escaping="yes">",
-			    "class"=>"</xsl:text><xsl:value-of select="@class"/><xsl:text disable-output-escaping="yes">",
-			    "classNS"=>"</xsl:text><xsl:value-of select="@classNS"/><xsl:text disable-output-escaping="yes">",
+			    "class"=>'</xsl:text><xsl:value-of select="@class"/><xsl:text disable-output-escaping="yes">',
+			    "classNS"=>'</xsl:text><xsl:value-of select="@classNS"/><xsl:text disable-output-escaping="yes">',
 			    "prototype"=>"</xsl:text><xsl:value-of select="@prototype"/><xsl:text disable-output-escaping="yes">",
 			    "validator"=>"</xsl:text><xsl:value-of select="@validator"/><xsl:text disable-output-escaping="yes">",
 				"prop"=>"</xsl:text><xsl:value-of select="@propName"/><xsl:text disable-output-escaping="yes">",
@@ -1234,7 +1227,7 @@
 			$enum = array( </xsl:text>
 			<xsl:value-of select="$enum" />
 			<xsl:text disable-output-escaping="yes"> );
-			$this->assertEnumeration( $this->tdo->_text() , $enum );</xsl:text>
+			$this->assertEnumeration( $this->tdo->__text() , $enum );</xsl:text>
 		</xsl:if>
 		<xsl:apply-templates select="tmp:*" mode="VALIDATION_RULE" />
 	</xsl:template>
@@ -1244,7 +1237,7 @@
 			$this->assert</xsl:text>
 			<xsl:value-of select="translate(substring(local-name(),1,1),$smallcase,$uppercase)"/>
 			<xsl:value-of select="substring(local-name(),2)"/>
-			<xsl:text disable-output-escaping="yes">( $this->tdo->_text(), $this::</xsl:text>
+			<xsl:text disable-output-escaping="yes">( $this->tdo->__text(), $this::</xsl:text>
 			<xsl:value-of select="translate(local-name(),$smallcase,$uppercase)" />
 			<xsl:if test="local-name() = 'pattern'"><xsl:value-of select="position()"/></xsl:if>
 			<xsl:text> );</xsl:text>

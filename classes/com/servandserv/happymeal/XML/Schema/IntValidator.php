@@ -16,7 +16,7 @@ class IntValidator extends LongValidator
 	public function validate () 
 	{
 		parent::validate();
-		$this->assertMaxInclusive( $this->tdo->_text(), $this::MAXINCLUSIVE );
-		$this->assertMinInclusive( $this->tdo->_text(), $this::MININCLUSIVE );
+		$this->assertMaxInclusive( $this->tdo->__text(), $this::MAXINCLUSIVE );
+		$this->assertMinInclusive( $this->tdo->__text(), $this::MININCLUSIVE );
 	}
 }

@@ -1,12 +1,29 @@
-# happymeal
-xsd2php, xsd2js, wadl2php code generator, happymeal router, happymeal js micro framework
+# Happymeal
+xsd to php classes generator, wadl to php code generator
 
-Генерация php кода на основе XML Schemas, WADL описания REST сервисов
+## Install happymeal project
 
-1. Генерируются Адаптеры преобразующие  XML данные  в php, js объекты и наоборот.
-Генерация производится по схемам данных
+`
+mkdir /path_to_project/project_name
+cd /path_to_project/project_name
 
-2. Генерируется контроллер REST сервиса  на основании WADL. Контроллер использует роутер classes/App.php
+mkdir vendor
+cd vendor
+git clone https://github.com/servandserv/happymeal.git
+cp /happymeal/happymeal.ini /path_to_project/project_name
+`
 
+## XSD to PHP classes generator
 
-Usage: happymeal man
+### Generate code
+
+1. Configurate happymeal.ini file 
+2. Run the bash script
+
+`path_to_happymeal/happymeal xsd2php path_to_project/project_name/happymeal.ini`
+
+### Use php code
+
+`
+
+`

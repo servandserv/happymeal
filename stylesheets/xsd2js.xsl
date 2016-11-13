@@ -213,7 +213,7 @@
 	<xsl:template match="tmp:property" mode="ECHO_PROPERTIES">
 		<xsl:text>
 				</xsl:text>
-			<xsl:value-of select="@name"/>: <xsl:value-of select="tmp:default" />
+			<xsl:value-of select="@propName"/>: <xsl:value-of select="tmp:default" />
 			<xsl:if test="position()!=last()">
 			<xsl:text>,</xsl:text>
 			</xsl:if>
@@ -224,7 +224,7 @@
 				</xsl:text>
 		<xsl:value-of select="@getter"/>
 		<xsl:text>: function() { return anyComplexType.</xsl:text>
-		<xsl:value-of select="@name" />
+		<xsl:value-of select="@propName" />
 		<xsl:text>; },</xsl:text>
 	</xsl:template>
 	
@@ -237,7 +237,7 @@
 		    <xsl:when test="@array">
 		        <xsl:text>
 		            anyComplexType.</xsl:text>
-                <xsl:value-of select="@name" />
+                <xsl:value-of select="@propName" />
                 <xsl:text>.push(val);
                     return this.isValid(</xsl:text>
                 <xsl:apply-templates select="." mode="VALIDATION_RULE" />
@@ -250,7 +250,7 @@
 			<xsl:otherwise>
 			    <xsl:text>
 			        anyComplexType.</xsl:text>
-				<xsl:value-of select="@name" />
+				<xsl:value-of select="@propName" />
 				<xsl:text> = val;
 				    return this.isValid((val === null || </xsl:text><xsl:apply-templates select="." mode="VALIDATION_RULE" /><xsl:text>),{
 				        target: "</xsl:text><xsl:value-of select="translate(@classNS,'\','.')" /><xsl:text>",
@@ -273,12 +273,12 @@
 	<xsl:template match="tmp:property[@class]" mode="ECHO_UNSERIALIZE">
 		<xsl:text>
 							case "</xsl:text><xsl:value-of select="@name"/><xsl:text>":
-								var </xsl:text><xsl:value-of select="@name"/><xsl:text> = h.Locator("</xsl:text>
+								var </xsl:text><xsl:value-of select="@propName"/><xsl:text> = h.Locator("</xsl:text>
 								<xsl:value-of select="@class" /><xsl:text>");
-								</xsl:text><xsl:value-of select="@name" /><xsl:text>.fromXmlParser(parser,self,callback);
+								</xsl:text><xsl:value-of select="@propName" /><xsl:text>.fromXmlParser(parser,self,callback);
 								self.</xsl:text>
 								<xsl:value-of select="@setter" />
-								<xsl:text>(</xsl:text><xsl:value-of select="@name" /><xsl:text>);
+								<xsl:text>(</xsl:text><xsl:value-of select="@propName" /><xsl:text>);
 								break;</xsl:text>
 	</xsl:template>
 	

@@ -25,7 +25,7 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 
 	public function validate () 
 	{
-		$this->assertSimple( $this->tdo->_text() );
+		$this->assertSimple( $this->tdo->__text() );
 	}
 
 	protected function assertSimple( $value ) 

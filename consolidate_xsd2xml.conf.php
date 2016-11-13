@@ -3,6 +3,8 @@
 //define( "SCHEMAS_PATH", "/web/schemas" );
 define( "XML_SCHEMA_NS", "com\servandserv\happymeal\XML\Schema" );
 define( "XML_SCHEMA_TARGET_NS", "XML\Schema" );
+define( "HAPPYMEAL_TMP_NS", "com:servandserv:happymeal:tmp" );
+define( "PROPERTY_PREFIX", "_" );
 
 $class_name_restrictions = array(
 	'__halt_compiler', 
@@ -25,7 +27,13 @@ $class_name_restrictions = array(
 	'unset', 'use', 
 	'var', 
 	'while', 
-	'xor'
+	'xor',
+	/** javascript
+	'break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'finally', 'for', 'function', 'if', 'in', 'instanceof', 
+	'new', 'return', 'switch', 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with',
+	'class', 'const', 'enum', 'export', 'extends', 'import', 'super', 'implements', 'interface', 'let', 'package', 'private', 'protected', 'public',
+	'static', 'yield',
+	'null','true','false','NaN','Infinity','undefined'*/
 );
 
 $nss_replacements = array(
@@ -39,7 +47,5 @@ $nss_replacements = array(
 	"http://wadl.dev.java.net/2009/02" => "com:servandserv:happymeal:WADL"
 );
 
-$local_nss = array( 
-    "urn:"
-);
+$local_nss = array( "urn:" );
 

@@ -12,13 +12,13 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 	const NS = "http://www.w3.org/2001/XMLSchema";
 	const PREF = NULL;
 	
-	protected $_text;
+	protected $__text;
 	
-	public function _text( $text = NULL ) {
+	public function __text( $text = NULL ) {
 		if( $text !== NULL ) {
-			$this->_text = $text;
+			$this->__text = $text;
 		} else {
-			return $this->_text;
+			return $this->__text;
 		}
 	}
 	
@@ -60,7 +60,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 		if( $xr->isEmptyElement ) return $this;
 		while( $xr->read() ) {
 			if( $xr->nodeType == \XMLReader::TEXT ) {
-				$this->_text = $xr->value;
+				$this->__text = $xr->value;
 			} elseif( $xr->nodeType == \XMLReader::END_ELEMENT && $root == $xr->localName ) {
 				return $this;
 			}
@@ -70,7 +70,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 
 	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = XMLAdaptor::ELEMENT ) {
 		if( $mode & XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
-		if( $this->_text ) $xw->text( $this->_text );
+		if( $this->__text ) $xw->text( $this->__text );
 		if( $mode & XMLAdaptor::ENDELEMENT ) $xw->endElement();
 	}
 	
@@ -86,7 +86,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 	public function fromJSONArray( array $arr ) 
 	{
 	    if(isset($arr[self::ROOT])) {
-	        $this->_text = $arr[self::ROOT];
+	        $this->__text = $arr[self::ROOT];
 	    }
 	    return $this;
 	}
@@ -98,7 +98,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 	
 	public function toJSONArray( $jsonname = self::ROOT )
     {
-        return array($jsonname=>$this->_text);
+        return array($jsonname=>$this->__text);
     }
 	
 	
@@ -238,7 +238,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
     protected function modelFromTree( array $arr )
     {
         if(isset($arr[self::ROOT])&&$arr[self::ROOT]["ns"]==self::NS) {
-            $this->_text = trim($arr[self::ROOT]["elements"][0]);
+            $this->__text = trim($arr[self::ROOT]["elements"][0]);
         }
         return $this;
     }

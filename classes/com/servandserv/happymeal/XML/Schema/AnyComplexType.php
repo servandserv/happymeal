@@ -22,7 +22,7 @@ class AnyComplexType extends AnyType
 	
 	public function validateType ( \com\servandserv\happymeal\ValidationHandler $handler ) 
 	{
-		$validator = Bindings::create("com\servandserv\happymeal\XML\Schema\AnyComplexTypeValidator",array( $this, $handler ));
+		$validator = Bindings::create('com\servandserv\happymeal\XML\Schema\AnyComplexTypeValidator',array( $this, $handler ));
 		$validator->validate();
 	}
 	
@@ -112,7 +112,7 @@ class AnyComplexType extends AnyType
 			    $attrNS = $xr->namespaceURI ? $xr->namespaceURI : $ns;
 			    foreach($this->__props as $k=>$prop) {
 			        if( $prop["attribute"]==true &&
-			            $prop["xmlns"]==$ns &&
+			            ($prop["xmlns"]==$attrNS || !$attrNS) &&
 			            $xr->localName==$prop["nodeName"] &&
 			            method_exists($this,$prop["setter"])) {
 			            
@@ -128,7 +128,7 @@ class AnyComplexType extends AnyType
 	protected function elementsFromXmlReader( \XMLReader &$xr ) {
 	    foreach($this->__props as $k=>$prop) {
 			if( $prop["attribute"]==false &&
-			    $prop["xmlns"]==$xr->namespaceURI &&
+			    ($prop["xmlns"]==$xr->namespaceURI || !$xr->namespaceURI) &&
 			    $xr->localName==$prop["nodeName"] &&
 			    method_exists($this,$prop["setter"])) {
 	            

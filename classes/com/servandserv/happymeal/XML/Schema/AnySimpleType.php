@@ -11,7 +11,7 @@ class AnySimpleType extends AnyType
 	
 	public function __construct( $val = NULL ) 
 	{
-		$this->_text( $val );
+		$this->__text( $val );
 		return $this;
 	}
 	
@@ -25,13 +25,13 @@ class AnySimpleType extends AnyType
 	
 	public function equals( \com\servandserv\happymeal\XML\Schema\AnyType $obj ) 
 	{
-		return $this->_text() === $obj->_text();
+		return $this->__text() === $obj->__text();
 	}
 	
 	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = \com\servandserv\happymeal\XMLAdaptor::ELEMENT ) 
 	{
 		if( $mode & \com\servandserv\happymeal\XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
-		if( $prop = $this->_text() ) $xw->text( $prop ) ;
+		if( $prop = $this->__text() ) $xw->text( $prop ) ;
 		if( $mode & \com\servandserv\happymeal\XMLAdaptor::ENDELEMENT ) $xw->endElement();
 	}
 	
@@ -42,7 +42,7 @@ class AnySimpleType extends AnyType
 		if( $xr->isEmptyElement ) return $this;
 		while( $xr->read() ) {
 			if( $xr->nodeType == \XMLReader::TEXT ) {
-				$this->_text( $xr->value );
+				$this->__text( $xr->value );
 			} elseif( $xr->nodeType == \XMLReader::END_ELEMENT && $root == $xr->localName ) {
 				return $this;
 			}

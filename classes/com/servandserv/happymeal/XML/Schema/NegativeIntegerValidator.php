@@ -15,7 +15,7 @@ class NegativeIntegerValidator extends NonPositiveIntegerValidator
 	public function validate () 
 	{
 		parent::validate();
-		$this->assertMaxInclusive( $this->tdo->_text(), $this::MAXINCLUSIVE );
+		$this->assertMaxInclusive( $this->tdo->__text(), $this::MAXINCLUSIVE );
 	}
 
 }

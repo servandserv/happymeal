@@ -6,100 +6,109 @@
  *
  */
 
-include_once "config.php";
+include_once "consolidate_xsd2xml.conf.php";
 
 $code = "";
 $counter = 0;//nodes counter
 $nss = $uniques = array();
 
-if(count($argv) < 2 || !$argv[1]) {
-	throw new Exception("Undefined schema path");
+$base = $argv[1];
+if(!$argv[1] || !file_exists($base) || !is_dir($base)) {
+    print ("Base directory '".$base."' is not directory\r\n");
+    exit(1);
 }
-// schemas dir
-$base = realpath($argv[1]);
-
-if(count($argv) < 3 || !$argv[2]) {
-	throw new Exception("Undefined build directory");
+$buildDir = $base.DIRECTORY_SEPARATOR.$argv[2];
+if(!$argv[2] || !file_exists($buildDir) || !is_dir($buildDir)) {
+    print ("Codegen directory '".$buildDir."' is not directory\r\n");
+    exit(1);
 }
-// generated classes dir
-$buildDir = $argv[2];
+$schemasPath = $argv[3];
+if(!$schemasPath) {
+    print "Schemas path empty\r\n";
+    exit(1);
+}
+$schemas = explode(" ",$schemasPath);
 // imported xsd schema files 
 $imports = array();
-
-if( count( $argv ) > 3 ) {
-	$i = 3;
-	while( isset( $argv[$i] ) ) {
-		$fullname = $base.DIRECTORY_SEPARATOR.$argv[$i];
-		$fullname = preg_replace("/\/{2,}/","/",$fullname);//убираем двойные слэши чтобы однозначно идентифицировать адрес импортируемого ресурса
-		if( is_dir( $fullname ) ) {
-			$dir = new RecursiveDirectoryIterator( $fullname );
-			foreach( new RecursiveIteratorIterator( $dir ) as $val ) {
-				if( $val->isFile() && strpos($val->getPathname(),".xsd") != 0 ) {
-					$imports[$val->getPathname()] = FALSE;
-				}
-			}
-			/*
-			foreach ( glob( $fullname."{/*}/*.xsd" ) as $filename ) {
-				if( !file_exists( $filename ) ) throw new Exception( "File ".$filename." doesn"t exist" ); 
-				$imports[$filename] = FALSE;
-			}
-			 * */
-		} else {
-			if( !file_exists( $fullname ) ) throw new Exception( "File $fullname doesn't exist" ); 
-			$imports[$fullname] = FALSE;
-		}
-		$i++;
+foreach($schemas as $schema) {
+	$fullname = $base.DIRECTORY_SEPARATOR.$schema;
+	$fullname = preg_replace("/\/{2,}/","/",$fullname);//убираем двойные слэши чтобы однозначно идентифицировать адрес импортируемого ресурса
+	if(!file_exists($fullname)) {
+	    print "Schema file $fullname not exists\r\n";
+	    exit(1);
 	}
-} else {
-	if( is_dir( $base ) ) {
-		foreach ( glob( $base."/*.xsd" ) as $filename ) {
-			if( !file_exists( $filename ) ) throw new Exception( "File ".$filename." doesn't exist" ); 
-			$imports[$filename] = FALSE;
+	if( is_dir( $fullname ) ) {
+	    $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($fullname), RecursiveIteratorIterator::SELF_FIRST);
+        foreach($objects as $name => $object) {
+            if( $object->isFile() && strpos($object->getPathname(),".xsd") != 0 ) {
+                $imports[$object->getPathname()] = FALSE;
+            }
+        }
+	} else {
+		if( !file_exists( $fullname ) ) {
+		    print "File $fullname not exists\r\n";
+		    exit(1);
 		}
+		$imports[$fullname] = FALSE;
 	}
 }
 
-//print_r( $imports ); exit;
+//print_r( $imports );exit(1);
 
+// create consolidated xml file with all imported schemas
 $xw = new XMLWriter();
 $xw->openMemory();
 $xw->setIndent( true );
 $xw->setIndentString( " " );
 $xw->startDocument( "1.0", "UTF-8" );
-$xw->startElementNS( NULL, "schema", "com:servandserv:happymeal:tmp" );
-//$xw->writeAttribute( "namespace", $namespace );
+$xw->startElementNS( NULL, "schema", HAPPYMEAL_TMP_NS );
 
+// get first schema to import
 $notImported = getNotImported( $imports );
-
+// do while schemas list has schemas to import
 while( $notImported ) {
 	$tree = array();
 	import2assoc( $notImported, $xw );
-	/**
-	foreach( $tree as $file ) {
-		foreach( $file as $class ) {
-			//$code .= class2code( $class );
-		}
-	}
-    */
 	$notImported = getNotImported( $imports );
 }
 $xw->endElement();
 $xw->endDocument();
-$xml = $xw->flush();
-print( $xml );
-exit;
+print( $xw->flush() );
+exit(0);
 
-/* functions */
-function getNotImported ( $imports ) {
+/**
+ * return first new xsd schema link
+ * in imports array
+ */
+function getNotImported ( $imports ) 
+{
 	foreach( $imports as $k => $v ) {
 		if( $v === FALSE ) return $k;
 	}
 	return FALSE;
 }
 
-// parse schema files
-function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_path = "" ) {
+function import2assoc ( $path, \XMLWriter &$xw ) 
+{
+	global $base, $imports, $nss, $nss_replacements, $tree;
 
+	if( isset( $imports[$path] ) && $imports[$path] !== FALSE ) return array();
+	if(!$xmlstr = file_get_contents( $path )) {
+	    print "Can't read schemas file '$path'\r\n";
+	    exit(1);
+	}
+
+	$xr = new XMLReader();
+	if(!$xr->XML( $xmlstr ) ) {
+	    print "Error on parse schema XML $path\r\n";
+	    exit(1);
+	}
+	$tree[] = xml2assoc( $xr, $path, $xw );
+}
+
+// parse schema files
+function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_path = "" ) 
+{
 	global $uniques, $nss, $nss_replacements, $counter, $buildDir;
 
 	$tree = null;
@@ -119,7 +128,7 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 					case "import":
 					case "include":
 					    // import included schemas
-						import2assoc( realpath( dirname( $path )."/".$xr->getAttribute( "schemaLocation" ) ), $xw );
+						import2assoc( href2realpath( $path, $xr->getAttribute( "schemaLocation" ) ), $xw );
 						break;
 					default:
 						$node = array(
@@ -151,7 +160,7 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 									$node["attributes"]["getter"] = "get".$propname;
 									$node["attributes"]["setter"] = "set".$propname;
 									$node["attributes"]["className"] = $classname;
-									$node["attributes"]["propName"] = $propname;
+									$node["attributes"]["propName"] = PROPERTY_PREFIX.$propname;
 									$node["attributes"]["targetNS"] = $target;
 									$node["attributes"]["classNS"] = create_class_ns( $packagename, $ns_path, $classname );
 									$node["attributes"]["class"] = $node["attributes"]["classNS"]."\\".$classname;
@@ -165,7 +174,7 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 									$node["attributes"]["typeClassName"] = $typename;
 									$node["attributes"]["typeClass"] = $node["attributes"]["typeClassNS"].
 											"\\".$typename;
-									$node["attributes"]["mode"] = "\Adaptor_XML::CONTENTS";
+									$node["attributes"]["mode"] = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS';
 								}
 								if( $xr->localName == "ref" && !$xr->prefix ) {
 									$packagerefname = create_package_ns( $xr->value, $target );
@@ -174,7 +183,7 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 									$node["attributes"]["refClassName"] = $refname;
 									$node["attributes"]["refClass"] = $node["attributes"]["refClassNS"].
 											"\\".$refname;
-									$node["attributes"]["mode"] = "\Adaptor_XML::ELEMENT";
+									$node["attributes"]["mode"] = '\com\servandserv\happymeal\XMLAdaptor::ELEMENT';
 								}
 								if( $xr->localName == "substitutionGroup" && !$xr->prefix ) {
 									$package_subs_name = create_package_ns( $xr->value, $target );
@@ -211,16 +220,6 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 				$tree .= $xr->value;
 		}
 	return $tree;
-}
-
-function import2assoc ( $path, \XMLWriter &$xw ) {
-	global $base, $imports, $nss, $nss_replacements, $tree;
-
-	if( isset( $imports[$path] ) && $imports[$path] !== FALSE ) return array();
-
-	$xr = new XMLReader();
-	$xr->XML( file_get_contents( $path ) );
-	$tree[] = xml2assoc( $xr, $path, $xw );
 }
 
 function schema2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = null ) {
@@ -353,4 +352,13 @@ function create_prop_name ( $val, $target, $ln ) {
 		$val = "x".$val;
 	}
 	return $val;
+}
+
+function href2realpath( $schemaPath,$includePath )
+{
+    if(preg_match("/^https?:/",$schemaPath,$m)) {
+        return $includePath;
+    } else {
+        return realpath( dirname( $schemaPath ).DIRECTORY_SEPARATOR.$includePath );
+    }
 }

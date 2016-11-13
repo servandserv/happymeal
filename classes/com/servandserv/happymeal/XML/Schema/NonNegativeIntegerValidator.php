@@ -15,7 +15,7 @@ class NonNegativeIntegerValidator extends IntegerValidator
 	public function validate () 
 	{
 		parent::validate();
-		$this->assertMinInclusive( $this->tdo->_text(), $this::MININCLUSIVE );
+		$this->assertMinInclusive( $this->tdo->__text(), $this::MININCLUSIVE );
 	}
 
 }

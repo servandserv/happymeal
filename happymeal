@@ -5,80 +5,45 @@ realp() {
 }
 
 usage() { printf "
-Usage: happymeal xsd2code -vj -s path_to_schemas -o path_to_project
-       happymeal wadl2code
-       happymeal man
+Usage: path_to_happymeal/happymeal xsd2code path_to_happymeal_ini_file
+       path_to_happymeal/happymeal wadl2code path_to_happymeal_ini_file
+       path_to_happymealhappymeal man
 
 Сommand:
-  xsd2code Генерация кода классов на основе схем данных и его тестирование.
-    Генерация делается в 4 прохода
-    а) первым проходом собираем все схемы указанные в параметрах в один файл.
-       Добавляем в узлы элементов атрибуты необходимые для построения классов.
-       выполняет сборку скрипт 'consolidate_xsd2xml.php' на выходе скрипта
-       формируется временный файл '../happymeal_build_tmp/consolidated.xml'
-    б) формируем единый файл с кодом путем трансформации
-       '../happymeal_build_tmp/consolidated.xml' с использованием xslt шаблонов
-       расположенных в файле 'stylesheets/xsd2classes.xsl' на выходе получаем
-       временный текстовый файл '../happymeal_build_tmp/classes.txt' который
-       содержит php и указатели на файлы классов
-    в) парсим полученный текстовый файл '../happymeal_build_tmp/classes.txt' и
-       формируем файлы с классами, записываем файлы классов в соответствующие
-       папки
-    г) из файла '../happymeal_build_tmp/consolidated.xml' путем трансформации
-       шаблонами 'stylesheets/xsd2tests.xsl' формируем файл
-       '../happymeal_build/xsd2code_tests.php', который содержит исполняемый код
-       тестов (пока частично реализованы тесты простых типов). Выполняем
-       полученный файл.
-    д) если указан флаг j то из файла '../happymeal_build_tmp/consolidated.xml' путем трансформации
-       шаблонами 'stylesheets/xsd2js.xsl' формируем js файл который содержит
-       код js адабторов к xml и json данным на стороне клиента
-       в этот же файл добавляется библиотеки 
-        - sax.js (для распарсивания xml документов)
-        - Happymeal.js (минифреймворк на клиенте)
-
-  flags:
-    -v
-       set flag to generate validation code for classes
-    -j 
-       set flag to generate js code
-    -m 
-       target namespace for php classes
-    -s 
-       relative path to xsd schemas
-    -o 
-       target path to generated classes
+  xsd2code Generate php,js data adaptors based on xsd schemas 
+  Adaptors can translate data from xml,json,markup arrays to php,js classes and back
 
   examples:
-    happymeal xsd2code -vj -s ../web/schemas -o ../project
+    cd my_project
+    vendor/happymeal xsd2code happymeal.ini
 
 Command:
-    wadl2code Генерируем код скрипта роутера по данным wadl.
-        Проверяет все файлы *.wadl в папке (-s путь). Если вторым параметром
-        указывается конкретный файл схемы, то генерирует только по нему
-        использует для версионности скрипта путь /api/v[0-9]{1,2}\.[0-9]{1,2}
-        base ресурсов wadl файла.
-        генерируется файл api.v[0-9]{1,2}-[0-9]{1,2}.php в каталоге web
+  wadl2code Generate php client adaptors based on WADL schema
 
-        happymeal wadl2code  -o path/to/destination -s path/to/schemas  -m \\\\Namespace\\\\Port\\\\Adaptor\\\\Data schema_catalog
-    
-Command:
-  man   Мануал
-
-Сommand:[todo]
-  init  Инициализация happymeal в рабочем проекте.
-
-Comments: Загружаем из репы батник $0. Выполняем $0 init
+  TODO
 
 
 " 1>&2; exit 1; }
 
-xsd2php() 
-{
-    echo "$sFlag"
-}
+ini=$2
+if [ -z "${ini}" ]; then
+    usage
+fi
+if [ ! -f "${ini}" ]; then
+    echo "Error: ini file not found" >&2
+    exit 1
+fi
 
-#  подчищаем
-#trap 'rm -rf -- ../happymeal_build/tmp' EXIT
+iniPath=$(dirname $(realp $2))
+invokePath=$(pwd)
+happymealPath=$(dirname $(realp $0))
+tmpDir=$(sed -n -e 's/^\s*tmpDir\s*=\s*//p' $2)
+mkdir -p $tmpDir
+tmpClean=$(sed -n -e 's/^\s*tmpClean\s*=\s*//p' $2)
+if [ "${tmpClean}" == 1 ]; then
+    #  clean tmp dir
+    trap 'rm -rf -- $tmpDir' EXIT
+fi
 
 command=$1
 if [ -z "${command}" ]; then
@@ -93,66 +58,44 @@ mkfile() {
     chmod 775 $f
 }
 
-invokePath=$(pwd)
-happymealPath=$(dirname $(realp $0))
-
 if [ "$command" == "xsd2code" ]; then
 
-    jFlag=
-    vFlag="WITHOUT_VALIDATORS"
-    sFlag=
-    oFlag=
-
-    OPTIND=2
-    while getopts "vjs:o:" optname
-        do
-        case "$optname" in
-            v)  vFlag="WITH_VALIDATORS"
-                ;;
-            j)  jFlag=1
-                ;;
-            s)  sFlag=$(realp $OPTARG)
-                ;;
-            o)  oFlag=$(realp $OPTARG)
-                ;;
-            :)  echo "Option -$OPTARG requires an argument" >&2
-                exit 1
-                ;;
-            ?)  echo "Unknown option -$OPTARG" >&2
-                exit 1
-                ;;
-            *)  echo "Unknown error while processing options" >&2
-                exit 1
-        esac
-    done
-    shift $((OPTIND-1))
-
-    if [ -z "${sFlag}" ]; then
-        usage
+    validators=$(sed -n -e 's/^\s*validators\s*=\s*//p' $2)
+    if [ -z "${validators}" ]; then
+        validators=0
     fi
-    if [ -z "${oFlag}" ]; then
-        usage
-    fi
-    if [ ! -d "${sFlag}" ]; then
-        echo "Error: schemas path not found" >&2
+    schemasPath=$(sed -n -e 's/^\s*schemasPath\s*=\s*//p' $2)
+    if [ -z "${schemasPath}" ]; then
+        echo "Error: schemas path variable not found" >&2
         exit 1
     fi
+    codegenPath=$(sed -n -e 's/^\s*codegenPath\s*=\s*//p' $2)
+    mkdir -p ${iniPath}/${codegenPath}
+    if [ -z "${codegenPath}" ]; then
+        echo "Error: codegen path variable not found" >&2
+        exit 1
+    fi
+    jsPath=$(sed -n -e 's/^\s*jsPath\s*=\s*//p' $2)
+    if [ "${jsPath}" ]; then
+        appName=$(sed -n -e 's/^\s*appName\s*=\s*//p' $2)
+        mkdir -p ${iniPath}/${jsPath}
+    fi
 
-    echo "Path to schemas: $sFlag"
-    echo "Path to generated php classes code: $oFlag"
-
-    mkdir -p "$oFlag/classes.codegen/com"
-    tmpBuildDir=$oFlag"/tmp_happymeal"
-    #  clean
-    #trap 'rm -rf -- $tmpBuildDir' EXIT
-    mkdir -p "$tmpBuildDir"
-    # каталог классов не чистим
-    rm -rf "$tmpBuildDir"/*
+    echo "Base path: ${iniPath}"
+    echo "Path to schemas: ${schemasPath}"
+    echo "Path to generated php code: ${codegenPath}"
+    if [ -z "${jsPath}" ]; then
+        echo "Path to generated js code: ${jsPath}"
+    fi
     
     # create happymeals classes
-    php $happymealPath"/consolidate_xsd2xml.php" $happymealPath"/schemas" "$oFlag/classes.codegen" $* > "$tmpBuildDir"/consolidated.xml
-    xsltproc --stringparam MODE "$vFlag" $happymealPath"/stylesheets/xsd2classes.xsl" "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/classes.txt
-    cat "$tmpBuildDir"/classes.txt | while IFS= read -r s; do
+    php $happymealPath"/consolidate_xsd2xml.php" "${happymealPath}" "classes" "schemas" > "$tmpDir"/consolidated.xml
+    if [ ! $? -eq 0 ];then
+        cat "$tmpDir"/consolidated.xml
+        exit 1
+    fi
+    xsltproc --stringparam MODE "$validators" "${happymealPath}/stylesheets/xsd2classes.xsl" "$tmpDir"/consolidated.xml > "$tmpDir"/classes.txt
+    cat "$tmpDir"/classes.txt | while IFS= read -r s; do
         if [[ "$s" = "#path:"* ]]
             then
             mkfile $s
@@ -160,17 +103,19 @@ if [ "$command" == "xsd2code" ]; then
             echo "$s" >>$f
         fi
     done
-    cp -pR $happymealPath"/classes/com/servandserv" $oFlag"/classes.codegen/com"
+    cp -pR $happymealPath"/classes/com" ${codegenPath}
     
     # create project classes
-    php $happymealPath"/consolidate_xsd2xml.php" "$sFlag" "$oFlag/classes.codegen" $* > "$tmpBuildDir"/consolidated.xml
-    
+    php $happymealPath"/consolidate_xsd2xml.php" "${iniPath}" "${codegenPath}" "${schemasPath}" > "$tmpDir"/consolidated.xml
+    if [ ! $? -eq 0 ];then
+        cat "$tmpDir"/consolidated.xml
+        exit 1
+    fi
     echo "consolidate xsd schemas ...    OK!"
-    echo $vFlag
-    xsltproc --stringparam MODE "$vFlag" $happymealPath"/stylesheets/xsd2classes.xsl" "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/classes.txt
+    xsltproc --stringparam MODE "$validators" "${happymealPath}/stylesheets/xsd2classes.xsl" "$tmpDir"/consolidated.xml > "$tmpDir"/classes.txt
     echo "xsd to classes code ...        OK!"
 
-    cat "$tmpBuildDir"/classes.txt | while IFS= read -r s; do
+    cat "$tmpDir"/classes.txt | while IFS= read -r s; do
         if [[ "$s" = "#path:"* ]]
             then
             mkfile $s
@@ -179,25 +124,20 @@ if [ "$command" == "xsd2code" ]; then
         fi
     done
     echo "classes code to files ...       OK!"
-
+    
     #if [ "${tFlag}" == 1 ]; then
     #    xsltproc stylesheets/xsd2tests.xsl "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/xsd2code_tests.php
     #    php "$tmpBuildDir"/xsd2code_tests.php "$oFlag"
     #fi
     
-    if [ "${jFlag}" == 1 ]; then
-        appname=${oFlag##*/}
-        mkdir -p ${oFlag}/web.codegen/js
-        xsltproc ${happymealPath}/stylesheets/xsd2js.xsl ${tmpBuildDir}/consolidated.xml > ${oFlag}/web.codegen/js/${appname}.js
-        #  сожмем
-        java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js ${oFlag}/web.codegen/js/${appname}.js > ${oFlag}/web.codegen/js/${appname}.min.js
-        cat ${happymealPath}/web/js/Happymeal.js ${happymealPath}/web/js/libs/sax.js > ${oFlag}/web.codegen/js/Happymeal.js
-        java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js ${oFlag}/web.codegen/js/Happymeal.js > ${oFlag}/web.codegen/js/Happymeal.min.js
+    if [ -d "${jsPath}" ]; then
+        appFile=${iniPath}/${jsPath}/${appName}
+        xsltproc ${happymealPath}/stylesheets/xsd2js.xsl ${tmpDir}/consolidated.xml > ${appFile}.js
+        # min
+        java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js ${appFile}.js > ${appFile}.min.js
+        cat ${happymealPath}/web/js/Happymeal.js ${happymealPath}/web/js/libs/sax.js > ${iniPath}/${jsPath}/Happymeal.js
+        java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js ${iniPath}/${jsPath}/Happymeal.js > ${iniPath}/${jsPath}/Happymeal.min.js
     fi
-    
-    chmod -R 755 "$oFlag"
-    #rm -rf "$tmpBuildDir"
-    cd "$invokePath"
     exit 0;
     
 elif [ "$command" == "wadl2code" ]; then
@@ -291,9 +231,6 @@ elif [ "$command" == "wadl2code" ]; then
     cd "$invokePath"
     exit 0;
 
-elif [ "$command" == "man" ]; then
-    usage
-    exit 0;
 else
     usage
 fi
