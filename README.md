@@ -1,5 +1,5 @@
 # Happymeal
-xsd to php classes generator, wadl to php code generator
+xsd to php classes generator, wadl to php code generator(soon)
 
 ## Install happymeal project
 
