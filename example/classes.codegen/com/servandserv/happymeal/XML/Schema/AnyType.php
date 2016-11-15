@@ -211,11 +211,11 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
         }
         $nodeKey = $prefix ? $prefix.":".$localName : $localName;
         $xmlnsKey = $prefix ? ("xmlns:".$prefix) : "xmlns";
-        //if( isset( $nss[$xmlnsKey] ) ) {
+        if( isset( $nss[$xmlnsKey] ) || count($nss)==0 ) {
             if( !isset( $tree[$nodeKey] ) ) {
                 $tree[$nodeKey] = array(
                     "prefix"=>$prefix,
-                    "ns"=> $nss[$xmlnsKey],
+                    "ns"=> isset($nss[$xmlnsKey])?$nss[$xmlnsKey]:NULL,
                     "localName"=>$localName,
                     "complex"=>false
                 );
@@ -232,7 +232,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
             } else {
                 $tree[$nodeKey][$nodeType][$position] = $v;
             }
-        //}
+        }
     }
     
     protected function modelFromTree( array $arr )

@@ -51,3 +51,10 @@ $markup = array(
 $m4 = \com\servandserv\happymeal\Bindings::create("com\servandserv\Example\Model");
 $m4->fromMarkupArray($markup,array("xmlns"=>"urn:com:servandserv:Example:Model"));
 print $m4->toXmlStr();
+
+$m5 = \com\servandserv\happymeal\Bindings::create('com\servandserv\XML\Atom\Link');
+$m5->fromMarkupArray(array(
+    "href"=>"http://",
+    "rel"=>"user"
+));
+print $m5->toXmlStr();

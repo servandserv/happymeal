@@ -270,7 +270,7 @@ class AnyComplexType extends AnyType
          */
         foreach( $arr as $nodeKey=>$nodeData ) {
             foreach($this->__props as $k=>$prop) {
-                if( $prop["xmlns"]===$nodeData["ns"] &&
+                if( ( $prop["xmlns"]===$nodeData["ns"] || $nodeData["ns"]===NULL ) &&
                     $prop["attribute"]===TRUE && 
                     $prop["nodeName"]===$nodeData["localName"] && 
                     count($nodeData["attributes"]) > 0 &&
@@ -279,7 +279,7 @@ class AnyComplexType extends AnyType
                     call_user_func(array($this,$prop["setter"]),trim($nodeData["attributes"][0]));
                 }
                 
-                if( $prop["xmlns"]===$nodeData["ns"] &&
+                if( ( $prop["xmlns"]===$nodeData["ns"] || $nodeData["ns"]===NULL ) &&
                     $prop["attribute"]===FALSE &&
                     $prop["nodeName"]===$nodeData["localName"] &&
                     count($nodeData["elements"])>0 &&
