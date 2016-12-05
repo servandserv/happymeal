@@ -4,6 +4,8 @@ namespace com\servandserv\happymeal\WADL\Application;
 
 interface MiddlewareService
 {
+
+
     /**
      * 
      * @param $adapter request data transfer object

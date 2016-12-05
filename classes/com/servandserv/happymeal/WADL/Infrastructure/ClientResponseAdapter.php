@@ -4,20 +4,13 @@ namespace com\servandserv\happymeal\WADL\Infrastructure;
 
 use \com\servandserv\happymeal\XML\Schema\AnyType;
 use \com\servandserv\happymeal\WADL\Application\ClientResponsePort;
+use \com\servandserv\happymeal\WADL\Application\Headers;
 
 class ClientResponseAdapter implements ClientResponsePort
 {
-
-    const _200 = " 200 OK";
-    const _204 = " 204 No Content";
-    const _400 = " 400 Bad Request";
-    const _403 = " 403 Forbidden";
-    const _405 = " 405 Method Not Allowed";
-    const _500 = " 500 Internal Server Error";
-
     private $code;
 
-    public function __construct( $code = self::_200 )
+    public function __construct( $code = Headers::_200 )
     {
         $this->code = $code;
     }
@@ -25,7 +18,7 @@ class ClientResponseAdapter implements ClientResponsePort
     public function response( AnyType $adapter = NULL )
     {
         if( $adapter === NULL ) {
-            header( $this->responseHeader( self::_204 ) );
+            header( $this->responseHeader( Headers::_204 ) );
         } else {
             header( $this->responseHeader( $this->code ) );
 		    switch( $this->accept() ) {

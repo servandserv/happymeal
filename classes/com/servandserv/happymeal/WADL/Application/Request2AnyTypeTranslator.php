@@ -2,7 +2,7 @@
 
 namespace com\servandserv\happymeal\WADL\Application;
 
-class Request2AnyTypeTranslator  implements AnyTypeTranslator
+class Request2AnyTypeTranslator implements AnyTypeTranslator
 {
 
     public function translate( \com\servandserv\happymeal\XML\Schema\AnyType $adapter ) 

@@ -8,26 +8,24 @@ use \com\servandserv\happymeal\ErrorsHandler;
 class RepresentationService implements MiddlewareService
 {
 
-    protected $req2type;
-    protected $err2resp;
-    protected $h;
+    protected $err2type;
     protected $resp;
 
-    public function __construct( AnyTypeTranslator $req2type, AnyTypeTranslator $err2resp, ErrorsHandler $h, ClientResponsePort $resp )
+    public function __construct( ErrorsTranslator $err2type, ClientResponsePort $resp )
     {
-        $this->req2type = $req2type;
-        $this->err2resp = $err2resp;
-        $this->h = $h;
+        $this->err2type = $err2type;
         $this->resp = $resp;
     }
     
     public function process( AnyType $adapter )
     {
+        $req2type = new Request2AnyTypeTranslator();
+        $handler = new ErrorsHandler();
         try {
-            $this->req2type->translate( $adapter );
-            $adapter->validateType( $this->h );
-            if( $this->h->hasErrors() ) {
-                $this->resp->response( $this->err2resp->translate( $this->h->getErrors() ) );
+            $req2type->translate( $adapter );
+            $adapter->validateType( $handler );
+            if( $handler->hasErrors() ) {
+                $this->resp->response( $this->err2type->translate( $handler->getErrors() ) );
             }
         } catch( \Exception $e ) {
             $this->resp->throwException( $e->getMessage() );
