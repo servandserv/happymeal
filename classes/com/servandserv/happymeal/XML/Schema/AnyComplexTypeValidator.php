@@ -36,7 +36,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 	    }
 	}
 	
-	protected function assertMinOccurs( $prop, $minOccurs = 1 ) {
+	protected function assertMinOccurs( $prop, $node, $minOccurs = 1 ) {
 		$method = "get".$prop;
 		if( !method_exists( $this->tdo, $method ) ) return;
 		$val = $this->tdo->{$method}();
@@ -44,7 +44,8 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 			$this->handleError(
 			    Bindings::create(self::ERROR_CLASS)
 			        ->setTargetNS($this->targetNS)
-			        ->setName($prop)
+			        ->setName($node)
+			        ->setClassNS($this->classNS)
 			        ->setRule(self::ASSERT_MIN_OCCURS)
 			        ->setAssertion($minOccurs)
 			        ->setValue(NULL));
@@ -53,14 +54,15 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 			$this->handleError(
 			    Bindings::create(self::ERROR_CLASS)
 			        ->setTargetNS($this->targetNS)
-			        ->setName($prop)
+			        ->setName($node)
+			        ->setClassNS($this->classNS)
 			        ->setRule(self::ASSERT_MIN_OCCURS)
 			        ->setAssetion($minOccurs)
 			        ->setValue(count($val)));
 		}
 	}
 	
-	protected function assertMaxOccurs( $prop, $maxOccurs = 1 ) {
+	protected function assertMaxOccurs( $prop, $node, $maxOccurs = 1 ) {
 		$method = "get".$prop;
 		if( !method_exists( $this->tdo, $method ) ) return;
 		$val = $this->tdo->{$method}();
@@ -68,7 +70,8 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($prop)
+		        ->setClassNS($this->classNS)
+		        ->setName($node)
 		        ->setRule(self::ASSERT_MAX_OCCURS)
 		        ->setAssertion($maxOccurs)
 		        ->setValue(count($val)));
@@ -86,13 +89,14 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_CHOICE)
 		        ->setAssetion(1)
 		        ->setValue($choice));
 	}
 	
-	protected function assertFixed( $prop, $fixed ) 
+	protected function assertFixed( $prop, $node, $fixed ) 
 	{
 		$method = "get".$prop;
 		if( !method_exists( $this->tdo, $method ) ) return;
@@ -101,7 +105,8 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->node)
 		        ->setRule(self::ASSERT_FIXED)
 		        ->setAssertion($fixed)
 		        ->setValue($val));

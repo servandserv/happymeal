@@ -4,15 +4,15 @@
 	
 	/**
 	 *
-	 * Валидатор класса com\servandserv\happymeal\errors\Error\TargetNS
+	 * Валидатор класса com\servandserv\happymeal\errors\Error\ClassNS
 	 *
 	 */
-	class TargetNSValidator extends \com\servandserv\happymeal\XML\Schema\StringTypeValidator {
+	class ClassNSValidator extends \com\servandserv\happymeal\XML\Schema\StringTypeValidator {
 		public function __construct( \com\servandserv\happymeal\XML\Schema\StringType $tdo = NULL, \com\servandserv\happymeal\ValidationHandler $handler = NULL ) {
 			
 			parent::__construct( $tdo, $handler);
-			$this->className = "TargetNS";
-			$this->nodeName = "targetNS";
+			$this->className = "ClassNS";
+			$this->nodeName = "classNS";
 			$this->targetNS = "urn:com:servandserv:happymeal:errors";
 			$this->classNS = "com:servandserv:happymeal:errors:Error";
 		}

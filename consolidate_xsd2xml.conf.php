@@ -27,7 +27,7 @@ $class_name_restrictions = array(
 	'unset', 'use', 
 	'var', 
 	'while', 
-	'xor',
+	'xor'
 	/** javascript
 	'break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'finally', 'for', 'function', 'if', 'in', 'instanceof', 
 	'new', 'return', 'switch', 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with',
@@ -35,6 +35,12 @@ $class_name_restrictions = array(
 	'static', 'yield',
 	'null','true','false','NaN','Infinity','undefined'*/
 );
+
+$base_types_replacements = [
+    'anyuri','boolean','byte','datetime','date','decimal','double','duration','float','idref','id','int',
+	'integer','language','long','ncname','nmtoken','name','negativeinteger','nonnegativeinteger','nonpositiveinteger',
+	'normalizedstring','positiveinteger','qname','short','string','time','token'
+];
 
 $nss_replacements = array(
 	"http://www.w3.org/1999/XSL/Transform" => "com:servandserv:happymeal:XML:XSL",

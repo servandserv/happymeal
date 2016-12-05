@@ -174,7 +174,7 @@
 			<xsl:for-each select="tmp:restriction/tmp:enumeration">
 				<xsl:text disable-output-escaping="yes">
 		const _</xsl:text>
-					<xsl:value-of select="translate(@value, '.-', '__')" />
+					<xsl:value-of select="translate(@value, '.-\/', '____')" />
 					<xsl:text> = "</xsl:text>
 					<xsl:value-of select="@value" />
 					<xsl:text>";</xsl:text>
@@ -1166,7 +1166,9 @@
 			    <xsl:apply-templates select="tmp:*" mode="SIMPLE_TYPE_VALIDATOR" /-->
 			<xsl:text disable-output-escaping="yes">
 			$this->className = "</xsl:text><xsl:value-of select="@className" /><xsl:text disable-output-escaping="yes">";
+			$this->nodeName = "</xsl:text><xsl:value-of select="@schemaName" /><xsl:text disable-output-escaping="yes">";
 			$this->targetNS = "</xsl:text><xsl:value-of select="@targetNS" /><xsl:text disable-output-escaping="yes">";
+			$this->classNS = "</xsl:text><xsl:value-of select="translate(@classNS,'\',':')" /><xsl:text disable-output-escaping="yes">";
 		}
 		public function validate() {
 			parent::validate();</xsl:text>
@@ -1376,6 +1378,8 @@
 			$this->assertFixed( '</xsl:text>
 				<xsl:value-of select="$source/@propName" />
 				<xsl:text>','</xsl:text>
+				<xsl:value-of select="$source/@schemaName"/>
+				<xsl:text>','</xsl:text>
 				<xsl:value-of select="$source/@fixed"/>
 				<xsl:text>' );</xsl:text>
 			</xsl:if>
@@ -1385,11 +1389,15 @@
 			$this->assertMinOccurs( '</xsl:text>
 			<xsl:value-of select="@propName" />
 			<xsl:text>','</xsl:text>
+			<xsl:value-of select="@schemaName"/>
+			<xsl:text>','</xsl:text>
 			<xsl:value-of select="$minOccurs"/>
 			<xsl:text>' );</xsl:text>
 			<xsl:text disable-output-escaping="yes">
 			$this->assertMaxOccurs( '</xsl:text>
 			<xsl:value-of select="@propName" />
+			<xsl:text>','</xsl:text>
+			<xsl:value-of select="@schemaName"/>
 			<xsl:text>','</xsl:text>
 			<xsl:value-of select="$maxOccurs"/>
 			<xsl:text>' );</xsl:text>

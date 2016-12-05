@@ -27,7 +27,7 @@ class ValidationHandler
 	
 	public function hasErrors() 
 	{
-		return count( $this->errors ) > 0;
+		return count( $this->errors->getError() ) > 0;
 	}
 	
 	public function clean () 

@@ -34,7 +34,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 			Bindings::create(self::ERROR_CLASS)
 			    ->setTargetNS($this->targetNS)
-			    ->setName($this->className)
+			    ->setClassNS($this->classNS)
+			    ->setName($this->nodeName)
 			    ->setRule(self::ASSERT_SIMPLE)
 			    ->setAssertion(NULL)
 			    ->setValue($value));
@@ -47,7 +48,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 			Bindings::create(self::ERROR_CLASS)
 			    ->setTargetNS($this->targetNS)
-			    ->setName($this->className)
+			    ->setClassNS($this->classNS)
+			    ->setName($this->nodeName)
 			    ->setRule(self::ASSERT_PATTERN)
 			    ->setAssertion($regexp)
 			    ->setValue($value));
@@ -60,7 +62,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 			Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_MIN_INCLUSIVE)
 		        ->setAssertion($minInclusive)
 		        ->setValue($value));
@@ -73,7 +76,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_MIN_EXCLUSIVE)
 		        ->setAssertion($minExclusive)
 		        ->setValue($value));
@@ -86,7 +90,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_MAX_INCLUSIVE)
 		        ->setAssertion($maxInclusive)
 		        ->setValue($value));
@@ -99,7 +104,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_MAX_EXCLUSIVE)
 		        ->setAssertion($maxExclusive)
 		        ->setValue($value));
@@ -112,7 +118,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_LENGTH)
 		        ->setAssertion($length)
 		        ->setValue($value));
@@ -125,7 +132,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_MIN_LENGTH)
 		        ->setAssertion($minLength)
 		        ->setValue($value));
@@ -138,7 +146,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_MAX_LENGTH)
 		        ->setAssertion($maxLength)
 		        ->setValue($value));
@@ -150,7 +159,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_ENUMERATION)
 		        ->setAssertion(implode(",",$enum))
 		        ->setValue($value));
@@ -163,7 +173,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_FRACTION_DIGITS)
 		        ->setAssertion($fractionDigits)
 		        ->setValue($value));
@@ -176,7 +187,8 @@ class AnySimpleTypeValidator extends AnyTypeValidator
 	    $this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
 		        ->setTargetNS($this->targetNS)
-		        ->setName($this->className)
+		        ->setClassNS($this->classNS)
+		        ->setName($this->nodeName)
 		        ->setRule(self::ASSERT_TOTAL_DIGITS)
 		        ->setAssertion($totalDigits)
 		        ->setValue($value));

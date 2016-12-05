@@ -14,7 +14,7 @@
 		protected $_Error = [];
 		public function __construct() {
 			parent::__construct();
-			$this->__props["c9f0f895fb98ab9159f51fd0297e236d"] = array(
+			$this->__props["45c48cce2e2d7fbdea1afc51c7c6ad26"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Error",
 			    "class"=>'com\servandserv\happymeal\errors\Error',

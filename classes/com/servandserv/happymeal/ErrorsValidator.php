@@ -12,7 +12,7 @@
 			
 			parent::__construct( $tdo, $handler);
 			    
-			$this->__props["c9f0f895fb98ab9159f51fd0297e236d"] = array(
+			$this->__props["45c48cce2e2d7fbdea1afc51c7c6ad26"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Error",
 			    "class"=>'com\servandserv\happymeal\errors\Error',
@@ -30,11 +30,13 @@
 				"maxOccurs"=>"unbounded"
 			);
 			$this->className = "Errors";
+			$this->nodeName = "Errors";
 			$this->targetNS = "urn:com:servandserv:happymeal:errors";
+			$this->classNS = "com:servandserv:happymeal";
 		}
 		public function validate() {
 			parent::validate();
-			$this->assertMinOccurs( '_Error','0' );
-			$this->assertMaxOccurs( '_Error','unbounded' );
+			$this->assertMinOccurs( '_Error','Error','0' );
+			$this->assertMaxOccurs( '_Error','Error','unbounded' );
 		}
 	}

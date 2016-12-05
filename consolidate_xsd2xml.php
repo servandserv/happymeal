@@ -154,7 +154,7 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 									$node["attributes"]["schemaName"] = $xr->value;
 									
 									$packagename = create_package_ns( $xr->value, $target );
-									$classname = create_class_name( $xr->value );
+									$classname = create_class_name( $xr->value, $packagename );
 									$propname = create_prop_name( $xr->value, $target, $node["localName"] );
 									//$node["attributes"]["package"] = $packagename;
 									$node["attributes"]["getter"] = "get".$propname;
@@ -169,7 +169,7 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 								}
 								if( in_array( $xr->localName, array( "type", "base", "itemType" ) ) && !$xr->prefix ) {
 									$packagetypename = create_package_ns( $xr->value, $target );
-									$typename = create_class_name( $xr->value );
+									$typename = create_class_name( $xr->value, $packagetypename );
 									$node["attributes"]["typeClassNS"] = create_class_ns( $packagetypename, "", $typename );
 									$node["attributes"]["typeClassName"] = $typename;
 									$node["attributes"]["typeClass"] = $node["attributes"]["typeClassNS"].
@@ -178,7 +178,7 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 								}
 								if( $xr->localName == "ref" && !$xr->prefix ) {
 									$packagerefname = create_package_ns( $xr->value, $target );
-									$refname = create_class_name( $xr->value );
+									$refname = create_class_name( $xr->value, $packagerefname );
 									$node["attributes"]["refClassNS"] = create_class_ns( $packagerefname, "", $refname );
 									$node["attributes"]["refClassName"] = $refname;
 									$node["attributes"]["refClass"] = $node["attributes"]["refClassNS"].
@@ -311,9 +311,12 @@ function create_package_ns ( $val, $target ) {
 // Имя класса. указано в атрибуте name узла
 // убираем префикс в атрибуте
 // заменяем первую букву оставшейся строки на прописную
-function create_class_name ( $val ) {
+// заменяем -  на _
+// имена совпадающие с зарезервированными словами заменяем на имя+Type
+function create_class_name ( $val, $packagename ) {
 	
 	global $class_name_restrictions;
+	global $base_types_replacements;
 	
 	$comma = strpos( $val, ":" );
 	if( $comma ) {
@@ -321,8 +324,12 @@ function create_class_name ( $val ) {
 		$val = substr( $val, $comma + 1 );
 	}
 	$val = strtoupper( substr( $val, 0, 1 ) ).substr( $val, 1 );
+	$val = str_replace( "-", "_", $val );
 	if( in_array( strtolower( $val ), $class_name_restrictions ) ) {
-		$val = "x".$val;
+		$val = $val."Type";
+	}
+	if( $packagename == 'com\servandserv\happymeal\XML\Schema' && in_array( strtolower( $val ), $base_types_replacements ) ) {
+	    $val = $val."Type";
 	}
 	return $val;
 }
