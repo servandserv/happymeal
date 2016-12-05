@@ -20,7 +20,7 @@ class AnyComplexType extends AnyType
 		return $this == $obj;
 	}
 	
-	public function validateType ( \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function validateType ( \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		$validator = Bindings::create('com\servandserv\happymeal\XML\Schema\AnyComplexTypeValidator',array( $this, $handler ));
 		$validator->validate();

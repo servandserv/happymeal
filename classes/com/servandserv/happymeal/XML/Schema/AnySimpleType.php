@@ -15,7 +15,7 @@ class AnySimpleType extends AnyType
 		return $this;
 	}
 	
-	public function validateType ( \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function validateType ( \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 	    \com\servandserv\happymeal\Bindings::create(
 		    'com\servandserv\happymeal\XML\Schema\AnySimpleTypeValidator',

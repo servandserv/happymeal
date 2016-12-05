@@ -9,7 +9,7 @@ class DecimalTypeValidator extends AnySimpleTypeValidator
 	const PATTERN = "/^[-+]?[0-9]*\.?[0-9]+$/";
 	//const PATTERN = "/[-+]?[0-9]*\.?[0-9]+/";
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\DecimalType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\DecimalType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

@@ -9,7 +9,7 @@ class PositiveIntegerType extends NonNegativeIntegerType
 	const NS = "http://www.w3.org/2001/XMLSchema";
 	const PREF = NULL;
 	
-	public function validateType ( \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function validateType ( \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		$validator = \com\servandserv\happymeal\Bindings::create("com\servandserv\happymeal\XML\Schema\PositiveIntegerTypeValidator",array( $this, $handler ));
 		$validator->validate();

@@ -8,7 +8,7 @@
 	 *
 	 */
 	class ErrorsValidator extends \com\servandserv\happymeal\XML\Schema\AnyComplexTypeValidator {
-		public function __construct( \com\servandserv\happymeal\Errors $tdo = NULL, \com\servandserv\happymeal\ValidationHandler $handler = NULL ) {
+		public function __construct( \com\servandserv\happymeal\Errors $tdo = NULL, \com\servandserv\happymeal\ErrorsHandler $handler = NULL ) {
 			
 			parent::__construct( $tdo, $handler);
 			    

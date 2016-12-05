@@ -8,7 +8,7 @@ class LongTypeValidator extends IntegerTypeValidator
 	const MININCLUSIVE = -9223372036854775808;
 	const MAXINCLUSIVE = 9223372036854775807;
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\LongType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\LongType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

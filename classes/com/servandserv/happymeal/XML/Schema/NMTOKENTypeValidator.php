@@ -8,7 +8,7 @@ class NMTOKENTypeValidator extends TokenTypeValidator
 	//const PATTERN = "/[-\._:A-Za-z0-9]+/";
 	const PATTERN = "/^[-\._:A-Za-z0-9]+$/";
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\NMTOKENType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\NMTOKENType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

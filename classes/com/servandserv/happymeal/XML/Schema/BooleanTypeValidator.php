@@ -10,7 +10,7 @@ use \com\servandserv\happymeal\Bindings;
 class BooleanTypeValidator extends \com\servandserv\happymeal\XML\Schema\AnySimpleTypeValidator 
 {
 
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\BooleanType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\BooleanType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

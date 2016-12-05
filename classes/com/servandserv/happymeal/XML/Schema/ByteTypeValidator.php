@@ -8,7 +8,7 @@ class ByteTypeValidator extends ShortTypeValidator
 	const MININCLUSIVE = -128;
 	const MAXINCLUSIVE = 127;
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\ByteType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\ByteType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

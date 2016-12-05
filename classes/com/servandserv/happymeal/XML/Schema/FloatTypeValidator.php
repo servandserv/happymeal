@@ -9,7 +9,7 @@ class FloatTypeValidator extends AnySimpleTypeValidator
 	//const PATTERN = "/[-+]?[0-9]*\.?[0-9]+/";
 	const PATTERN = "/^([-+]?[0-9]*\.?[0-9]+((e|E)-?[0-9]+)?|NaN|-INF|INF)$/";
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\FloatType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\FloatType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

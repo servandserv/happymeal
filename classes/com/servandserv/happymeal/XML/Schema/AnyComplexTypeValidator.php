@@ -7,7 +7,7 @@ use \com\servandserv\happymeal\Bindings;
 class AnyComplexTypeValidator extends AnyTypeValidator 
 {
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\AnyComplexType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) {
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\AnyComplexType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) {
 		parent::__construct( $tdo, $handler );
 	}
 

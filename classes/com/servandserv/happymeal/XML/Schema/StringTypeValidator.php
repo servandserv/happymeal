@@ -6,7 +6,7 @@ class StringTypeValidator extends AnySimpleTypeValidator
 {
 	const WHITESPACE = "preserve";
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\StringType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\StringType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

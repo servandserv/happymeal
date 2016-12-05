@@ -7,7 +7,7 @@ class NegativeIntegerTypeValidator extends NonPositiveIntegerTypeValidator
 
 	const MAXINCLUSIVE = -1;
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\NegativeIntegerType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\NegativeIntegerType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

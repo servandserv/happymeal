@@ -7,7 +7,7 @@ class AnyURITypeValidator extends AnySimpleTypeValidator
 
 	const WHITESPACE = "collapse";
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\AnyURIType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) {
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\AnyURIType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) {
 		parent::__construct( $tdo, $handler );
 	}
 

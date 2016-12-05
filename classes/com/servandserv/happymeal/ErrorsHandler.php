@@ -5,7 +5,7 @@ namespace com\servandserv\happymeal;
 /**
  * errors container
  */
-class ValidationHandler 
+class ErrorsHandler 
 {
 
 	private $errors;

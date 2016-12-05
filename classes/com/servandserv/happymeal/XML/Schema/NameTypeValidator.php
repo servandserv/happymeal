@@ -7,7 +7,7 @@ class NameTypeValidator extends TokenTypeValidator
 
 	const PATTERN = "/^[_:A-Za-z][-.:\w]+$/";
 	
-	public function __construct ( \com\servandserv\happymeal\XML\Schema\NameType $tdo, \com\servandserv\happymeal\ValidationHandler $handler ) 
+	public function __construct ( \com\servandserv\happymeal\XML\Schema\NameType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

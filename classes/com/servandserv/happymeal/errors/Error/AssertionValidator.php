@@ -8,7 +8,7 @@
 	 *
 	 */
 	class AssertionValidator extends \com\servandserv\happymeal\XML\Schema\StringTypeValidator {
-		public function __construct( \com\servandserv\happymeal\XML\Schema\StringType $tdo = NULL, \com\servandserv\happymeal\ValidationHandler $handler = NULL ) {
+		public function __construct( \com\servandserv\happymeal\XML\Schema\StringType $tdo = NULL, \com\servandserv\happymeal\ErrorsHandler $handler = NULL ) {
 			
 			parent::__construct( $tdo, $handler);
 			$this->className = "Assertion";

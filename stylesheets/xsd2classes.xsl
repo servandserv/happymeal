@@ -527,7 +527,7 @@
 		<xsl:if test="$MODE='WITH_VALIDATORS'">
 			<xsl:text disable-output-escaping="yes">
 		
-		public function validateType( \com\servandserv\happymeal\ValidationHandler $handler ) {
+		public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {
 			$validator = \com\servandserv\happymeal\Bindings::create('</xsl:text>
 			<xsl:value-of select="@class" />
 			<xsl:text disable-output-escaping="yes">Validator',array($this,$handler));
@@ -1130,7 +1130,7 @@
 					<!--xsl:apply-templates select="." mode="TYPE_CLASS" /-->
 				</xsl:otherwise>
 			</xsl:choose>
-			<xsl:text disable-output-escaping="yes"> $tdo = NULL, \com\servandserv\happymeal\ValidationHandler $handler = NULL ) {
+			<xsl:text disable-output-escaping="yes"> $tdo = NULL, \com\servandserv\happymeal\ErrorsHandler $handler = NULL ) {
 			
 			parent::__construct( $tdo, $handler);</xsl:text>
 			<xsl:for-each select="$props/tmp:property">

@@ -22,7 +22,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 		}
 	}
 	
-	public function validateType( \com\servandserv\happymeal\ValidationHandler $handler ) {}
+	public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {}
 	
 	public function equals( \com\servandserv\happymeal\XML\Schema\AnyType $obj ) {
 		return $this == $obj;

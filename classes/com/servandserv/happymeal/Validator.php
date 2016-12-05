@@ -28,7 +28,7 @@ abstract class Validator
     
 	protected $validationHandler;
 
-	public function __construct ( \com\servandserv\happymeal\ValidationHandler $handler = NULL ) 
+	public function __construct ( \com\servandserv\happymeal\ErrorsHandler $handler = NULL ) 
 	{
 		$this->validationHandler = $handler;
 	}
