@@ -1,6 +1,6 @@
 <?php
 
-namespace \com\servandserv\happymeal\WADL\Domain\Model;
+namespace com\servandserv\happymeal\WADL\Domain\Model;
 
 class Auth
 {

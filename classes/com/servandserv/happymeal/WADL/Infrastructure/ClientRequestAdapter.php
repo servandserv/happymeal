@@ -11,7 +11,7 @@ class ClientRequestAdapter implements ClientRequestPort
 
     protected $adapter;
 
-    public function __construct( AnyType $adapter )
+    public function __construct( AnyType $adapter = NULL )
     {
         $this->adapter = $adapter;
     }
