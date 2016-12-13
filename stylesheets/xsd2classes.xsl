@@ -532,6 +532,8 @@
 			<xsl:value-of select="@class" />
 			<xsl:text disable-output-escaping="yes">Validator',array($this,$handler));
 			$validator->validate();
+			
+			return $handler->hasErrors();
 		}
 			</xsl:text>
 		</xsl:if>
