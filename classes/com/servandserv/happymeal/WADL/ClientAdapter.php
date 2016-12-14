@@ -118,6 +118,6 @@ class ClientAdapter
 	
 	private function responseHeader( $code )
 	{
-	    return $_SERVER["SERVER_PROTOCOL"] . $code;
+	    return $_SERVER["SERVER_PROTOCOL"] ." ". $code;
 	}
 }
