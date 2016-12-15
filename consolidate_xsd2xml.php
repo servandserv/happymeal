@@ -31,7 +31,7 @@ $schemas = explode(" ",$schemasPath);
 // imported xsd schema files 
 $imports = array();
 foreach($schemas as $schema) {
-	$fullname = $base.DIRECTORY_SEPARATOR.$schema;
+	$fullname = realpath( $base.DIRECTORY_SEPARATOR.$schema );
 	$fullname = preg_replace("/\/{2,}/","/",$fullname);//убираем двойные слэши чтобы однозначно идентифицировать адрес импортируемого ресурса
 	if(!file_exists($fullname)) {
 	    print "Schema file $fullname not exists\r\n";
@@ -92,6 +92,8 @@ function import2assoc ( $path, \XMLWriter &$xw )
 {
 	global $base, $imports, $nss, $nss_replacements, $tree;
 
+    print $path."\r\n";
+
 	if( isset( $imports[$path] ) && $imports[$path] !== FALSE ) return array();
 	if(!$xmlstr = file_get_contents( $path )) {
 	    print "Can't read schemas file '$path'\r\n";
@@ -136,11 +138,10 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 							"prefix" => $xr->prefix,
 							"localName" => $xr->localName
 						);
-
-						$xw->startElement( $xr->localName );
 						
+						$node["attributes"] = [];
+						$uid = NULL;
 						if( $xr->hasAttributes ) {
-							$node["attributes"] = array();
 							while( $xr->moveToNextAttribute() ) {
 								if( $node["localName"] == "pattern" && !$xr->prefix ) {
 									// for regex restriction nodes replace some symbols 
@@ -166,6 +167,7 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 									$node["attributes"]["class"] = $node["attributes"]["classNS"]."\\".$classname;
 									$node["attributes"]["filePath"] = $buildDir.DIRECTORY_SEPARATOR. 
 											str_replace( "\\", DIRECTORY_SEPARATOR, $node["attributes"]["class"] );
+									$uid = $node["attributes"]["class"];
 								}
 								if( in_array( $xr->localName, array( "type", "base", "itemType" ) ) && !$xr->prefix ) {
 									$packagetypename = create_package_ns( $xr->value, $target );
@@ -194,24 +196,27 @@ function xml2assoc ( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_p
 											"\\".$subs_name;
 								}
 							}
-							foreach( $node["attributes"] as $k => $v ) {
-								$xw->writeAttribute( $k, $v );
-							}
-							$xw->writeAttribute( "_ID", md5( $counter++ ) );
+							
 							$xr->moveToElement();
 						}
-						if( $xr->isEmptyElement ) {
-							$node["content"] = "";
-							$xw->endElement();
-						} else {
-							if( isset( $classname ) ) $new_path = $ns_path != "" ? $ns_path."\\".$classname : $classname;
-							else $new_path = $ns_path;
-							$node["content"] = xml2assoc( $xr, $path, $xw, $target, $new_path );
-						}
-						if( isset( $node["attributes"]["class"] ) && !isset( $uniques[$node["attributes"]["class"]] ) ) {
-							$uniques[$node["attributes"]["class"]] = $node;
-						}
-						$tree[] = $node;
+						//if( $uid == NULL || ( $uid != NULL && !isset( $uniques[$uid] ) ) ) {
+						    //print $uid."\r\n";
+						    $xw->startElement( $xr->localName );
+						    foreach( $node["attributes"] as $k => $v ) {
+							    $xw->writeAttribute( $k, $v );
+						    }
+						    $xw->writeAttribute( "_ID", md5( $counter++ ) );
+						    if( $xr->isEmptyElement ) {
+							    $node["content"] = "";
+							    $xw->endElement();
+						    } else {
+							    if( isset( $classname ) ) $new_path = $ns_path != "" ? $ns_path."\\".$classname : $classname;
+							    else $new_path = $ns_path;
+							    $node["content"] = xml2assoc( $xr, $path, $xw, $target, $new_path );
+						    }
+							if( $uid != NULL && !isset( $uniques[$uid] ) ) $uniques[$uid] = $node;
+							$tree[] = $node;
+						//}
 				}
 				break;
 			case XMLReader::TEXT:
@@ -361,7 +366,7 @@ function create_prop_name ( $val, $target, $ln ) {
 	return $val;
 }
 
-function href2realpath( $schemaPath,$includePath )
+function href2realpath( $schemaPath, $includePath )
 {
     if(preg_match("/^https?:/",$schemaPath,$m)) {
         return $includePath;

@@ -2,6 +2,10 @@
 
 namespace com\servandserv\happymeal\XML\Schema;
 
+use \com\servandserv\happymeal\XMLAdaptor;
+use \com\servandserv\happymeal\Bindings;
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class IntegerType extends DecimalType 
 {
 	
@@ -9,17 +13,17 @@ class IntegerType extends DecimalType
 	const NS = "http://www.w3.org/2001/XMLSchema";
 	const PREF = NULL;
 	
-	public function validateType ( \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function validateType ( ErrorsHandler $handler ) 
 	{
-		$validator = \com\servandserv\happymeal\Bindings::create("com\servandserv\happymeal\XML\Schema\IntegerTypeValidator",array( $this, $handler ));
+		$validator = Bindings::create( 'com\servandserv\happymeal\XML\Schema\IntegerTypeValidator', array( $this, $handler ) );
 		$validator->validate();
 	}
 	
-	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = \com\servandserv\happymeal\XMLAdaptor::ELEMENT ) 
+	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = XMLAdaptor::ELEMENT ) 
 	{
-		if( $mode & \com\servandserv\happymeal\XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
+		if( $mode & XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
 		$xw->text( $this->__text() );
-		if( $mode & \com\servandserv\happymeal\XMLAdaptor::ENDELEMENT ) $xw->endElement();
+		if( $mode & XMLAdaptor::ENDELEMENT ) $xw->endElement();
 	}
 	
 }
