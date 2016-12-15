@@ -92,8 +92,6 @@ function import2assoc ( $path, \XMLWriter &$xw )
 {
 	global $base, $imports, $nss, $nss_replacements, $tree;
 
-    print $path."\r\n";
-
 	if( isset( $imports[$path] ) && $imports[$path] !== FALSE ) return array();
 	if(!$xmlstr = file_get_contents( $path )) {
 	    print "Can't read schemas file '$path'\r\n";
