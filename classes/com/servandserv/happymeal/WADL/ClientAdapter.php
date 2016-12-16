@@ -20,10 +20,10 @@ class ClientAdapter
     protected $response;
     
     public static function create( array $conf )
-    {
+    {   
+        $cli =  new self();
         foreach( $conf as $name=>$method ) {
             if( strtolower( $name ) === strtolower( $_SERVER["REQUEST_METHOD"] ) ) {
-                $cli =  new self();
                 if ( $_SERVER["REQUEST_METHOD"] == "POST" ) {
 			        if ( !isset($GLOBALS["HTTP_RAW_POST_DATA"] ) ) {
 				        $GLOBALS["HTTP_RAW_POST_DATA"] = file_get_contents( "php://input" );
