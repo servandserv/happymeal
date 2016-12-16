@@ -12,7 +12,7 @@
 			
 			parent::__construct( $tdo, $handler);
 			    
-			$this->__props["45c48cce2e2d7fbdea1afc51c7c6ad26"] = array(
+			$this->__props["02e74f10e0327ad868d138f2b4fdd6f0"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Error",
 			    "class"=>'com\servandserv\happymeal\errors\Error',

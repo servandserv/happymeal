@@ -11,7 +11,7 @@ class TimeType extends AnySimpleType
 	
 	public function validateType ( \com\servandserv\happymeal\ErrorsHandler $handler ) 
 	{
-		$validator = \com\servandserv\happymeal\Bindings::create("com\servandserv\happymeal\XML\Schema\TimeTypeValidator",array(( $this, $handler ));
+		$validator = \com\servandserv\happymeal\Bindings::create("com\servandserv\happymeal\XML\Schema\TimeTypeValidator", [ $this, $handler ]);
 		$validator->validate();
 	}
 	

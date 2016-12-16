@@ -50,7 +50,7 @@
 		protected $_Description = null;
 		public function __construct() {
 			parent::__construct();
-			$this->__props["c4ca4238a0b923820dcc509a6f75849b"] = array(
+			$this->__props["eccbc87e4b5ce2fe28308fd9f2a7baf3"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"targetNS",
 			    "class"=>'',
@@ -65,7 +65,7 @@
 				"array"=>"",
 				"minOccurs"=>1
 			);
-			$this->__props["c81e728d9d4c2f636f067f89cc14862c"] = array(
+			$this->__props["1679091c5a880faf6fb5e6087eb1b2dc"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"classNS",
 			    "class"=>'',
@@ -80,7 +80,7 @@
 				"array"=>"",
 				"minOccurs"=>1
 			);
-			$this->__props["eccbc87e4b5ce2fe28308fd9f2a7baf3"] = array(
+			$this->__props["45c48cce2e2d7fbdea1afc51c7c6ad26"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"name",
 			    "class"=>'',
@@ -95,7 +95,7 @@
 				"array"=>"",
 				"minOccurs"=>0
 			);
-			$this->__props["a87ff679a2f3e71d9181a67b7542122c"] = array(
+			$this->__props["c20ad4d76fe97759aa27a0c99bff6710"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"value",
 			    "class"=>'',
@@ -110,7 +110,7 @@
 				"array"=>"",
 				"minOccurs"=>0
 			);
-			$this->__props["e4da3b7fbbce2345d7772b0674a318d5"] = array(
+			$this->__props["9bf31c7ff062936a96d3c8bd1f8f2ff3"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"rule",
 			    "class"=>'',
@@ -125,7 +125,7 @@
 				"array"=>"",
 				"minOccurs"=>1
 			);
-			$this->__props["1679091c5a880faf6fb5e6087eb1b2dc"] = array(
+			$this->__props["6f4922f45568161a8cdf4ad2299f6d23"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"assertion",
 			    "class"=>'',
@@ -140,7 +140,7 @@
 				"array"=>"",
 				"minOccurs"=>0
 			);
-			$this->__props["8f14e45fceea167a5a36dedd4bea2543"] = array(
+			$this->__props["3c59dc048e8850243be8079a5c74d079"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"description",
 			    "class"=>'',

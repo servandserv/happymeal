@@ -20,7 +20,6 @@
                 extension-element-prefixes="exsl regexp"
                 exclude-result-prefixes="tmp"
                 xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-                targetNamespace="http://www.sitemaps.org/schemas/sitemap/0.9"
                 version="1.0">
 
     <xsl:output
