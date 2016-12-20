@@ -174,7 +174,7 @@
 			<xsl:for-each select="tmp:restriction/tmp:enumeration">
 				<xsl:text disable-output-escaping="yes">
 		const _</xsl:text>
-					<xsl:value-of select="translate(@value, '.-\/', '____')" />
+					<xsl:value-of select="translate(translate(@value, '.-\/', '____'),$smallcase,$uppercase)" />
 					<xsl:text> = "</xsl:text>
 					<xsl:value-of select="@value" />
 					<xsl:text>";</xsl:text>
