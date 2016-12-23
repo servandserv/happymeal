@@ -70,7 +70,7 @@ class ClientAdapter
         else return $dto->fromMarkupArray( $this->reqArray );
     }
     
-    public function response( AnyType $adapter = NULL, $code = 200 )
+    public function response( AnyType $adapter = NULL, $code = 200, $pi = NULL )
     {
         if( $adapter === NULL ) {
             header( $this->responseHeader( 204 ) );
@@ -83,7 +83,7 @@ class ClientAdapter
 				    break;
 			    default:
 			        header( "Content-type: application/xml; charset: utf-8" );
-				    echo $adapter->toXmlStr();
+				    echo $adapter->toXmlStr( $adapter::NS, $adapter::ROOT, $pi );
 		    }
 		}
 		exit;
