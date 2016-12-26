@@ -1332,14 +1332,15 @@
 		<xsl:variable name="elements">
 			<xsl:for-each select="tmp:element">
 				<xsl:text>'</xsl:text>
-				<xsl:choose>
+				<!--xsl:choose>
 					<xsl:when test="@propName">
 						<xsl:value-of select="@propName" />
 					</xsl:when>
 					<xsl:when test="@refClassName">
 						<xsl:value-of select="@refClassName" />
 					</xsl:when>
-				</xsl:choose>
+				</xsl:choose-->
+				<xsl:value-of select="@getter" />
 				<xsl:text>'</xsl:text>
 				<xsl:if test="position()!=last()">,</xsl:if>
 			</xsl:for-each>
@@ -1378,7 +1379,7 @@
 			<xsl:if test="$source/@fixed">
 				<xsl:text disable-output-escaping="yes">
 			$this->assertFixed( '</xsl:text>
-				<xsl:value-of select="$source/@propName" />
+				<xsl:value-of select="$source/@getter" />
 				<xsl:text>','</xsl:text>
 				<xsl:value-of select="$source/@schemaName"/>
 				<xsl:text>','</xsl:text>
@@ -1389,7 +1390,7 @@
 	    <!-- minOccurs and maxOccurs проверяем и на компдексных типах -->
 			<xsl:text disable-output-escaping="yes">
 			$this->assertMinOccurs( '</xsl:text>
-			<xsl:value-of select="@propName" />
+			<xsl:value-of select="@getter" />
 			<xsl:text>','</xsl:text>
 			<xsl:value-of select="@schemaName"/>
 			<xsl:text>','</xsl:text>
@@ -1397,7 +1398,7 @@
 			<xsl:text>' );</xsl:text>
 			<xsl:text disable-output-escaping="yes">
 			$this->assertMaxOccurs( '</xsl:text>
-			<xsl:value-of select="@propName" />
+			<xsl:value-of select="@getter" />
 			<xsl:text>','</xsl:text>
 			<xsl:value-of select="@schemaName"/>
 			<xsl:text>','</xsl:text>

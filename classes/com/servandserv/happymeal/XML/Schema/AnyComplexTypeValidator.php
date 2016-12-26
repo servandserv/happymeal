@@ -36,11 +36,10 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 	    }
 	}
 	
-	protected function assertMinOccurs( $prop, $node, $minOccurs = 1 ) {
-		$method = "get".$prop;
-		if( !method_exists( $this->tdo, $method ) ) return;
-		$val = $this->tdo->{$method}();
-		if ( $val === NULL && $minOccurs != 0 ) {
+	protected function assertMinOccurs( $getter, $node, $minOccurs = 1 ) {
+		if( !method_exists( $this->tdo, $getter ) ) return;
+		$val = $this->tdo->{$getter}();
+		if ( $val === NULL && $minOccurs !== 0 ) {
 			$this->handleError(
 			    Bindings::create(self::ERROR_CLASS)
 			        ->setTargetNS($this->targetNS)
@@ -62,10 +61,9 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 		}
 	}
 	
-	protected function assertMaxOccurs( $prop, $node, $maxOccurs = 1 ) {
-		$method = "get".$prop;
-		if( !method_exists( $this->tdo, $method ) ) return;
-		$val = $this->tdo->{$method}();
+	protected function assertMaxOccurs( $getter, $node, $maxOccurs = 1 ) {
+		if( !method_exists( $this->tdo, $getter ) ) return;
+		$val = $this->tdo->{$getter}();
 		if ( is_array( $val ) || $maxOccurs == "unbounded" || count( $val ) <= $maxOccurs  ) return;
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
@@ -77,13 +75,12 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 		        ->setValue(count($val)));
 	}
 	
-	protected function assertChoice( array $props ) {
+	protected function assertChoice( array $getters ) {
 		$choice = 0;
-		foreach( $props as $prop ) {
-			$method = "get".$prop;
-			if( !method_exists( $this->tdo, $method ) ) return;
-			$val = $this->tdo->{$method}();
-			if( $this->tdo->{$method}() ) $choice++;
+		foreach( $getters as $getter ) {
+			if( !method_exists( $this->tdo, $getter ) ) return;
+			$val = $this->tdo->{$getter}();
+			if( $this->tdo->{$getter}() ) $choice++;
 		}
 		if ( $choice <= 1  ) return;
 		$this->handleError(
@@ -96,11 +93,10 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 		        ->setValue($choice));
 	}
 	
-	protected function assertFixed( $prop, $node, $fixed ) 
+	protected function assertFixed( $getter, $node, $fixed ) 
 	{
-		$method = "get".$prop;
-		if( !method_exists( $this->tdo, $method ) ) return;
-		$val = $this->tdo->{$method}();
+		if( !method_exists( $this->tdo, $getter ) ) return;
+		$val = $this->tdo->{$getter}();
 		if ( $val == $fixed ) return;
 		$this->handleError(
 		    Bindings::create(self::ERROR_CLASS)
