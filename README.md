@@ -42,7 +42,7 @@ $xmlstr = $obj->toXmlStr();
 ```
 Validate object
 ```
-use \com\servandserv\happymeal\ErrorsHandler();
+use \com\servandserv\happymeal\ErrorsHandler;
 
 $eh = new ErrorsHandler();
 $obj = new \namespace\Object();
