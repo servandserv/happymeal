@@ -40,3 +40,18 @@ $obj->setProp1("prop1");
 $obj->setProp2("prop2");
 $xmlstr = $obj->toXmlStr();
 ```
+Validate object
+```
+use \com\servandserv\happymeal\ErrorsHandler();
+
+$eh = new ErrorsHandler();
+$obj = new \namespace\Object();
+if($xmlstr = file_get_contents('file_path')) {
+  $obj->fromXmlStr($xmlstr);
+}
+if( $errors = $obj->validateType( $eh ) ) {
+    header( "Content-Type: application/xml" );
+    print $errors->toXmlStr();
+    exit;
+}
+```

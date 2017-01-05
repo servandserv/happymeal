@@ -533,7 +533,7 @@
 			<xsl:text disable-output-escaping="yes">Validator',array($this,$handler));
 			$validator->validate();
 			
-			return $handler->hasErrors();
+			return $handler->hasErrors() ? $handler->getErrors() : FALSE;
 		}
 			</xsl:text>
 		</xsl:if>
