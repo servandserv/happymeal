@@ -1,0 +1,39 @@
+#!/bin/bash
+# generate happymeal data objects
+# - errors
+# - views
+
+realp() {
+    echo `perl -e 'use Cwd "abs_path";print abs_path(shift)' $1`
+}
+
+f="/dev/null"
+mkfile() {
+    f=$2
+    mkdir -p `dirname $f`
+    echo -n >$f
+    chmod 775 $f
+}
+
+happymealPath=$(dirname $(dirname $(realp $0)))
+tmpDir=${happymealPath}/tmp
+mkdir -p $tmpDir
+
+#  clean tmp dir
+trap 'rm -rf -- $tmpDir' EXIT
+
+# create happymeals classes an put them to classes dir
+php $happymealPath"/consolidate_xsd2xml.php" "${happymealPath}" "classes" "schemas" > ${tmpDir}/consolidated.xml
+if [ ! $? -eq 0 ];then
+    cat "$tmpDir"/consolidated.xml
+    exit 1
+fi
+xsltproc --stringparam MODE "1" "${happymealPath}/stylesheets/xsd2classes.xsl" "$tmpDir"/consolidated.xml > "$tmpDir"/classes.txt
+cat "$tmpDir"/classes.txt | while IFS= read -r s; do
+    if [[ "$s" = "#path:"* ]]
+        then
+        mkfile $s
+    else
+        echo "$s" >>$f
+    fi
+done

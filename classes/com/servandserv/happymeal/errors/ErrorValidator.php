@@ -144,20 +144,20 @@
 		}
 		public function validate() {
 			parent::validate();
-			$this->assertMinOccurs( '_TargetNS','targetNS','1' );
-			$this->assertMaxOccurs( '_TargetNS','targetNS','1' );
-			$this->assertMinOccurs( '_ClassNS','classNS','1' );
-			$this->assertMaxOccurs( '_ClassNS','classNS','1' );
-			$this->assertMinOccurs( '_Name','name','0' );
-			$this->assertMaxOccurs( '_Name','name','1' );
-			$this->assertMinOccurs( '_Value','value','0' );
-			$this->assertMaxOccurs( '_Value','value','1' );
-			$this->assertMinOccurs( '_Rule','rule','1' );
-			$this->assertMaxOccurs( '_Rule','rule','1' );
-			$this->assertMinOccurs( '_Assertion','assertion','0' );
-			$this->assertMaxOccurs( '_Assertion','assertion','1' );
-			$this->assertMinOccurs( '_Description','description','0' );
-			$this->assertMaxOccurs( '_Description','description','1' );
+			$this->assertMinOccurs( 'getTargetNS','targetNS','1' );
+			$this->assertMaxOccurs( 'getTargetNS','targetNS','1' );
+			$this->assertMinOccurs( 'getClassNS','classNS','1' );
+			$this->assertMaxOccurs( 'getClassNS','classNS','1' );
+			$this->assertMinOccurs( 'getName','name','0' );
+			$this->assertMaxOccurs( 'getName','name','1' );
+			$this->assertMinOccurs( 'getValue','value','0' );
+			$this->assertMaxOccurs( 'getValue','value','1' );
+			$this->assertMinOccurs( 'getRule','rule','1' );
+			$this->assertMaxOccurs( 'getRule','rule','1' );
+			$this->assertMinOccurs( 'getAssertion','assertion','0' );
+			$this->assertMaxOccurs( 'getAssertion','assertion','1' );
+			$this->assertMinOccurs( 'getDescription','description','0' );
+			$this->assertMaxOccurs( 'getDescription','description','1' );
 		}
 	}
 	

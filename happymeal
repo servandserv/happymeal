@@ -10,7 +10,7 @@ Usage: path_to_happymeal/happymeal xsd2code path_to_happymeal_ini_file
        path_to_happymealhappymeal man
 
 Сommand:
-  xsd2code Generate php,js data adaptors based on xsd schemas 
+  xsd2code Generate php,js data adaptors based on xsd schemas
   Adaptors can translate data from xml,json,markup arrays to php,js classes and back
 
   examples:
@@ -87,24 +87,26 @@ if [ "$command" == "xsd2code" ]; then
     if [ -z "${jsPath}" ]; then
         echo "Path to generated js code: ${jsPath}"
     fi
-    
-    # create happymeals classes
-    php $happymealPath"/consolidate_xsd2xml.php" "${happymealPath}" "classes" "schemas" > "$tmpDir"/consolidated.xml
-    if [ ! $? -eq 0 ];then
-        cat "$tmpDir"/consolidated.xml
-        exit 1
-    fi
-    xsltproc --stringparam MODE "$validators" "${happymealPath}/stylesheets/xsd2classes.xsl" "$tmpDir"/consolidated.xml > "$tmpDir"/classes.txt
-    cat "$tmpDir"/classes.txt | while IFS= read -r s; do
-        if [[ "$s" = "#path:"* ]]
-            then
-            mkfile $s
-        else
-            echo "$s" >>$f
-        fi
-    done
-    cp -pR $happymealPath"/classes/com" ${codegenPath}
-    
+
+    # create happymeals classes an put them to classes dir
+    #php $happymealPath"/consolidate_xsd2xml.php" "${happymealPath}" "classes" "schemas" > "$tmpDir"/consolidated.xml
+    #if [ ! $? -eq 0 ];then
+    #    cat "$tmpDir"/consolidated.xml
+    #    exit 1
+    #fi
+    #xsltproc --stringparam MODE "$validators" "${happymealPath}/stylesheets/xsd2classes.xsl" "$tmpDir"/consolidated.xml > "$tmpDir"/classes.txt
+    #cat "$tmpDir"/classes.txt | while IFS= read -r s; do
+    #    if [[ "$s" = "#path:"* ]]
+    #        then
+    #        mkfile $s
+    #    else
+    #        echo "$s" >>$f
+    #    fi
+    #done
+
+    # copy happymeal classes to codegen path
+    cp -pR $happymealPath"/classes/com" ${iniPath}/${codegenPath}
+
     # create project classes
     php $happymealPath"/consolidate_xsd2xml.php" "${iniPath}" "${codegenPath}" "${schemasPath}" > "$tmpDir"/consolidated.xml
     if [ ! $? -eq 0 ];then
@@ -124,12 +126,12 @@ if [ "$command" == "xsd2code" ]; then
         fi
     done
     echo "classes code to files ...       OK!"
-    
+
     #if [ "${tFlag}" == 1 ]; then
     #    xsltproc stylesheets/xsd2tests.xsl "$tmpBuildDir"/consolidated.xml > "$tmpBuildDir"/xsd2code_tests.php
     #    php "$tmpBuildDir"/xsd2code_tests.php "$oFlag"
     #fi
-    
+
     if [ -d "${jsPath}" ]; then
         appFile=${iniPath}/${jsPath}/${appName}
         xsltproc ${happymealPath}/stylesheets/xsd2js.xsl ${tmpDir}/consolidated.xml > ${appFile}.js
@@ -139,7 +141,7 @@ if [ "$command" == "xsd2code" ]; then
         java -jar ${happymealPath}/tools/yuicompressor/yuicompressor-2.4.8.jar --type js ${iniPath}/${jsPath}/Happymeal.js > ${iniPath}/${jsPath}/Happymeal.min.js
     fi
     exit 0;
-    
+
 elif [ "$command" == "wadl2code" ]; then
 
     OPTIND=2
@@ -203,7 +205,7 @@ elif [ "$command" == "wadl2code" ]; then
                 sed -i -e "s/element=\"${pref}\:/element=\"${namespace}\:/g"  "$tmpBuildDir"/wadl.xml
             fi
         done
-        
+
         # выкусим номер версии api и составим по нему имя скрипта который связан с этой версией
         # версии в адресах записываются таким образом .../api/v[1-9]\.[0-9]{1,2}/... превращаем это в файл api\.v{0-9}-{0-9}{1,2}.php
         base=$( cat $j | grep "resources *base" | sed -e 's/^[^"]*"//; s/".*//' )
@@ -212,7 +214,7 @@ elif [ "$command" == "wadl2code" ]; then
             then
             api=$( echo $base | sed -e 's/.*\(api\)/\1/; s/\/$//' | tr "." "-" | tr "/" "." )".php"
         fi
-        
+
         xsltproc --stringparam WADL ${j/#*web} --stringparam API $api --stringparam DEST ${oFlag}/web.codegen/api ${happymealPath}/stylesheets/wadl2code.xsl "$tmpBuildDir"/wadl.xml  > "$tmpBuildDir"/wadl2code.txt
         cat "$tmpBuildDir"/wadl2code.txt | while IFS= read -r s; do
             if [[ "$s" = "#path:"* ]]

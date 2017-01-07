@@ -36,7 +36,9 @@
 		}
 		public function validate() {
 			parent::validate();
-			$this->assertMinOccurs( '_Error','Error','0' );
-			$this->assertMaxOccurs( '_Error','Error','unbounded' );
+			$this->assertMinOccurs( 'getError','Error','0' );
+			$this->assertMaxOccurs( 'getError','Error','unbounded' );
 		}
 	}
+	
+

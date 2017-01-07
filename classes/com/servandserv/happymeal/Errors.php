@@ -57,14 +57,6 @@
 			}
 			return $res;
 		}
-		
-		public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {
-			$validator = \com\servandserv\happymeal\Bindings::create('com\servandserv\happymeal\ErrorsValidator',array($this,$handler));
-			$validator->validate();
-			
-			return $handler->hasErrors();
-		}
-			
 	}
 		
 
