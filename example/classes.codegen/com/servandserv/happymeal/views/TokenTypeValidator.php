@@ -12,7 +12,7 @@
 			
 			parent::__construct( $tdo, $handler);
 			    
-			$this->__props["093f65e080a295f8076b1c5722a46aa2"] = array(
+			$this->__props["38b3eff8baf56627478ec76a704e9b52"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"id",
 			    "class"=>'',
@@ -30,7 +30,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["072b030ba126b2f4b2374f342be9ed44"] = array(
+			$this->__props["ec8956637a99787bd197eacd77acce5e"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"created",
 			    "class"=>'',
@@ -48,16 +48,16 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["7f39f8317fbdb1988ef4c628eba02591"] = array(
+			$this->__props["6974ce5ac660610b44d9b9fed0ff9548"] = array(
 			    "attribute"=>false,
-			    "nodeName"=>"url",
-			    "class"=>'',
-			    "classNS"=>'com\servandserv\happymeal\views\TokenType',
-			    "prototype"=>'com\servandserv\happymeal\XML\Schema\StringType',
-			    "validator"=>'com\servandserv\happymeal\views\TokenType\UrlValidator',
-				"prop"=>"_Url",
-				"getter"=>"getUrl",
-				"setter"=>"setUrl",
+			    "nodeName"=>"Request",
+			    "class"=>'com\servandserv\happymeal\views\Request',
+			    "classNS"=>'com\servandserv\happymeal\views',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\AnyComplexType',
+			    "validator"=>'com\servandserv\happymeal\views\RequestValidator',
+				"prop"=>"_Request",
+				"getter"=>"getRequest",
+				"setter"=>"setRequest",
 				"default"=>"",
 				"fixed"=>"",
 				"xmlns"=>"urn:com:servandserv:happymeal:views",
@@ -66,7 +66,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["44f683a84163b3523afe57c2e008bc8c"] = array(
+			$this->__props["c9e1074f5b3f9fc8ea15d152add07294"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Errors",
 			    "class"=>'com\servandserv\happymeal\Errors',
@@ -94,8 +94,8 @@
 			$this->assertMaxOccurs( 'getId','id','1' );
 			$this->assertMinOccurs( 'getCreated','created','1' );
 			$this->assertMaxOccurs( 'getCreated','created','1' );
-			$this->assertMinOccurs( 'getUrl','url','1' );
-			$this->assertMaxOccurs( 'getUrl','url','1' );
+			$this->assertMinOccurs( 'getRequest','Request','1' );
+			$this->assertMaxOccurs( 'getRequest','Request','1' );
 			$this->assertMinOccurs( 'getErrors','Errors','0' );
 			$this->assertMaxOccurs( 'getErrors','Errors','unbounded' );
 		}

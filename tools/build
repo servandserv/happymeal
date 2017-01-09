@@ -28,7 +28,7 @@ if [ ! $? -eq 0 ];then
     cat "$tmpDir"/consolidated.xml
     exit 1
 fi
-xsltproc --stringparam MODE "1" "${happymealPath}/stylesheets/xsd2classes.xsl" "$tmpDir"/consolidated.xml > "$tmpDir"/classes.txt
+xsltproc --stringparam MODE "WITH_VALIDATORS" "${happymealPath}/stylesheets/xsd2classes.xsl" "$tmpDir"/consolidated.xml > "$tmpDir"/classes.txt
 cat "$tmpDir"/classes.txt | while IFS= read -r s; do
     if [[ "$s" = "#path:"* ]]
         then

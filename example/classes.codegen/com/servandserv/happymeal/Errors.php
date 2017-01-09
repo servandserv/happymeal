@@ -14,7 +14,7 @@
 		protected $_Error = [];
 		public function __construct() {
 			parent::__construct();
-			$this->__props["02e74f10e0327ad868d138f2b4fdd6f0"] = array(
+			$this->__props["35f4a8d465e6e1edc05f3d8ab658c551"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Error",
 			    "class"=>'com\servandserv\happymeal\errors\Error',
@@ -40,7 +40,7 @@
 		/**
 		 * @param com\servandserv\happymeal\errors\Error[]
 		 */
-		public function setErrorArray ( array $vals ) {
+		public function setErrorArray ( array $vals = []  ) {
 			$this->_Error = $vals;
 			return $this;
 		}
@@ -57,6 +57,14 @@
 			}
 			return $res;
 		}
+		
+		public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {
+			$validator = \com\servandserv\happymeal\Bindings::create('com\servandserv\happymeal\ErrorsValidator',array($this,$handler));
+			$validator->validate();
+			
+			return $handler->hasErrors() ? $handler->getErrors() : FALSE;
+		}
+			
 	}
 		
 

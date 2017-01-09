@@ -96,7 +96,7 @@
 		/**
 		 * @param com\servandserv\xml\atom\Link[]
 		 */
-		public function setLinkArray ( array $vals ) {
+		public function setLinkArray ( array $vals = []  ) {
 			$this->_Link = $vals;
 			return $this;
 		}

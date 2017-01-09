@@ -12,7 +12,7 @@
 			
 			parent::__construct( $tdo, $handler);
 			    
-			$this->__props["b53b3a3d6ab90ce0268229151c9bde11"] = array(
+			$this->__props["5fd0b37cd7dbbb00f97ba6ce92bf5add"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"name",
 			    "class"=>'',
@@ -30,7 +30,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["9f61408e3afb633e50cdf1b20de6f466"] = array(
+			$this->__props["2b44928ae11fb9384c4cf38708677c48"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"value",
 			    "class"=>'',

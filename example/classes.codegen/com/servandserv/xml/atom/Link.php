@@ -110,14 +110,14 @@
 		/**
 		 * @param \StringType $val
 		 */
-		public function setType (  $val ) {
+		public function setType (  $val = NULL ) {
 			$this->_Type = $val;
 			return $this;
 		}
 		/**
 		 * @param \StringType $val
 		 */
-		public function setMethod (  $val ) {
+		public function setMethod (  $val = NULL ) {
 			$this->_Method = $val;
 			return $this;
 		}

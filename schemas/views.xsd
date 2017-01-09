@@ -10,32 +10,49 @@
 <xsd:element name="View">
     <xsd:complexType>
         <xsd:sequence>
-            <xsd:element ref="Session" />
-            <xsd:element ref="Request" />
-        </xsd:sequence>
-    </xsd:complexType>
-</xsd:element>
-
-<xsd:element name="Session">
-    <xsd:complexType>
-        <xsd:sequence>
-            <xsd:element name="id" type="xsd:string" minOccurs="1" />
-            <xsd:element ref="State" />
+            <xsd:element name="sessionId" type="xsd:string" minOccurs="1" />
+            <xsd:element ref="Env" />
             <xsd:element name="Token" type="TokenType" minOccurs="1" />
-            <xsd:element name="Referer" type="TokenType" minOccurs="0" />
+            <xsd:element name="Referrer" type="TokenType" minOccurs="0" />
             <xsd:element name="Callback" type="TokenType" minOccurs="0" />
         </xsd:sequence>
     </xsd:complexType>
 </xsd:element>
 
-<xsd:element name="State">
+<xsd:element name="Env">
+    <xsd:annotation>
+        <xsd:documentation>
+            Container for environment parameters
+        </xsd:documentation>
+    </xsd:annotation>
     <xsd:complexType>
         <xsd:sequence>
-            <xsd:element name="base" type="xsd:string" />
             <xsd:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
 </xsd:element>
+
+<xsd:element name="Tokens">
+    <xsd:complexType>
+        <xsd:sequence>
+            <xsd:element name="Token" type="TokenType" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:complexType name="TokenType">
+    <xsd:annotation>
+        <xsd:documentation>
+            Use TokenType for temporary data (manage user interface flow)
+        </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+        <xsd:element name="id" type="xsd:string" minOccurs="1" />
+        <xsd:element name="created" type="xsd:integer" minOccurs="1" />
+        <xsd:element ref="Request" />
+        <xsd:element ref="err:Errors" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+</xsd:complexType>
 
 <xsd:element name="Request">
     <xsd:complexType>
@@ -55,14 +72,5 @@
         </xsd:sequence>
     </xsd:complexType>
 </xsd:element>
-
-<xsd:complexType name="TokenType">
-    <xsd:sequence>
-        <xsd:element name="id" type="xsd:string" minOccurs="1" />
-        <xsd:element name="created" type="xsd:integer" minOccurs="1" />
-        <xsd:element name="url" type="xsd:string" minOccurs="1" />
-        <xsd:element ref="err:Errors" minOccurs="0" maxOccurs="unbounded" />
-    </xsd:sequence>
-</xsd:complexType>
 
 </xsd:schema>

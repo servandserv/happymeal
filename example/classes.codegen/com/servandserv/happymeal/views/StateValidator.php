@@ -12,7 +12,7 @@
 			
 			parent::__construct( $tdo, $handler);
 			    
-			$this->__props["f7177163c833dff4b38fc8d2872f1ec6"] = array(
+			$this->__props["3416a75f4cea9109507cacd8e2f2aefc"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"base",
 			    "class"=>'',
@@ -30,7 +30,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["6c8349cc7260ae62e3b1396831a8398f"] = array(
+			$this->__props["a1d0c6e83f027327d8461063f4ac58a6"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Param",
 			    "class"=>'com\servandserv\happymeal\views\Param',

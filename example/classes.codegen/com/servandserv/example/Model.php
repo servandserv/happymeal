@@ -15,7 +15,7 @@
 		/**
 		 * @maxOccurs 1 
 		 * @minOccurs 1 
-		 * @var com\servandserv\example\Model\Price
+		 * @var com\servandserv\example\PriceType
 		 */
 		protected $_Price = null;
 		/**
@@ -416,9 +416,9 @@
 			return $this;
 		}
 		/**
-		 * @param com\servandserv\example\Model\Price $val
+		 * @param com\servandserv\example\PriceType $val
 		 */
-		public function setPrice ( \com\servandserv\example\Model\Price $val ) {
+		public function setPrice ( \com\servandserv\example\PriceType $val ) {
 			$this->_Price = $val;
 			return $this;
 		}
@@ -537,7 +537,7 @@
 		/**
 		 * @param com\servandserv\xml\atom\Link[]
 		 */
-		public function setLinkArray ( array $vals ) {
+		public function setLinkArray ( array $vals = []  ) {
 			$this->_Link = $vals;
 			return $this;
 		}
@@ -555,7 +555,7 @@
 			return $this->_Product;
 		}
 		/**
-		 * @return com\servandserv\example\Model\Price
+		 * @return com\servandserv\example\PriceType
 		 */
 		public function getPrice() {
 			return $this->_Price;

@@ -337,6 +337,7 @@
 			</xsl:if>
 			<xsl:attribute name="maxOccurs"><xsl:value-of select="$maxOccurs" /></xsl:attribute>
 			<xsl:attribute name="minOccurs"><xsl:value-of select="$minOccurs" /></xsl:attribute>
+            <xsl:attribute name="mode"><xsl:value-of select="@mode" /></xsl:attribute>
 			<xsl:element name="default">
 				<xsl:choose>
 					<xsl:when test="$source/@default">"<xsl:value-of select="$source/@default"/>"</xsl:when>
@@ -366,10 +367,15 @@
 			<xsl:when test="not($p/@class)">
 				<xsl:value-of select="substring-after($p/@prototype,'com\servandserv\happymeal\XML\Schema')" />
 			</xsl:when>
-			<xsl:when test="$p/@abstract">
+            <xsl:when test="$p/@abstract">
 			    <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
 				<xsl:value-of select="$p/@abstract" />
 			</xsl:when>
+            <!-- если класс описан через type а не через ref то используем class type -->
+            <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
+                <xsl:value-of select="@typeClass" />
+            </xsl:when>
 			<xsl:otherwise>
 			    <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
 				<xsl:value-of select="$p/@class" />
@@ -393,9 +399,12 @@
 			<xsl:when test="not($p/@class)">
 				<xsl:value-of select="substring-after($p/@prototype,'com\servandserv\happymeal\XML\Schema')" />
 			</xsl:when>
-			<xsl:when test="$p/@abstract">
+            <xsl:when test="$p/@abstract">
 				<xsl:value-of select="$p/@abstract" />
 			</xsl:when>
+            <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                <xsl:value-of select="$p/@typeClass" />
+            </xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="$p/@class" />
 			</xsl:otherwise>
@@ -409,6 +418,9 @@
             <xsl:when test="$p/@prototype = 'com\servandserv\happymeal\XML\Schema\AnyType'">
 				<xsl:text>\</xsl:text><xsl:value-of select="$p/@prototype" />
 			</xsl:when>
+            <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                <xsl:text>\</xsl:text><xsl:value-of select="$p/@typeClass" />
+            </xsl:when>
 			<xsl:when test="$p/@abstract">
 				<xsl:text>\</xsl:text><xsl:value-of select="$p/@abstract" />
 			</xsl:when>
@@ -416,7 +428,11 @@
 				<xsl:text>\</xsl:text><xsl:value-of select="$p/@class" />
 			</xsl:when>
 		</xsl:choose>
-		<xsl:text disable-output-escaping="yes"> $val ) {</xsl:text>
+        <xsl:text disable-output-escaping="yes"> $val </xsl:text>
+        <xsl:if test="$p/@minOccurs='0' and not($p/@array)">
+            <xsl:text>= NULL </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="yes">) {</xsl:text>
 		<xsl:choose>
 			<xsl:when test="$p/@array">
 				<xsl:text disable-output-escaping="yes">
@@ -438,6 +454,9 @@
 				<xsl:when test="not($p/@class)">
 					<xsl:value-of select="substring-after($p/@prototype,'com\servandserv\happymeal\XML\Schema')" />
 				</xsl:when>
+                 <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                    <xsl:value-of select="$p/@typeClass" />
+                </xsl:when>
 				<xsl:when test="$p/@abstract">
 					<xsl:value-of select="$p/@abstract" />
 				</xsl:when>
@@ -450,7 +469,11 @@
 		 */
 		public function </xsl:text>
 			<xsl:value-of select="$p/@setter" />
-			<xsl:text disable-output-escaping="yes">Array ( array $vals ) {
+			<xsl:text disable-output-escaping="yes">Array ( array $vals </xsl:text>
+            <xsl:if test="$p/@minOccurs='0'">
+                <xsl:text>= [] </xsl:text>
+            </xsl:if>
+            <xsl:text disable-output-escaping="yes"> ) {
 			$this-></xsl:text>
 			<xsl:value-of select="$p/@propName" />
 			<xsl:text disable-output-escaping="yes"> = $vals;
@@ -469,9 +492,12 @@
 			<xsl:when test="not($p/@class)">
 				<xsl:value-of select="substring-after($p/@prototype,'com\servandserv\happymeal\XML\Schema')" />
 			</xsl:when>
-			<xsl:when test="$p/@abstract">
+            <xsl:when test="$p/@abstract">
 				<xsl:value-of select="$p/@abstract" />
 			</xsl:when>
+             <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                <xsl:value-of select="$p/@typeClass" />
+            </xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="$p/@class" />
 			</xsl:otherwise>
@@ -529,7 +555,14 @@
 		
 		public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {
 			$validator = \com\servandserv\happymeal\Bindings::create('</xsl:text>
-			<xsl:value-of select="@class" />
+            <xsl:choose>
+                <xsl:when test="@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and @typeClass">
+                    <xsl:value-of select="@typeClass" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="@class" />
+                </xsl:otherwise>
+            </xsl:choose>
 			<xsl:text disable-output-escaping="yes">Validator',array($this,$handler));
 			$validator->validate();
 			

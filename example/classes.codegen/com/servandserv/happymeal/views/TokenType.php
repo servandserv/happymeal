@@ -1,6 +1,10 @@
 <?php
 	namespace com\servandserv\happymeal\views;
 		
+	/**
+	 * Use TokenType for temporary data (manage user interface flow)
+	 * 
+	 */
 	class TokenType extends \com\servandserv\happymeal\XML\Schema\AnyComplexType {
 			
 		const NS = "urn:com:servandserv:happymeal:views";
@@ -21,9 +25,9 @@
 		/**
 		 * @maxOccurs 1 
 		 * @minOccurs 1 
-		 * @var \StringType
+		 * @var com\servandserv\happymeal\views\Request
 		 */
-		protected $_Url = null;
+		protected $_Request = null;
 		/**
 		 * @maxOccurs unbounded 
 		 * @minOccurs 0 
@@ -32,7 +36,7 @@
 		protected $_Errors = [];
 		public function __construct() {
 			parent::__construct();
-			$this->__props["093f65e080a295f8076b1c5722a46aa2"] = array(
+			$this->__props["38b3eff8baf56627478ec76a704e9b52"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"id",
 			    "class"=>'',
@@ -47,7 +51,7 @@
 				"array"=>"",
 				"minOccurs"=>1
 			);
-			$this->__props["072b030ba126b2f4b2374f342be9ed44"] = array(
+			$this->__props["ec8956637a99787bd197eacd77acce5e"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"created",
 			    "class"=>'',
@@ -62,22 +66,22 @@
 				"array"=>"",
 				"minOccurs"=>1
 			);
-			$this->__props["7f39f8317fbdb1988ef4c628eba02591"] = array(
+			$this->__props["6974ce5ac660610b44d9b9fed0ff9548"] = array(
 			    "attribute"=>false,
-			    "nodeName"=>"url",
-			    "class"=>'',
-			    "classNS"=>'com\servandserv\happymeal\views\TokenType',
-			    "prototype"=>'com\servandserv\happymeal\XML\Schema\StringType',
-				"prop"=>"_Url",
-				"getter"=>"getUrl",
-				"setter"=>"setUrl",
+			    "nodeName"=>"Request",
+			    "class"=>'com\servandserv\happymeal\views\Request',
+			    "classNS"=>'com\servandserv\happymeal\views',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\AnyComplexType',
+				"prop"=>"_Request",
+				"getter"=>"getRequest",
+				"setter"=>"setRequest",
 				"default"=>"",
 				"fixed"=>"",
 				"xmlns"=>"urn:com:servandserv:happymeal:views",
 				"array"=>"",
 				"minOccurs"=>1
 			);
-			$this->__props["44f683a84163b3523afe57c2e008bc8c"] = array(
+			$this->__props["c9e1074f5b3f9fc8ea15d152add07294"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Errors",
 			    "class"=>'com\servandserv\happymeal\Errors',
@@ -108,10 +112,10 @@
 			return $this;
 		}
 		/**
-		 * @param \StringType $val
+		 * @param com\servandserv\happymeal\views\Request $val
 		 */
-		public function setUrl (  $val ) {
-			$this->_Url = $val;
+		public function setRequest ( \com\servandserv\happymeal\views\Request $val ) {
+			$this->_Request = $val;
 			return $this;
 		}
 		/**
@@ -124,7 +128,7 @@
 		/**
 		 * @param com\servandserv\happymeal\Errors[]
 		 */
-		public function setErrorsArray ( array $vals ) {
+		public function setErrorsArray ( array $vals = []  ) {
 			$this->_Errors = $vals;
 			return $this;
 		}
@@ -141,10 +145,10 @@
 			return $this->_Created;
 		}
 		/**
-		 * @return \StringType
+		 * @return com\servandserv\happymeal\views\Request
 		 */
-		public function getUrl() {
-			return $this->_Url;
+		public function getRequest() {
+			return $this->_Request;
 		}
 		/**
 		 * @return com\servandserv\happymeal\Errors | []
@@ -159,4 +163,14 @@
 			}
 			return $res;
 		}
+		
+		public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {
+			$validator = \com\servandserv\happymeal\Bindings::create('com\servandserv\happymeal\views\TokenTypeValidator',array($this,$handler));
+			$validator->validate();
+			
+			return $handler->hasErrors() ? $handler->getErrors() : FALSE;
+		}
+			
 	}
+		
+

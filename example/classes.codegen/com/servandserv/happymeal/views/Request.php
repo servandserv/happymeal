@@ -26,7 +26,7 @@
 		protected $_Param = [];
 		public function __construct() {
 			parent::__construct();
-			$this->__props["f457c545a9ded88f18ecee47145a72c0"] = array(
+			$this->__props["a3c65c2974270fd093ee8a9bf8ae7d0b"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"method",
 			    "class"=>'',
@@ -41,7 +41,7 @@
 				"array"=>"",
 				"minOccurs"=>1
 			);
-			$this->__props["c0c7c76d30bd3dcaefc96f40275bdc0a"] = array(
+			$this->__props["2723d092b63885e0d7c260cc007e8b9d"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"url",
 			    "class"=>'',
@@ -56,7 +56,7 @@
 				"array"=>"",
 				"minOccurs"=>1
 			);
-			$this->__props["2838023a778dfaecdc212708f721b788"] = array(
+			$this->__props["5f93f983524def3dca464469d2cf9f3e"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"Param",
 			    "class"=>'com\servandserv\happymeal\views\Param',
@@ -96,7 +96,7 @@
 		/**
 		 * @param com\servandserv\happymeal\views\Param[]
 		 */
-		public function setParamArray ( array $vals ) {
+		public function setParamArray ( array $vals = []  ) {
 			$this->_Param = $vals;
 			return $this;
 		}
@@ -125,6 +125,14 @@
 			}
 			return $res;
 		}
+		
+		public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {
+			$validator = \com\servandserv\happymeal\Bindings::create('com\servandserv\happymeal\views\RequestValidator',array($this,$handler));
+			$validator->validate();
+			
+			return $handler->hasErrors() ? $handler->getErrors() : FALSE;
+		}
+			
 	}
 		
 

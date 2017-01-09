@@ -12,16 +12,16 @@
 			
 			parent::__construct( $tdo, $handler);
 			    
-			$this->__props["c16a5320fa475530d9583c34fd356ef5"] = array(
+			$this->__props["9778d5d219c5080b9a6a17bef029331c"] = array(
 			    "attribute"=>false,
-			    "nodeName"=>"Session",
-			    "class"=>'com\servandserv\happymeal\views\Session',
-			    "classNS"=>'com\servandserv\happymeal\views',
-			    "prototype"=>'com\servandserv\happymeal\XML\Schema\AnyComplexType',
-			    "validator"=>'com\servandserv\happymeal\views\SessionValidator',
-				"prop"=>"_Session",
-				"getter"=>"getSession",
-				"setter"=>"setSession",
+			    "nodeName"=>"sessionId",
+			    "class"=>'',
+			    "classNS"=>'com\servandserv\happymeal\views\View',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\StringType',
+			    "validator"=>'com\servandserv\happymeal\views\View\SessionIdValidator',
+				"prop"=>"_SessionId",
+				"getter"=>"getSessionId",
+				"setter"=>"setSessionId",
 				"default"=>"",
 				"fixed"=>"",
 				"xmlns"=>"urn:com:servandserv:happymeal:views",
@@ -30,21 +30,75 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["6364d3f0f495b6ab9dcf8d3b5c6e0b01"] = array(
+			$this->__props["fe9fc289c3ff0af142b6d3bead98a923"] = array(
 			    "attribute"=>false,
-			    "nodeName"=>"Request",
-			    "class"=>'com\servandserv\happymeal\views\Request',
+			    "nodeName"=>"Env",
+			    "class"=>'com\servandserv\happymeal\views\Env',
 			    "classNS"=>'com\servandserv\happymeal\views',
 			    "prototype"=>'com\servandserv\happymeal\XML\Schema\AnyComplexType',
-			    "validator"=>'com\servandserv\happymeal\views\RequestValidator',
-				"prop"=>"_Request",
-				"getter"=>"getRequest",
-				"setter"=>"setRequest",
+			    "validator"=>'com\servandserv\happymeal\views\EnvValidator',
+				"prop"=>"_Env",
+				"getter"=>"getEnv",
+				"setter"=>"setEnv",
 				"default"=>"",
 				"fixed"=>"",
 				"xmlns"=>"urn:com:servandserv:happymeal:views",
 				"array"=>"",
 				"minOccurs"=>"1",
+				"maxOccurs"=>"1"
+			);
+			    
+			$this->__props["68d30a9594728bc39aa24be94b319d21"] = array(
+			    "attribute"=>false,
+			    "nodeName"=>"Token",
+			    "class"=>'com\servandserv\happymeal\views\View\Token',
+			    "classNS"=>'com\servandserv\happymeal\views\View',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\AnyComplexType',
+			    "validator"=>'com\servandserv\happymeal\views\View\TokenValidator',
+				"prop"=>"_Token",
+				"getter"=>"getToken",
+				"setter"=>"setToken",
+				"default"=>"",
+				"fixed"=>"",
+				"xmlns"=>"urn:com:servandserv:happymeal:views",
+				"array"=>"",
+				"minOccurs"=>"1",
+				"maxOccurs"=>"1"
+			);
+			    
+			$this->__props["3ef815416f775098fe977004015c6193"] = array(
+			    "attribute"=>false,
+			    "nodeName"=>"Referrer",
+			    "class"=>'com\servandserv\happymeal\views\View\Referrer',
+			    "classNS"=>'com\servandserv\happymeal\views\View',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\AnyComplexType',
+			    "validator"=>'com\servandserv\happymeal\views\View\ReferrerValidator',
+				"prop"=>"_Referrer",
+				"getter"=>"getReferrer",
+				"setter"=>"setReferrer",
+				"default"=>"",
+				"fixed"=>"",
+				"xmlns"=>"urn:com:servandserv:happymeal:views",
+				"array"=>"",
+				"minOccurs"=>"0",
+				"maxOccurs"=>"1"
+			);
+			    
+			$this->__props["93db85ed909c13838ff95ccfa94cebd9"] = array(
+			    "attribute"=>false,
+			    "nodeName"=>"Callback",
+			    "class"=>'com\servandserv\happymeal\views\View\Callback',
+			    "classNS"=>'com\servandserv\happymeal\views\View',
+			    "prototype"=>'com\servandserv\happymeal\XML\Schema\AnyComplexType',
+			    "validator"=>'com\servandserv\happymeal\views\View\CallbackValidator',
+				"prop"=>"_Callback",
+				"getter"=>"getCallback",
+				"setter"=>"setCallback",
+				"default"=>"",
+				"fixed"=>"",
+				"xmlns"=>"urn:com:servandserv:happymeal:views",
+				"array"=>"",
+				"minOccurs"=>"0",
 				"maxOccurs"=>"1"
 			);
 			$this->className = "View";
@@ -54,10 +108,16 @@
 		}
 		public function validate() {
 			parent::validate();
-			$this->assertMinOccurs( 'getSession','Session','1' );
-			$this->assertMaxOccurs( 'getSession','Session','1' );
-			$this->assertMinOccurs( 'getRequest','Request','1' );
-			$this->assertMaxOccurs( 'getRequest','Request','1' );
+			$this->assertMinOccurs( 'getSessionId','sessionId','1' );
+			$this->assertMaxOccurs( 'getSessionId','sessionId','1' );
+			$this->assertMinOccurs( 'getEnv','Env','1' );
+			$this->assertMaxOccurs( 'getEnv','Env','1' );
+			$this->assertMinOccurs( 'getToken','Token','1' );
+			$this->assertMaxOccurs( 'getToken','Token','1' );
+			$this->assertMinOccurs( 'getReferrer','Referrer','0' );
+			$this->assertMaxOccurs( 'getReferrer','Referrer','1' );
+			$this->assertMinOccurs( 'getCallback','Callback','0' );
+			$this->assertMaxOccurs( 'getCallback','Callback','1' );
 		}
 	}
 	

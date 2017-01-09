@@ -12,7 +12,7 @@
 			
 			parent::__construct( $tdo, $handler);
 			    
-			$this->__props["eccbc87e4b5ce2fe28308fd9f2a7baf3"] = array(
+			$this->__props["a684eceee76fc522773286a895bc8436"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"targetNS",
 			    "class"=>'',
@@ -30,7 +30,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["1679091c5a880faf6fb5e6087eb1b2dc"] = array(
+			$this->__props["72b32a1f754ba1c09b3695e0cb6cde7f"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"classNS",
 			    "class"=>'',
@@ -48,7 +48,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["45c48cce2e2d7fbdea1afc51c7c6ad26"] = array(
+			$this->__props["072b030ba126b2f4b2374f342be9ed44"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"name",
 			    "class"=>'',
@@ -66,7 +66,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["c20ad4d76fe97759aa27a0c99bff6710"] = array(
+			$this->__props["03afdbd66e7929b125f8597834fa83a4"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"value",
 			    "class"=>'',
@@ -84,7 +84,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["9bf31c7ff062936a96d3c8bd1f8f2ff3"] = array(
+			$this->__props["3295c76acbf4caaed33c36b1b5fc2cb1"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"rule",
 			    "class"=>'',
@@ -102,7 +102,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["6f4922f45568161a8cdf4ad2299f6d23"] = array(
+			$this->__props["14bfa6bb14875e45bba028a21ed38046"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"assertion",
 			    "class"=>'',
@@ -120,7 +120,7 @@
 				"maxOccurs"=>"1"
 			);
 			    
-			$this->__props["3c59dc048e8850243be8079a5c74d079"] = array(
+			$this->__props["32bb90e8976aab5298d5da10fe66f21d"] = array(
 			    "attribute"=>false,
 			    "nodeName"=>"description",
 			    "class"=>'',

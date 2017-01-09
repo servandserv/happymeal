@@ -7,13 +7,13 @@ use \com\servandserv\happymeal\Bindings;
 class AnyComplexTypeValidator extends AnyTypeValidator
 {
 
-    public function __construct ( \com\servandserv\happymeal\XML\Schema\AnyComplexType $tdo,
+    public function __construct( \com\servandserv\happymeal\XML\Schema\AnyComplexType $tdo,
         \com\servandserv\happymeal\ErrorsHandler $handler )
     {
         parent::__construct( $tdo, $handler );
     }
 
-    public function validate ()
+    public function validate()
     {
         foreach( $this->__props as $k => $prop ) {
             if( method_exists( $this->tdo, $prop["getter"] ) ) {
@@ -38,11 +38,11 @@ class AnyComplexTypeValidator extends AnyTypeValidator
         }
     }
 
-    protected function assertMinOccurs ( $getter, $node, $minOccurs = 1 )
+    protected function assertMinOccurs( $getter, $node, $minOccurs = 1 )
     {
         if( !method_exists( $this->tdo, $getter ) ) return;
         $val = $this->tdo->{$getter}();
-        if( $val === NULL && intval( $minOccurs ) !== 0 ) {
+        if( !$val && intval( $minOccurs ) !== 0 ) {
             $this->handleError(
                 Bindings::create( self::ERROR_CLASS )
                     ->setTargetNS( $this->targetNS )
@@ -64,7 +64,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
         }
     }
 
-    protected function assertMaxOccurs ( $getter, $node, $maxOccurs = 1 )
+    protected function assertMaxOccurs( $getter, $node, $maxOccurs = 1 )
     {
         if( !method_exists( $this->tdo, $getter ) ) return;
         $val = $this->tdo->{$getter}();
@@ -79,7 +79,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
                 ->setValue( count( $val ) ) );
     }
 
-    protected function assertChoice ( array $getters )
+    protected function assertChoice( array $getters )
     {
         $choice = 0;
         foreach( $getters as $getter ) {
@@ -98,7 +98,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
                 ->setValue( $choice ) );
     }
 
-    protected function assertFixed ( $getter, $node, $fixed )
+    protected function assertFixed( $getter, $node, $fixed )
     {
         if( !method_exists( $this->tdo, $getter ) ) return;
         $val = $this->tdo->{$getter}();

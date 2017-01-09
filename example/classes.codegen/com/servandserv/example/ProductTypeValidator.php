@@ -22,3 +22,5 @@
 			$this->assertPattern( $this->tdo->__text(), $this::PATTERN1 );
 		}
 	}
+	
+
