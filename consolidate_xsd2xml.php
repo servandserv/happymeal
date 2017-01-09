@@ -32,11 +32,11 @@ $schemas = explode( " ", $schemasPath );
 $imports = array();
 foreach( $schemas as $schema ) {
     if( file_exists( $schema ) ) {
-        $fullname = $schema;
+        $fullname = realpath( $schema );
     } else {
         $fullname = realpath( $base.DIRECTORY_SEPARATOR.$schema );
         $fullname = preg_replace( "/\/{2,}/", "/", $fullname ); //убираем двойные слэши чтобы однозначно идентифицировать адрес импортируемого ресурса
-        if( !file_exists( $fullname ) ) {
+        if( !file_exists( $fulname ) ) {
             print "Schema file $fullname not exists\r\n";
             exit( 1 );
         }
@@ -50,10 +50,6 @@ foreach( $schemas as $schema ) {
             }
         }
     } else {
-        if( !file_exists( $fullname ) ) {
-            print "File $fullname not exists\r\n";
-            exit( 1 );
-        }
         $imports[$fullname] = FALSE;
     }
 }
@@ -78,6 +74,7 @@ while( $notImported ) {
 $xw->endElement();
 $xw->endDocument();
 print( $xw->flush() );
+//file_put_contents('imported',print_r($imports,true));
 exit( 0 );
 
 /**
