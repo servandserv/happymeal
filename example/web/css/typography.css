@@ -1,0 +1,133 @@
+/*w3c-cssvalidator skipme:true*/
+body {
+    background-color: #FFF;
+    color:#000;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+body, caption, th, td, input, textarea, select, option, legend, fieldset, h1, h2, h3, h4, h5, h6 {
+    font-size-adjust: 0.5;
+}
+
+p {
+    /*line-height: 1.5;*/
+    /*-moz-osx-font-smoothing: grayscale;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    // Non standard for webkit
+    word-break: break-word;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    hyphens: auto;
+    -webkit-hyphenate-before: 3;
+    -webkit-hyphenate-after: 3;
+    hyphenate-lines: 3;*/
+}
+a, a:visited { 
+    text-decoration: underline; 
+}
+a:hover { 
+    text-decoration: none; 
+}
+a:active { color: tomato; }
+a:focus { border: 1px dotted tomato; }
+strong { font-weight: bold; }
+em { font-style: italic; }
+code, pre { font-family: monospace, serif; font-size: .85rem; }
+
+p { 
+    margin: 0 0 1.25em;
+    font-size: 1em;  /* equivalent to 16px */
+    line-height: 1.3; /* equivalent to 20px */
+    color:#222;
+}
+
+h1 {
+    font-size: 2em; /* 2x body copy size = 32px */
+    line-height: 2.6; /* 45px / 36px */
+    color:#000;
+}
+h2 {
+    font-size: 1.625em; /* 1.625x body copy size = 26px */
+    line-height: 2.1125;/*1.15384615; * 30px / 26px */
+    color:#000;
+}
+h3 {
+    font-size: 1.375em; /* 1.375x body copy size = 22px */
+    line-height: 1.7875;/*1.13636364;* 25px / 22px */
+    color:#000;
+}
+h4 {
+    font-size: 1.125em;/* 1.125x body copy size = 18px */
+    line-height: 1.4625;/*1.11111111;*/
+    color:#000;
+}
+blockquote {
+    font-size: 1.25em; /* 20px / 16px */
+    line-height: 1.625; /* 25px / 20px */
+    font-style: italic; 
+    color:#222;
+}
+blockquote:before {
+    content: "\201C";
+    display: inline-block;
+    padding-right: .4em;
+}
+
+@media (min-width: 43.75em) {
+    p {
+        font-size: 1em; /* equivalent to 16px */
+        line-height: 1.375; /* equivalent to 22px */
+    }
+    h1 {
+        font-size: 2.5em;/* 2.5x body copy size = 40px */
+        line-height: 1.125;
+    }
+    h2 {
+        font-size: 2em;/* 2x body copy size = 32px */
+        line-height: 1.25;
+    }
+    h3 {
+        font-size: 1.5em;/* 1.5x body copy size = 24px */
+        line-height: 1.25;
+    }
+    h4 {
+        line-height: 1.22222222;/* (22px / 18px */
+    }
+    blockquote {
+        font-size: 1.5em;/* 24px / 16px = */
+        line-height: 1.45833333;/* 35px / 24px */
+    }
+}
+
+@media (min-width: 56.25em) {
+    h1 {
+        font-size: 3em; /* 3x body copy size = 48px */
+        line-height: 1.05; /* keep to a multiple of the 20px line height and something more appropriate for display headings */
+    }
+    h2 {
+        font-size: 2.25em;/* 2.25x body copy size = 36px */
+        line-height: 1.25;
+    }
+    h3 {
+        font-size: 1.75em;/* 1.75x body copy size = 28px */
+        line-height: 1.25;
+    }
+}
+
+@media print {
+    * { 
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster: h5bp.com/s */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    p, h2, h3 {
+        orphans: 3; /* http://css-tricks.com/almanac/properties/o/orphans/ */
+        widows: 3;  /* http://css-tricks.com/almanac/properties/w/widows/ */
+    }
+    h2, h3 {
+        page-break-after: avoid;
+    }
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Model xmlns="urn:com:servandserv:example" ID="1">
+    <product>AZFG</product>
+    <Price>
+        <value>100</value>
+        <units>USD</units>
+    </Price>
+    <str>simple string</str>
+    <anyURI>com.servandserv</anyURI>
+    <lang>ru-RU</lang>
+    <boolval>true</boolval>
+    <dt>2007-01-01</dt>
+    <dtt>2001-10-26T21:32:52+02:00</dtt>
+    <dur>PT1004199059S</dur>
+    <byte>120</byte>
+    <short>32767</short>
+    <int>2147483647</int>
+    <long>9223372036854775807</long>
+    <integer>234234234</integer>
+    <decimal>121323.343</decimal>
+    <double>-1.2344e56</double>
+    <float>-.45E-6</float>
+    <Link xmlns="urn:com:servandserv:xml:atom">
+        <rel>1</rel>
+        <href>fwfergergerger</href>
+    </Link>
+    <Link xmlns="urn:com:servandserv:xml:atom">
+        <rel>2</rel>
+        <href>fwfergergerger</href>
+        <type>text/html</type>
+    </Link>
+</Model>

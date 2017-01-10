@@ -6,11 +6,11 @@
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-				xmlns:tmp="urn:ru:ilb:tmp"
+				xmlns:tmp="com:servandserv:happymeal:tmp"
 				xmlns:exsl="http://exslt.org/common"
 				extension-element-prefixes="exsl"
 				exclude-result-prefixes="tmp"
-				xmlns="urn:ru:ilb:tmp"
+				xmlns="com:servandserv:happymeal:tmp"
 				version="1.0">
 
 	<xsl:output
@@ -22,6 +22,8 @@
 	<xsl:strip-space elements="*"/>
 	
 	<xsl:param name="MODE" />
+	
+	<xsl:key name="nss" match="//tmp:*" use="@targetNS" />
 	
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
@@ -35,17 +37,16 @@
 
 	<!-- CLASSES -->
 	
-	<!-- все элементы пропускаем -->
+	<!--  -->
 	<xsl:template match="tmp:*" mode="DATA-CLASS">
 		<xsl:apply-templates select="tmp:*" mode="DATA-CLASS" />
 	</xsl:template>
 
 	<!-- 
-		для именованных узлов элемент и комплексный тип строим файл класса 
-		для атрибутов и простых типов классы не строим
+	    for nodes with @class create class file
+	    except attributes and simple class nodes
 	-->
 	<xsl:template match="tmp:element[@class] | tmp:complexType[@class]" mode="DATA-CLASS">
-		<!--  определяем прототип элемента. Если в основе элемента лежит простой тип, то класс не строим -->
 		<xsl:variable name="props-set">
 			<xsl:apply-templates select="tmp:*" mode="PROPS" />
 		</xsl:variable>
@@ -53,8 +54,8 @@
 		<xsl:variable name="first-ancestor">
 			<xsl:apply-templates select="." mode="FIRST_ANCESTOR" />
 		</xsl:variable>
-		<xsl:if test="not(starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema')) or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType'">
-			<!--  только сложные типы -->
+		<xsl:if test="not(starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema')) or $first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType'">
+			<!--  only complex types  -->
 			<xsl:text disable-output-escaping="yes">
 
 #path: </xsl:text><xsl:value-of select="@filePath" /><xsl:text disable-output-escaping="yes">.php
@@ -86,17 +87,31 @@
 			</xsl:call-template>
 		</xsl:for-each>
 		<xsl:text disable-output-escaping="yes">
-		public function __construct() {</xsl:text>
-			parent::__construct();
+		public function __construct() {
+			parent::__construct();</xsl:text>
 			<xsl:for-each select="$props/tmp:property">
-			<xsl:text disable-output-escaping="yes">
-			$this->_properties["</xsl:text>
-			<xsl:value-of select="@nodeName" />
-			<xsl:text disable-output-escaping="yes">"] = array(
+			    <xsl:text disable-output-escaping="yes">
+			$this->__props["</xsl:text>
+			    <xsl:value-of select="@source-id" />
+			    <xsl:text disable-output-escaping="yes">"] = array(
+			    "attribute"=></xsl:text>
+			    <xsl:choose>
+			        <xsl:when test="@attribute">true</xsl:when>
+			        <xsl:otherwise>false</xsl:otherwise>
+			    </xsl:choose>
+			    <xsl:text disable-output-escaping="yes">,
+			    "nodeName"=>"</xsl:text><xsl:value-of select="@nodeName"/><xsl:text disable-output-escaping="yes">",
+			    "class"=>'</xsl:text><xsl:value-of select="@class"/><xsl:text disable-output-escaping="yes">',
+			    "classNS"=>'</xsl:text><xsl:value-of select="@classNS"/><xsl:text disable-output-escaping="yes">',
+			    "prototype"=>'</xsl:text><xsl:value-of select="@prototype"/><xsl:text disable-output-escaping="yes">',
 				"prop"=>"</xsl:text><xsl:value-of select="@propName"/><xsl:text disable-output-escaping="yes">",
-				"ns"=>"</xsl:text><xsl:value-of select="@targetNS"/><xsl:text disable-output-escaping="yes">",
-				"minOccurs"=></xsl:text><xsl:value-of select="@minOccurs"/><xsl:text disable-output-escaping="yes">,
-				"text"=>$this-></xsl:text><xsl:value-of select="@propName" /><xsl:text disable-output-escaping="yes">
+				"getter"=>"</xsl:text><xsl:value-of select="@getter"/><xsl:text disable-output-escaping="yes">",
+				"setter"=>"</xsl:text><xsl:value-of select="@setter"/><xsl:text disable-output-escaping="yes">",
+				"default"=>"</xsl:text><xsl:value-of select="@default"/><xsl:text disable-output-escaping="yes">",
+				"fixed"=>"</xsl:text><xsl:value-of select="@fixed"/><xsl:text disable-output-escaping="yes">",
+				"xmlns"=>"</xsl:text><xsl:value-of select="@targetNS"/><xsl:text disable-output-escaping="yes">",
+				"array"=>"</xsl:text><xsl:value-of select="@array"/><xsl:text disable-output-escaping="yes">",
+				"minOccurs"=></xsl:text><xsl:value-of select="@minOccurs"/><xsl:text disable-output-escaping="yes">
 			);</xsl:text>
 			</xsl:for-each><xsl:text>
 		}</xsl:text>
@@ -112,11 +127,9 @@
 				</xsl:call-template>
 			</xsl:for-each>
 			<xsl:apply-templates select="." mode="VALIDATION" />
-			<xsl:apply-templates select="." mode="SERIALIZE" />
-			<xsl:apply-templates select="." mode="UNSERIALIZE" />
-			<xsl:call-template name="FROM_JSON">
+			<!--xsl:call-template name="FROM_JSON">
 				<xsl:with-param name="ps" select="$props" />
-			</xsl:call-template>
+			</xsl:call-template-->
 		<xsl:text disable-output-escaping="yes">
 	}
 		</xsl:text>
@@ -161,7 +174,7 @@
 			<xsl:for-each select="tmp:restriction/tmp:enumeration">
 				<xsl:text disable-output-escaping="yes">
 		const _</xsl:text>
-					<xsl:value-of select="translate(@value, '.-', '__')" />
+					<xsl:value-of select="translate(translate(@value, '.-\/', '____'),$smallcase,$uppercase)" />
 					<xsl:text> = "</xsl:text>
 					<xsl:value-of select="@value" />
 					<xsl:text>";</xsl:text>
@@ -210,11 +223,11 @@
 		* Вывод в XMLWriter
 		* @codegen true
 		* @param XMLWriter $xw
-		* @param string $xmlname Имя корневого узла
-		* @param string $xmlns Пространство имен
+		* @param string $xmlname node name
+		* @param string $xmlns namespace
 		* @param int $mode
 		*/
-		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = \Adaptor_XML::ELEMENT ) {
+		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = \com\servandserv\happymeal\XMLAdaptor::ELEMENT ) {
 			parent::toXmlWriter($xw,$xmlname,$xmlns,$mode);
 		}
 	}
@@ -293,8 +306,10 @@
 			</xsl:if>
 			<xsl:attribute name="getter"><xsl:value-of select="@getter" /></xsl:attribute>
 			<xsl:attribute name="setter"><xsl:value-of select="@setter" /></xsl:attribute>
+			<xsl:attribute name="classNS"><xsl:value-of select="@classNS" /></xsl:attribute>
+			<xsl:attribute name="targetNS"><xsl:value-of select="@targetNS" /></xsl:attribute>
 			<xsl:choose>
-				<xsl:when test="not(starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema')) or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType'">
+				<xsl:when test="not(starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema')) or $first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType'">
 					<xsl:attribute name="class">
 						<xsl:value-of select="@class" />
 					</xsl:attribute>
@@ -305,6 +320,7 @@
 				<xsl:otherwise>
 				</xsl:otherwise>
 			</xsl:choose>
+			<xsl:attribute name="validator"><xsl:value-of select="@class" />Validator</xsl:attribute>
 			<xsl:variable name="abstract">
 				<xsl:apply-templates select="." mode="ABSTRACT" />
 			</xsl:variable>
@@ -321,6 +337,7 @@
 			</xsl:if>
 			<xsl:attribute name="maxOccurs"><xsl:value-of select="$maxOccurs" /></xsl:attribute>
 			<xsl:attribute name="minOccurs"><xsl:value-of select="$minOccurs" /></xsl:attribute>
+            <xsl:attribute name="mode"><xsl:value-of select="@mode" /></xsl:attribute>
 			<xsl:element name="default">
 				<xsl:choose>
 					<xsl:when test="$source/@default">"<xsl:value-of select="$source/@default"/>"</xsl:when>
@@ -339,19 +356,26 @@
 		<xsl:text disable-output-escaping="yes">
 		/**
 		 * @maxOccurs </xsl:text>
-		<xsl:value-of select="$p/@maxOccurs" /><xsl:text> </xsl:text>
+		<xsl:value-of select="$p/@maxOccurs" /><xsl:text> 
+		 * @minOccurs </xsl:text>
+		<xsl:value-of select="$p/@minOccurs" /><xsl:text> </xsl:text>
 		<xsl:value-of select="normalize-space($p/tmp:annotation/tmp:documentation)" />
 		<xsl:copy-of select="$p/tmp:annotation/tmp:appinfo" />
 		<xsl:text disable-output-escaping="yes">
 		 * @var </xsl:text>
 		<xsl:choose>
 			<xsl:when test="not($p/@class)">
-				<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
+				<xsl:value-of select="substring-after($p/@prototype,'com\servandserv\happymeal\XML\Schema')" />
 			</xsl:when>
-			<xsl:when test="$p/@abstract">
+            <xsl:when test="$p/@abstract">
 			    <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
 				<xsl:value-of select="$p/@abstract" />
 			</xsl:when>
+            <!-- если класс описан через type а не через ref то используем class type -->
+            <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
+                <xsl:value-of select="@typeClass" />
+            </xsl:when>
 			<xsl:otherwise>
 			    <xsl:if test="$p/@array = 'true'">Array of </xsl:if>
 				<xsl:value-of select="$p/@class" />
@@ -373,11 +397,14 @@
 		 * @param </xsl:text>
 		<xsl:choose>
 			<xsl:when test="not($p/@class)">
-				<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
+				<xsl:value-of select="substring-after($p/@prototype,'com\servandserv\happymeal\XML\Schema')" />
 			</xsl:when>
-			<xsl:when test="$p/@abstract">
+            <xsl:when test="$p/@abstract">
 				<xsl:value-of select="$p/@abstract" />
 			</xsl:when>
+            <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                <xsl:value-of select="$p/@typeClass" />
+            </xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="$p/@class" />
 			</xsl:otherwise>
@@ -388,9 +415,12 @@
 		<xsl:value-of select="$p/@setter" />
 		<xsl:text> ( </xsl:text>
 		<xsl:choose>
-            <xsl:when test="$p/@prototype = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyType'">
+            <xsl:when test="$p/@prototype = 'com\servandserv\happymeal\XML\Schema\AnyType'">
 				<xsl:text>\</xsl:text><xsl:value-of select="$p/@prototype" />
 			</xsl:when>
+            <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                <xsl:text>\</xsl:text><xsl:value-of select="$p/@typeClass" />
+            </xsl:when>
 			<xsl:when test="$p/@abstract">
 				<xsl:text>\</xsl:text><xsl:value-of select="$p/@abstract" />
 			</xsl:when>
@@ -398,17 +428,19 @@
 				<xsl:text>\</xsl:text><xsl:value-of select="$p/@class" />
 			</xsl:when>
 		</xsl:choose>
-		<xsl:text disable-output-escaping="yes"> $val ) {</xsl:text>
+        <xsl:text disable-output-escaping="yes"> $val </xsl:text>
+        <xsl:if test="$p/@minOccurs='0' and not($p/@array)">
+            <xsl:text>= NULL </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="yes">) {</xsl:text>
 		<xsl:choose>
 			<xsl:when test="$p/@array">
 				<xsl:text disable-output-escaping="yes">
-			$this-></xsl:text><xsl:value-of select="$p/@propName" /><xsl:text disable-output-escaping="yes">[] = $val;
-			$this->_properties["</xsl:text><xsl:value-of select="$p/@nodeName" /><xsl:text>"]["text"][] = $val;</xsl:text>
+			$this-></xsl:text><xsl:value-of select="$p/@propName" /><xsl:text disable-output-escaping="yes">[] = $val;</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text disable-output-escaping="yes">
-			$this-></xsl:text><xsl:value-of select="$p/@propName" /><xsl:text disable-output-escaping="yes"> = $val;
-			$this->_properties["</xsl:text><xsl:value-of select="$p/@nodeName" /><xsl:text>"]["text"] = $val;</xsl:text>
+			$this-></xsl:text><xsl:value-of select="$p/@propName" /><xsl:text disable-output-escaping="yes"> = $val;</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:text disable-output-escaping="yes">
@@ -420,8 +452,11 @@
 		 * @param </xsl:text>
 			<xsl:choose>
 				<xsl:when test="not($p/@class)">
-					<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
+					<xsl:value-of select="substring-after($p/@prototype,'com\servandserv\happymeal\XML\Schema')" />
 				</xsl:when>
+                 <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                    <xsl:value-of select="$p/@typeClass" />
+                </xsl:when>
 				<xsl:when test="$p/@abstract">
 					<xsl:value-of select="$p/@abstract" />
 				</xsl:when>
@@ -434,11 +469,15 @@
 		 */
 		public function </xsl:text>
 			<xsl:value-of select="$p/@setter" />
-			<xsl:text disable-output-escaping="yes">Array ( array $vals ) {
+			<xsl:text disable-output-escaping="yes">Array ( array $vals </xsl:text>
+            <xsl:if test="$p/@minOccurs='0'">
+                <xsl:text>= [] </xsl:text>
+            </xsl:if>
+            <xsl:text disable-output-escaping="yes"> ) {
 			$this-></xsl:text>
 			<xsl:value-of select="$p/@propName" />
 			<xsl:text disable-output-escaping="yes"> = $vals;
-			$this->_properties["</xsl:text><xsl:value-of select="$p/@nodeName" /><xsl:text>"]["text"] = $vals;
+			return $this;
 		}</xsl:text>
 		</xsl:if>
 	</xsl:template>
@@ -451,11 +490,14 @@
 		 * @return </xsl:text>
 		 <xsl:choose>
 			<xsl:when test="not($p/@class)">
-				<xsl:value-of select="substring-after($p/@prototype,'Happymeal\Port\Adaptor\Data\XML\Schema')" />
+				<xsl:value-of select="substring-after($p/@prototype,'com\servandserv\happymeal\XML\Schema')" />
 			</xsl:when>
-			<xsl:when test="$p/@abstract">
+            <xsl:when test="$p/@abstract">
 				<xsl:value-of select="$p/@abstract" />
 			</xsl:when>
+             <xsl:when test="$p/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and $p/@typeClass">
+                <xsl:value-of select="$p/@typeClass" />
+            </xsl:when>
 			<xsl:otherwise>
 				<xsl:value-of select="$p/@class" />
 			</xsl:otherwise>
@@ -467,14 +509,18 @@
 		<xsl:value-of select="$p/@getter" />
 		<xsl:choose>
 			<xsl:when test="$p/@array">
-		<xsl:text>($index = null) {</xsl:text> 
+		<xsl:text>($index = NULL, callable $cb = NULL) {</xsl:text> 
 		<xsl:text disable-output-escaping="yes">
-			if( $index !== null ) {
+			if( $index !== NULL ) {
 				$res = isset($this-></xsl:text>
 				<xsl:value-of select="$p/@propName" />
 				<xsl:text disable-output-escaping="yes">[$index]) ? $this-></xsl:text>
 				<xsl:value-of select="$p/@propName" />
-				<xsl:text disable-output-escaping="yes">[$index] : null;
+				<xsl:text disable-output-escaping="yes">[$index] : NULL;
+			} elseif( $cb ) {
+			    return array_values(array_filter($this-></xsl:text>
+			    <xsl:value-of select="$p/@propName" />
+			    <xsl:text disable-output-escaping="yes">, $cb));
 			} else {
 				$res = $this-></xsl:text>
 				<xsl:value-of select="$p/@propName" />
@@ -507,11 +553,20 @@
 		<xsl:if test="$MODE='WITH_VALIDATORS'">
 			<xsl:text disable-output-escaping="yes">
 		
-		public function validateType( \Happymeal\Port\Adaptor\Data\ValidationHandler $handler ) {
-			$validator = new \</xsl:text>
-			<xsl:value-of select="@class" />
-			<xsl:text disable-output-escaping="yes">Validator( $this, $handler );
+		public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {
+			$validator = \com\servandserv\happymeal\Bindings::create('</xsl:text>
+            <xsl:choose>
+                <xsl:when test="@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and @typeClass">
+                    <xsl:value-of select="@typeClass" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="@class" />
+                </xsl:otherwise>
+            </xsl:choose>
+			<xsl:text disable-output-escaping="yes">Validator',array($this,$handler));
 			$validator->validate();
+			
+			return $handler->hasErrors() ? $handler->getErrors() : FALSE;
 		}
 			</xsl:text>
 		</xsl:if>
@@ -528,7 +583,7 @@
 			<xsl:apply-templates select="." mode="FIRST_ANCESTOR" />
 		</xsl:variable>
 		<!--xsl:variable name="prototype" select="//tmp:*[@typeClass = $first-ancestor]" /-->
-		<xsl:if test="not(starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema')) or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType'">
+		<xsl:if test="not(starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema')) or $first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType'">
 			<xsl:text disable-output-escaping="yes">
 		
 		public function toXmlStr( $xmlns=self::NS, $xmlname=self::ROOT ) {
@@ -543,11 +598,11 @@
 		* @param string $xmlns Пространство имен
 		* @param int $mode
 		*/
-		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = \Adaptor_XML::ELEMENT ) {
-			if( $mode &amp; \Adaptor_XML::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
-			$this->attributesToXmlWriter( $xw, $xmlname, $xmlns );
-			$this->elementsToXmlWriter( $xw, $xmlname, $xmlns );
-			if( $mode &amp; \Adaptor_XML::ENDELEMENT ) $xw->endElement();
+		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = \com\servandserv\happymeal\XMLAdaptor::ELEMENT ) {
+			if( $mode &amp; \com\servandserv\happymeal\XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
+			$this->attributesToXmlWriter( $xw, $xmlns );
+			$this->elementsToXmlWriter( $xw, $xmlns );
+			if( $mode &amp; \com\servandserv\happymeal\XMLAdaptor::ENDELEMENT ) $xw->endElement();
 		}
 				
 		/**
@@ -557,8 +612,8 @@
 		* @param string $xmlns Пространство имен
 		*/
 		protected function attributesToXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS ) {
-			parent::attributesToXmlWriter( $xw, $xmlname, $xmlns );</xsl:text>
-			<xsl:apply-templates select="tmp:*" mode="ATTRIBUTE_SERIALIZE" />
+			parent::attributesToXmlWriter( $xw, $xmlns );</xsl:text>
+			<!--xsl:apply-templates select="tmp:*" mode="ATTRIBUTE_SERIALIZE" /-->
 			<xsl:text disable-output-escaping="yes">
 		}
 		/**
@@ -568,8 +623,8 @@
 		* @param string $xmlns Пространство имен
 		*/
 		protected function elementsToXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS ) {
-			parent::elementsToXmlWriter( $xw, $xmlname, $xmlns );</xsl:text>
-			<xsl:apply-templates select="tmp:*" mode="ELEMENT_SERIALIZE" />
+			parent::elementsToXmlWriter( $xw, $xmlns );</xsl:text>
+			<!--xsl:apply-templates select="tmp:*" mode="ELEMENT_SERIALIZE" /-->
 			<xsl:text disable-output-escaping="yes">
 		}</xsl:text>
 		</xsl:if>
@@ -700,14 +755,14 @@
 		</xsl:variable>
 		<!--xsl:variable name="prototype" select="//tmp:*[@typeClass = $first-ancestor]" /-->
 		<xsl:choose>
-			<xsl:when test="not(starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema')) or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType' or $first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyType'">
+			<xsl:when test="not(starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema')) or $first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType' or $first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyType'">
                 <xsl:choose>
-        			<xsl:when test="$source/@mode = '\Adaptor_XML::CONTENTS'">
+        			<xsl:when test="$source/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS'">
         				<xsl:text disable-output-escaping="yes">
         			$xw->startElement( '</xsl:text>
 	        			<xsl:value-of select="@name" />
 	        			<xsl:text disable-output-escaping="yes">');
-					$prop->toXmlWriter( $xw, NULL, NULL, \Adaptor_XML::CONTENTS );
+					$prop->toXmlWriter( $xw, NULL, NULL, \com\servandserv\happymeal\XMLAdaptor::CONTENTS );
 					$xw->endElement();</xsl:text>
 	        		</xsl:when>
         			<xsl:otherwise>
@@ -718,7 +773,7 @@
 			</xsl:when>
             <xsl:otherwise>
                 <xsl:choose>
-					<xsl:when test="$source/@mode = '\Adaptor_XML::CONTENTS'">
+					<xsl:when test="$source/@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS'">
 						<xsl:text disable-output-escaping="yes">
 				$xw->writeElement( '</xsl:text>
 						<xsl:value-of select="@name" />
@@ -862,7 +917,7 @@
 		</xsl:variable>
 		<!--xsl:variable name="prototype" select="//tmp:*[@typeClass = $first-ancestor]" /-->
 		<xsl:choose>
-			<xsl:when test="starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema') and not($first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+			<xsl:when test="starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema') and not($first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType')">
 				<xsl:text disable-output-escaping="yes">
 				case "</xsl:text>
 				<xsl:value-of select="@name" />
@@ -1051,6 +1106,10 @@
 	<!-- для именованных узлов элемент, атрибут, простой тип и комплексный тип строим файл класса -->
 	<xsl:template match="tmp:element[@class] | tmp:simpleType[@class] | tmp:complexType[@class] | tmp:attribute[@class]" mode="VALIDATOR-CLASS">
 		<xsl:variable name="self" select="." />
+		<xsl:variable name="props-set">
+			<xsl:apply-templates select="tmp:*" mode="PROPS" />
+		</xsl:variable>
+		<xsl:variable name="props" select="exsl:node-set($props-set)" />
 		<xsl:text disable-output-escaping="yes">
 
 #path: </xsl:text><xsl:value-of select="@filePath" />Validator<xsl:text disable-output-escaping="yes">.php
@@ -1077,7 +1136,7 @@
 			<xsl:when test="/tmp:schema/tmp:simpleType[@class = $self/@typeClass]">
 				<xsl:apply-templates select="." mode="TYPE_CLASS" />
 			</xsl:when>
-			<xsl:when test="starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema') and not($first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+			<xsl:when test="starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema') and not($first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType')">
 				<xsl:value-of select="$first-ancestor" />
 			</xsl:when>
 			<xsl:otherwise>
@@ -1098,7 +1157,7 @@
 		<xsl:text disable-output-escaping="yes">
 		public function __construct( \</xsl:text>
 			<xsl:choose>
-				<xsl:when test="not($first-ancestor='Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+				<xsl:when test="not($first-ancestor='com\servandserv\happymeal\XML\Schema\AnyComplexType')">
 					<xsl:value-of select="$first-ancestor" />
 				</xsl:when>
 				<xsl:otherwise>
@@ -1106,15 +1165,46 @@
 					<!--xsl:apply-templates select="." mode="TYPE_CLASS" /-->
 				</xsl:otherwise>
 			</xsl:choose>
-			<xsl:text disable-output-escaping="yes"> $tdo = NULL, \Happymeal\Port\Adaptor\Data\ValidationHandler $handler = NULL ) {
-			parent::__construct( $tdo, $handler);
+			<xsl:text disable-output-escaping="yes"> $tdo = NULL, \com\servandserv\happymeal\ErrorsHandler $handler = NULL ) {
+			
+			parent::__construct( $tdo, $handler);</xsl:text>
+			<xsl:for-each select="$props/tmp:property">
+			    <xsl:text disable-output-escaping="yes">
+			    
+			$this->__props["</xsl:text>
+			    <xsl:value-of select="@source-id" />
+			    <xsl:text disable-output-escaping="yes">"] = array(
+			    "attribute"=></xsl:text>
+			    <xsl:choose>
+			        <xsl:when test="@attribute">true</xsl:when>
+			        <xsl:otherwise>false</xsl:otherwise>
+			    </xsl:choose>
+			    <xsl:text disable-output-escaping="yes">,
+			    "nodeName"=>"</xsl:text><xsl:value-of select="@nodeName"/><xsl:text disable-output-escaping="yes">",
+			    "class"=>'</xsl:text><xsl:value-of select="@class"/><xsl:text disable-output-escaping="yes">',
+			    "classNS"=>'</xsl:text><xsl:value-of select="@classNS"/><xsl:text disable-output-escaping="yes">',
+			    "prototype"=>'</xsl:text><xsl:value-of select="@prototype"/><xsl:text disable-output-escaping="yes">',
+			    "validator"=>'</xsl:text><xsl:value-of select="@validator"/><xsl:text disable-output-escaping="yes">',
+				"prop"=>"</xsl:text><xsl:value-of select="@propName"/><xsl:text disable-output-escaping="yes">",
+				"getter"=>"</xsl:text><xsl:value-of select="@getter"/><xsl:text disable-output-escaping="yes">",
+				"setter"=>"</xsl:text><xsl:value-of select="@setter"/><xsl:text disable-output-escaping="yes">",
+				"default"=>"</xsl:text><xsl:value-of select="@default"/><xsl:text disable-output-escaping="yes">",
+				"fixed"=>"</xsl:text><xsl:value-of select="@fixed"/><xsl:text disable-output-escaping="yes">",
+				"xmlns"=>"</xsl:text><xsl:value-of select="@targetNS"/><xsl:text disable-output-escaping="yes">",
+				"array"=>"</xsl:text><xsl:value-of select="@array"/><xsl:text disable-output-escaping="yes">",
+				"minOccurs"=>"</xsl:text><xsl:value-of select="@minOccurs"/><xsl:text disable-output-escaping="yes">",
+				"maxOccurs"=>"</xsl:text><xsl:value-of select="@maxOccurs"/><xsl:text disable-output-escaping="yes">"
+			);</xsl:text>
+			</xsl:for-each>
+			<!--xsl:text >
 			if($tdo !== NULL) {</xsl:text>
-			    <xsl:apply-templates select="tmp:*" mode="SIMPLE_TYPE_VALIDATOR" />
+			    <xsl:apply-templates select="tmp:*" mode="SIMPLE_TYPE_VALIDATOR" /-->
 			<xsl:text disable-output-escaping="yes">
-			}
 			$this->className = "</xsl:text><xsl:value-of select="@className" /><xsl:text disable-output-escaping="yes">";
+			$this->nodeName = "</xsl:text><xsl:value-of select="@schemaName" /><xsl:text disable-output-escaping="yes">";
+			$this->targetNS = "</xsl:text><xsl:value-of select="@targetNS" /><xsl:text disable-output-escaping="yes">";
+			$this->classNS = "</xsl:text><xsl:value-of select="translate(@classNS,'\',':')" /><xsl:text disable-output-escaping="yes">";
 		}
-				
 		public function validate() {
 			parent::validate();</xsl:text>
 			<xsl:choose>
@@ -1142,7 +1232,7 @@
 		<xsl:apply-templates select="tmp:*" mode="VALIDATION_CONST"/>
 	</xsl:template>
 	
-	<xsl:template match="tmp:minExclusive | tmp:maxExclusive | tmp:minInclusive | tmp:maxInclusive | tmp:length | tmp:minLength | tmp:maxLength | tmp:pattern" mode="VALIDATION_CONST">
+	<xsl:template match="tmp:minExclusive | tmp:maxExclusive | tmp:minInclusive | tmp:maxInclusive | tmp:length | tmp:minLength | tmp:maxLength | tmp:pattern | tmp:fractionDigits | tmp:totalDigits" mode="VALIDATION_CONST">
 		<xsl:text disable-output-escaping="yes">
 		const </xsl:text>
 			<xsl:value-of select="translate(local-name(),$smallcase,$uppercase)"/>
@@ -1174,17 +1264,17 @@
 			$enum = array( </xsl:text>
 			<xsl:value-of select="$enum" />
 			<xsl:text disable-output-escaping="yes"> );
-			$this->assertEnumeration( $this->tdo->_text() , $enum );</xsl:text>
+			$this->assertEnumeration( $this->tdo->__text() , $enum );</xsl:text>
 		</xsl:if>
 		<xsl:apply-templates select="tmp:*" mode="VALIDATION_RULE" />
 	</xsl:template>
 	
-	<xsl:template match="tmp:minExclusive | tmp:maxExclusive | tmp:minInclusive | tmp:maxInclusive | tmp:length | tmp:minLength | tmp:maxLength | tmp:pattern" mode="VALIDATION_RULE">
+	<xsl:template match="tmp:minExclusive | tmp:maxExclusive | tmp:minInclusive | tmp:maxInclusive | tmp:length | tmp:minLength | tmp:maxLength | tmp:pattern | tmp:fractionDigits | tmp:totalDigits" mode="VALIDATION_RULE">
 		<xsl:text disable-output-escaping="yes">
 			$this->assert</xsl:text>
 			<xsl:value-of select="translate(substring(local-name(),1,1),$smallcase,$uppercase)"/>
 			<xsl:value-of select="substring(local-name(),2)"/>
-			<xsl:text disable-output-escaping="yes">( $this->tdo->_text(), $this::</xsl:text>
+			<xsl:text disable-output-escaping="yes">( $this->tdo->__text(), $this::</xsl:text>
 			<xsl:value-of select="translate(local-name(),$smallcase,$uppercase)" />
 			<xsl:if test="local-name() = 'pattern'"><xsl:value-of select="position()"/></xsl:if>
 			<xsl:text> );</xsl:text>
@@ -1234,7 +1324,7 @@
 			<xsl:apply-templates select="$source" mode="OCCURENCE_MAX" />
 		</xsl:variable>
 		<!-- проверяем только простые типы maxOccurs=1  --> 
-		<xsl:if test="not($first-ancestor='Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType') and $maxOccurs='1'">
+		<xsl:if test="not($first-ancestor='com\servandserv\happymeal\XML\Schema\AnyComplexType') and $maxOccurs='1'">
 			<xsl:text disable-output-escaping="yes">
 			$this->addSimpleValidator( '</xsl:text>
 			<xsl:value-of select="@propName" />
@@ -1275,14 +1365,15 @@
 		<xsl:variable name="elements">
 			<xsl:for-each select="tmp:element">
 				<xsl:text>'</xsl:text>
-				<xsl:choose>
+				<!--xsl:choose>
 					<xsl:when test="@propName">
 						<xsl:value-of select="@propName" />
 					</xsl:when>
 					<xsl:when test="@refClassName">
 						<xsl:value-of select="@refClassName" />
 					</xsl:when>
-				</xsl:choose>
+				</xsl:choose-->
+				<xsl:value-of select="@getter" />
 				<xsl:text>'</xsl:text>
 				<xsl:if test="position()!=last()">,</xsl:if>
 			</xsl:for-each>
@@ -1317,11 +1408,13 @@
 		<xsl:variable name="minOccurs">
 			<xsl:apply-templates select="$source" mode="OCCURENCE_MIN" />
 		</xsl:variable>
-		<xsl:if test="starts-with($first-ancestor,'Happymeal\Port\Adaptor\Data\XML\Schema') and not($first-ancestor = 'Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType')">
+		<xsl:if test="starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema') and not($first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType')">
 			<xsl:if test="$source/@fixed">
 				<xsl:text disable-output-escaping="yes">
 			$this->assertFixed( '</xsl:text>
-				<xsl:value-of select="$source/@propName" />
+				<xsl:value-of select="$source/@getter" />
+				<xsl:text>','</xsl:text>
+				<xsl:value-of select="$source/@schemaName"/>
 				<xsl:text>','</xsl:text>
 				<xsl:value-of select="$source/@fixed"/>
 				<xsl:text>' );</xsl:text>
@@ -1330,13 +1423,17 @@
 	    <!-- minOccurs and maxOccurs проверяем и на компдексных типах -->
 			<xsl:text disable-output-escaping="yes">
 			$this->assertMinOccurs( '</xsl:text>
-			<xsl:value-of select="@propName" />
+			<xsl:value-of select="@getter" />
+			<xsl:text>','</xsl:text>
+			<xsl:value-of select="@schemaName"/>
 			<xsl:text>','</xsl:text>
 			<xsl:value-of select="$minOccurs"/>
 			<xsl:text>' );</xsl:text>
 			<xsl:text disable-output-escaping="yes">
 			$this->assertMaxOccurs( '</xsl:text>
-			<xsl:value-of select="@propName" />
+			<xsl:value-of select="@getter" />
+			<xsl:text>','</xsl:text>
+			<xsl:value-of select="@schemaName"/>
 			<xsl:text>','</xsl:text>
 			<xsl:value-of select="$maxOccurs"/>
 			<xsl:text>' );</xsl:text>
@@ -1383,11 +1480,11 @@
 			<!-- Это затычка на случай когда элемент объявлен в схеме без типа и внутри него не ничего что бы указывало
 			на сложный тип делаем их по умолчанию наследниками простой строки -->
 			<xsl:when test="not(descendant::tmp:element) and not(descendant::tmp:attribute) and not(descendant::tmp:complexType)">
-				<xsl:text>Happymeal\Port\Adaptor\Data\XML\Schema\AnySimpleType</xsl:text>
+				<xsl:text>com\servandserv\happymeal\XML\Schema\AnySimpleType</xsl:text>
 			</xsl:when>
 			<!--  все остальыне наследники комплексного типа -->
 			<xsl:otherwise>
-				<xsl:text>Happymeal\Port\Adaptor\Data\XML\Schema\AnyComplexType</xsl:text>
+				<xsl:text>com\servandserv\happymeal\XML\Schema\AnyComplexType</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -1467,13 +1564,14 @@
 		
 		<xsl:text>$</xsl:text>
 		<xsl:value-of select="$varName" />
-		<xsl:text disable-output-escaping="yes"> = \Adaptor_Bindings::create("\\</xsl:text>
-		<xsl:call-template name="REPLACE">
+		<xsl:text disable-output-escaping="yes"> = \com\servandserv\happymeal\Bindings::create('</xsl:text>
+		<xsl:value-of select="$className" />
+		<!--xsl:call-template name="REPLACE">
 			<xsl:with-param name="input" select="$className"/>
 			<xsl:with-param name="from" select="'\'"/>
 			<xsl:with-param name="to" select="'\\'"/>
-		</xsl:call-template>
-		<xsl:text disable-output-escaping="yes">");</xsl:text>
+		</xsl:call-template-->
+		<xsl:text disable-output-escaping="yes">');</xsl:text>
 	</xsl:template>
 	
 	<xsl:template name="REPLACE">

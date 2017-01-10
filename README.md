@@ -1,12 +1,57 @@
-# happymeal
-xsd2php, xsd2js, wadl2php code generator, happymeal router, happymeal js micro framework
+# Happymeal
+xsd to php classes generator, wadl to php code generator(soon)
 
-Генерация php кода на основе XML Schemas, WADL описания REST сервисов
+## Install happymeal project
 
-1. Генерируются Адаптеры преобразующие  XML данные  в php, js объекты и наоборот.
-Генерация производится по схемам данных
+```
+mkdir -p /path_to_project/project_name
+cd /path_to_project/project_name
+mkdir -p vendor
+cd vendor
+git clone https://github.com/servandserv/happymeal.git
+cp /happymeal/happymeal.ini /path_to_project/project_name
+```
 
-2. Генерируется контроллер REST сервиса  на основании WADL. Контроллер использует роутер classes/App.php
+## XSD to PHP classes generator
 
+### Generate code
 
-Usage: happymeal man
+1. Configurate happymeal.ini file 
+2. Run the bash script
+```
+path_to_happymeal/happymeal xsd2php path_to_project/project_name/happymeal.ini
+```
+### Use php code
+
+1. Include classes to project
+2. Use data classes
+
+Read xml file and parser to object
+```
+$obj = new \namespace\Object();
+if($xmlstr = file_get_contents('file_path')) {
+  $obj->fromXmlStr($xmlstr);
+}
+```
+Translate object to xml str
+```
+$obj = new \namespace\Object();
+$obj->setProp1("prop1");
+$obj->setProp2("prop2");
+$xmlstr = $obj->toXmlStr();
+```
+Validate object
+```
+use \com\servandserv\happymeal\ErrorsHandler;
+
+$eh = new ErrorsHandler();
+$obj = new \namespace\Object();
+if($xmlstr = file_get_contents('file_path')) {
+  $obj->fromXmlStr($xmlstr);
+}
+if( $errors = $obj->validateType( $eh ) ) {
+    header( "Content-Type: application/xml" );
+    print $errors->toXmlStr();
+    exit;
+}
+```

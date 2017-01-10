@@ -1,16 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-    Document   : wadl2code.xsl
-    Created on : 27 January 2015, 21:31
-    Author     : kolpakov
-    Description:
-        Формируем php код контроллера на основе документа содержащего полную схему данных проекта
-        вариант генерации в котором простые типы данных представлены строками
--->
-
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:tmp="urn:ru:ilb:tmp"
+                xmlns:tmp="urn:com:servandserv:happymeal:tmp"
                 xmlns:xsd="http://www.w3.org/2001/XMLSchema"
                 xmlns:html="http://www.w3.org/1999/xhtml"
                 xmlns:wadl="http://wadl.dev.java.net/2009/02"
@@ -19,7 +9,7 @@
                 xmlns:regexp="http://exslt.org/regular-expressions"
                 extension-element-prefixes="exsl regexp"
                 exclude-result-prefixes="tmp"
-                xmlns="urn:ru:ilb:tmp"
+                xmlns="urn:com:servandserv:happymeal:tmp"
                 version="1.0">
 
     <xsl:output
@@ -32,20 +22,218 @@
     
     <xsl:param name="WADL" />
     <xsl:param name="API" />
-    <xsl:param name="OUTDIR" />
+    <xsl:param name="DEST" />
     
-    <xsl:variable name="SCHEMAS" select="document('../../happymeal_build_tmp/consolidated.xml')/tmp:schema"/>
+    <!--xsl:variable name="SCHEMAS" select="document('../../happymeal_build_tmp/consolidated.xml')/tmp:schema"/-->
     
     <xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
     <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
     
-    <xsl:variable name="BASE" select="wadl:application/wadl:resources/@base" />
+    <!-- prepare resources nodes -->
+    <xsl:variable name="RESOURCES-SET">
+        <xsl:apply-templates select="wadl:application/wadl:resources" mode="RESOURCES" />
+    </xsl:variable>
+    <xsl:variable name="RESOURCES" select="exsl:node-set($RESOURCES-SET)" />
     
-    <xsl:template match="wadl:application">
-        <xsl:apply-templates select="." mode="API" />
+    <xsl:template match="wadl:*" mode="RESOURCES">
+        <xsl:element name="{local-name()}">
+            <xsl:copy-of select="@*" />
+            <xsl:apply-templates select="wadl:*" mode="RESOURCES" />
+        </xsl:element>
     </xsl:template>
     
-    <xsl:template match="wadl:application" mode="API">
+    <xsl:template match="wadl:resource" mode="RESOURCES">
+        <xsl:element name="resource">
+            <xsl:copy-of select="@*" />
+            <xsl:choose>
+                <xsl:when test="@type">
+                    <xsl:variable name="id" select="$type" />
+                    <xsl:copy-of select="/wadl:application/wadl:resource_type[@id=$id]/@*" />
+                    <xsl:apply-templates select="/wadl:application/wadl:resource_type[@id=$id]/wadl:*" mode="RESOURCES" />
+                    <xsl:apply-templates select="wadl:*" mode="RESOURCES" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="wadl:*" mode="RESOURCES" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:element>
+    </xsl:template>
+    
+    <xsl:template match="wadl:resource_type" mode="RESOURCES">
+        <xsl:apply-templates select="wadl:*" mode="RESOURCES" />
+    </xsl:template>
+    
+    <xsl:template match="wadl:method" mode="RESOURCES">
+        <xsl:element name="method">
+            <xsl:copy-of select="@*" />
+            <xsl:choose>
+                <xsl:when test="@href">
+                    <xsl:variable name="id" select="@href" />
+                    <xsl:copy-of select="/wadl:application/wadl:method[@id=$id]/@*" />
+                    <xsl:apply-templates select="/wadl:application/wadl:method[@id=$id]/wadl:*" mode="RESOURCES" />
+                    <!-- A method reference element MUST NOT have any other WADL-defined attributes or contain any WADL-defined child elements.-->
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="wadl:*" mode="RESOURCES" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:element>
+    </xsl:template>
+    
+    <xsl:template match="wadl:representation" mode="RESOURCES">
+        <xsl:element name="representation">
+            <xsl:copy-of select="@*" />
+            <xsl:choose>
+                <xsl:when test="@href">
+                    <xsl:variable name="id" select="@href" />
+                    <xsl:copy-of select="/wadl:application/wadl:representation[@id=$id]/@*" />
+                    <xsl:apply-templates select="/wadl:application/wadl:representation[@id=$id]/wadl:*" mode="RESOURCES" />
+                    <!-- A representation reference element MUST NOT have any other WADL-defined attributes or contain any WADL-defined child elements.-->
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="wadl:*" mode="RESOURCES" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:element>
+    </xsl:template>
+    
+    <xsl:template match="wadl:param" mode="RESOURCES">
+        <xsl:element name="param">
+            <xsl:copy-of select="@*" />
+            <xsl:choose>
+                <xsl:when test="@href">
+                    <xsl:variable name="id" select="@href" />
+                    <xsl:copy-of select="/wadl:application/wadl:param[@id=$id]/@*" />
+                    <xsl:apply-templates select="/wadl:application/wadl:param[@id=$id]/wadl:*" mode="RESOURCES" />
+                    <!-- A param reference element MUST NOT have any other WADL-defined attributes or contain any WADL-defined child elements.-->
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="wadl:*" mode="RESOURCES" />
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:element>
+    </xsl:template>
+    
+    <xsl:template match="wadl:application">
+        <xsl:for-each select="$RESOURCES//tmp:resource">
+            <xsl:text disable-output-escaping="yes">
+#path: </xsl:text><xsl:value-of select="$DEST" /><xsl:value-of select="ancestor::tmp:resources/@base" /><xsl:value-of select="@path" />
+            <xsl:text disable-output-escaping="yes">
+&lt;?php
+    
+require_once __DIR__."/../conf/bootstrap.php";
+require_once __DIR__."/../conf/conf.php";
+
+/**
+ * в файле conf.php надо создать переменную $app и присвоить ей значение фабрики WADL объектов
+ */
+$app-&gt;createResource(</xsl:text>
+            <xsl:value-of select="concat('&#34;',ancestor::tmp:resources/@base,@path,'&#34;')" />
+            <xsl:if test="@mediaType">
+                <xsl:value-of select="concat(',&#34;',@mediaType,'&#34;')" />
+            </xsl:if>
+            <xsl:text disable-output-escaping="yes">)</xsl:text>
+            <xsl:apply-templates select="tmp:param" mode="APP" />
+            <xsl:apply-templates select="tmp:method" mode="APP" />
+            <xsl:apply-templates select="tmp:resource" mode="APP" />
+        </xsl:for-each>
+    <xsl:text disable-output-escaping="yes">
+    -&gt;run();
+    </xsl:text>
+    </xsl:template>
+    
+    <xsl:template match="tmp:method" mode="APP">
+        <xsl:text  disable-output-escaping="yes">
+    -&gt;setMethod($app-&gt;createMethod(</xsl:text>
+        <xsl:value-of select="concat('&#34;',@name,'&#34;')" />
+        <xsl:value-of select="concat(',&#34;',@id,'&#34;')" />
+        <xsl:text>)</xsl:text>
+        <xsl:apply-templates select="tmp:request" mode="APP" />
+        <xsl:apply-templates select="tmp:response" mode="APP" />
+        <xsl:text>)</xsl:text>
+    </xsl:template>
+    
+    <xsl:template match="tmp:request" mode="APP">
+        <xsl:text  disable-output-escaping="yes">
+        -&gt;setRequest($app->createRequest()</xsl:text>
+        <xsl:apply-templates select="tmp:param" mode="APP" />
+        <xsl:apply-templates select="tmp:representation" mode="APP" />
+        <xsl:text>)</xsl:text>
+    </xsl:template>
+    
+    <xsl:template match="tmp:response" mode="APP">
+        <xsl:text  disable-output-escaping="yes">
+        -&gt;setResponse($app->createResponse(</xsl:text>
+        <xsl:value-of select="concat('&#34;',@status,'&#34;')" />
+        <xsl:text>)</xsl:text>
+        <xsl:apply-templates select="tmp:param[@style='header']" mode="APP" />
+        <xsl:apply-templates select="tmp:representation" mode="APP" />
+        <xsl:text>)</xsl:text>
+    </xsl:template>
+    
+    <xsl:template match="tmp:param" mode="APP">
+            <xsl:text  disable-output-escaping="yes">
+            -&gt;setParam($app->createParam(</xsl:text>
+            <xsl:value-of select="concat('&#34;',@name,'&#34;')" />
+            <xsl:value-of select="concat(',&#34;',@style,'&#34;')" />
+            <xsl:choose>
+                <xsl:when test="@type">
+                    <xsl:value-of select="concat(',&#34;',@type,'&#34;')" />
+                </xsl:when>
+                <xsl:otherwise>,NULL</xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="@default">
+                    <xsl:value-of select="concat(',&#34;',@default,'&#34;')" />
+                </xsl:when>
+                <xsl:otherwise>,NULL</xsl:otherwise>
+            </xsl:choose>
+            <!-- path ? -->
+            <xsl:text>,NULL</xsl:text>
+            <xsl:choose>
+                <xsl:when test="@required">
+                    <xsl:value-of select="concat(',&#34;',@required,'&#34;')" />
+                </xsl:when>
+                <xsl:otherwise>,NULL</xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="@repeating">
+                    <xsl:value-of select="concat(',&#34;',@repeating,'&#34;')" />
+                </xsl:when>
+                <xsl:otherwise>,FALSE</xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="@fixed">
+                    <xsl:value-of select="concat(',&#34;',@fixed,'&#34;')" />
+                </xsl:when>
+                <xsl:otherwise>,NULL</xsl:otherwise>
+            </xsl:choose>
+            <xsl:text>))</xsl:text>
+    </xsl:template>
+    
+    <xsl:template match="tmp:representation" mode="APP">
+        <xsl:text  disable-output-escaping="yes">
+            -&gt;setRepresentation($app-&gt;createRepresentation(</xsl:text>
+            <xsl:value-of select="concat('&#34;',@mediaType,'&#34;')" />
+            <xsl:choose>
+                <xsl:when test="@element">
+                    <xsl:value-of select="concat(',&#34;',@element,'&#34;')" />
+                </xsl:when>
+                <xsl:otherwise>,NULL</xsl:otherwise>
+            </xsl:choose>
+            <xsl:choose>
+                <xsl:when test="@profile">
+                    <xsl:value-of select="concat(',&#34;',@profile,'&#34;')" />
+                </xsl:when>
+                <xsl:otherwise>,NULL</xsl:otherwise>
+            </xsl:choose>
+        <xsl:text>)</xsl:text>
+        <xsl:apply-templates select="tmp:param" mode="APP" />
+        <xsl:text>)</xsl:text>
+    </xsl:template>
+    
+    
+    <xsl:template match="wadl:applicatio" mode="API">
         <xsl:value-of select="@*" />
         <xsl:text disable-output-escaping="yes">
 
