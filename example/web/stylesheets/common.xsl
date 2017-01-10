@@ -29,7 +29,7 @@
     <title><xsl:value-of select="$APP_NAME" /></title>
     <link rel="stylesheet" type="text/css" href="css/normalize.css" />
     <link rel="stylesheet" type="text/css" href="css/typography.css" />
-    <link rel="stylesheet" type="text/css" href="css/example.css" />
+    <link rel="stylesheet" type="text/css" href="css/elements.css" />
 </xsl:template>
 
 <xsl:template name="common-input">

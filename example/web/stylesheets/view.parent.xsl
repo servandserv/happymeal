@@ -59,7 +59,7 @@
                     </xsl:call-template>
                 </div>
                 <div>
-                    <input type="submit" name="submit" value="SUBMIT" />
+                    <button type="submit">submit</button>
                 </div>
             </form>
             <code>
