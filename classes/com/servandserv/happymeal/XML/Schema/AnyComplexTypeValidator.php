@@ -47,7 +47,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
                 Bindings::create( self::ERROR_CLASS )
                     ->setTargetNS( $this->targetNS )
                     ->setName( $node )
-                    ->setClassNS( $this->classNS )
+                    ->setClassNS( $this->classNS.":".$this->className )
                     ->setRule( self::ASSERT_MIN_OCCURS )
                     ->setAssertion( $minOccurs )
                     ->setValue( NULL ) );
@@ -57,7 +57,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
                 Bindings::create( self::ERROR_CLASS )
                     ->setTargetNS( $this->targetNS )
                     ->setName( $node )
-                    ->setClassNS( $this->classNS )
+                    ->setClassNS( $this->classNS.":".$this->className )
                     ->setRule( self::ASSERT_MIN_OCCURS )
                     ->setAssetion( $minOccurs )
                     ->setValue( count( $val ) ) );
@@ -72,7 +72,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
         $this->handleError(
             Bindings::create( self::ERROR_CLASS )
                 ->setTargetNS( $this->targetNS )
-                ->setClassNS( $this->classNS )
+                ->setClassNS( $this->classNS.":".$this->className )
                 ->setName( $node )
                 ->setRule( self::ASSERT_MAX_OCCURS )
                 ->setAssertion( $maxOccurs )
@@ -91,7 +91,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
         $this->handleError(
             Bindings::create( self::ERROR_CLASS )
                 ->setTargetNS( $this->targetNS )
-                ->setClassNS( $this->classNS )
+                ->setClassNS( $this->classNS.":".$this->className )
                 ->setName( $this->nodeName )
                 ->setRule( self::ASSERT_CHOICE )
                 ->setAssetion( 1 )
@@ -106,7 +106,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
         $this->handleError(
             Bindings::create( self::ERROR_CLASS )
                 ->setTargetNS( $this->targetNS )
-                ->setClassNS( $this->classNS )
+                ->setClassNS( $this->classNS.":".$this->className )
                 ->setName( $this->node )
                 ->setRule( self::ASSERT_FIXED )
                 ->setAssertion( $fixed )
