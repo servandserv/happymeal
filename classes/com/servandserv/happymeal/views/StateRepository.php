@@ -1,0 +1,14 @@
+<?php
+
+namespace com\servandserv\happymeal\views;
+
+use \com\servandserv\happymeal\views\TokenType;
+
+interface StateRepository
+{
+    public function getStateId();
+    public function registerToken( TokenType $token );
+    public function findToken( $id );
+    public function delToken( $id );
+    public function delOlderThen( $ts );
+}

@@ -15,6 +15,7 @@
             <xsd:element name="Token" type="TokenType" minOccurs="1" />
             <xsd:element name="Referrer" type="TokenType" minOccurs="0" />
             <xsd:element name="Callback" type="TokenType" minOccurs="0" />
+            <xsd:element ref="err:Error" minOccurs="0" maxOccurs="unbounded" />
         </xsd:sequence>
     </xsd:complexType>
 </xsd:element>
@@ -50,7 +51,7 @@
         <xsd:element name="id" type="xsd:string" minOccurs="1" />
         <xsd:element name="created" type="xsd:integer" minOccurs="1" />
         <xsd:element ref="Request" />
-        <xsd:element ref="err:Errors" minOccurs="0" maxOccurs="unbounded" />
+        <xsd:element ref="err:Errors" />
     </xsd:sequence>
 </xsd:complexType>
 

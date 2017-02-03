@@ -5,34 +5,32 @@ namespace com\servandserv\happymeal\views;
 use \com\servandserv\happymeal\views\TokenType;
 use \com\servandserv\happymeal\XML\Schema\AnyType;
 use \com\servandserv\happymeal\WADL\Router;
+use \com\servandserv\happymeal\Errors;
+use com\servandserv\happymeal\errors\Error;
 
 class ViewFactory implements Router
 {
 
     const CACHETIME = 300;
 
-    private $cachetime;
+    private $rep;
     private $referrer;
     private $callback;
     private $env;
 
-    public function __construct( array $params = [], $cachetime = self::CACHETIME )
+    public function __construct( StateRepository $rep, array $params = [] )
     {
-        $this->cachetime = $cachetime;
-        if( !isset( $_SESSION["routing"] ) ) {
-            $_SESSION["routing"] = [];
-        }
-        if( !isset( $_SESSION["tokens"] ) ) {
-            $_SESSION["tokens"] = [];
-        }
+        $this->rep = $rep;
+        //if( !isset( $_SESSION["routing"] ) ) {
+        //    $_SESSION["routing"] = [];
+        //}
+        //if( !isset( $_SESSION["tokens"] ) ) {
+        //    $_SESSION["tokens"] = [];
+        //}
         $referrerId = filter_input( INPUT_GET, "__referrer__" );
-        if( isset( $_SESSION["tokens"][$referrerId] ) ) {
-            $this->referrer = $_SESSION["tokens"][$referrerId];
-        }
+        $this->referrer = $rep->findToken( $referrerId );
         $callbackId = filter_input( INPUT_GET, "__callback__" );
-        if( isset( $_SESSION["tokens"][$callbackId] ) ) {
-            $this->callback = $_SESSION["tokens"][$callbackId];
-        }
+        $this->callback = $rep->findToken( $callbackId );
         $this->env = new Env();
         foreach( $params as $k => $v ) {
             $this->env->setParam( $this->createParam( $k, $v ) );
@@ -49,64 +47,76 @@ class ViewFactory implements Router
         return $this->callback;
     }
 
-    public function createView( TokenType $token )
+    public function createView( TokenType $token, array $state = [] )
     {
-        $request = (new Request() )->setMethod( "GET" )->setUrl( filter_input( INPUT_SERVER, "SCRIPT_NAME" ) );
-        foreach( $_GET as $k => $v ) {
-            $request->setParam( $this->createParam( $k, $v ) );
+        $sn = filter_input( INPUT_SERVER, "SCRIPT_NAME" );
+        $request = (new Request() )->setMethod( "GET" )->setUrl( $sn );
+        // all request params
+        foreach( $_REQUEST as $k => $v ) {
+            $request->setParam( self::createParam( $k, $v ) );
         }
-        $tokenId = hash_hmac( "md5", microtime( true ), filter_input( INPUT_SERVER, "SCRIPT_NAME" ) );
-        $token->setId( $tokenId )->setCreated( microtime( true ) )->setRequest( $request );
-        $_SESSION["tokens"][$tokenId] = $token;
-
-        $view = ( new View() )
-            ->setSessionId( session_id() )
-            ->setToken( $token )
-            ->setCallback( $this->callback )
-            ->setReferrer( $this->referrer )
-            ->setEnv( $this->env );
-
+        $token->setId( self::createTokenId( $sn ) )
+            ->setCreated( microtime( true ) )
+            ->setRequest( $request );
+        try {
+            $this->rep->registerToken( $token );
+            $view = ( new View() )
+                ->setSessionId( $this->rep->getStateId() )
+                ->setToken( $token )
+                ->setCallback( $this->callback )
+                ->setReferrer( $this->referrer )
+                ->setEnv( $this->env );
+        } catch( \Exception $e ) {
+            $view = ( new View() )
+                ->setSessionId( $this->rep->getStateId() )
+                ->setErrors( ( new Errors() )->setError(
+                    ( new Error )->setDescription( "Access denied" ) 
+                ));
+        }
         //clean old tokens
-        $this->clean();
+        $this->delOlderThen( $token->getCreated() - self::CACHETIME );
 
         return $view;
     }
+    
+    public static function createTokenId( $salt )
+    {
+        return hash_hmac( "md5", microtime( true ), $salt );
+    }
 
-    public function createParam( $k, $v )
+    public static function createParam( $k, $v )
     {
         return ( new Param() )->setName( $k )->setValue( $v );
     }
 
-    public function clean( $tokenId = NULL )
+    public function del( $tokenId )
     {
-        if( $tokenId && isset( $_SESSION["tokens"][$tokenId] ) ) {
-            unset( $_SESSION["tokens"][$tokenId] );
-        } else {
-            foreach( $_SESSION["tokens"] as $id => $token ) {
-                if( microtime( true ) - $token->getCreated() > $this->cachetime ) {
-                    unset( $_SESSION["tokens"][$id] );
-                }
-            }
+        if( $tokenId ) {
+            $this->rep->delToken( $id );
         }
+    }
+    
+    public function delOlderThen( $ts )
+    {
+        $this->rep->delOlderThen( $ts );
     }
 
     public function createToken( $referrerId )
     {
-        if( isset( $_SESSION["tokens"][$referrerId] ) ) {
-            return $_SESSION["tokens"][$referrerId];
-        }
+        return $this->rep->findToken( $referrerId );
     }
 
     public function redirect( AnyType $result = NULL )
     {
-        if( $this->referrer ) {
+        if( $this->referrer && method_exists( $this->referrer, "redirect" ) ) {
             // check if errors
             if( $result && is_a( $result, 'com\servandserv\happymeal\Errors' ) ) {
                 $this->referrer->setErrors( $result );
-                $_SESSION["tokens"][$this->referrer->getId()] = $this->referrer;
+                $this->rep->registerToken( $this->referrer );
             }
-            $this->referrer->redirect( $result );
+            return $this->referrer->redirect( $result );
         }
+        return FALSE;
     }
 
 }
