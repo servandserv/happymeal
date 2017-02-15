@@ -18,6 +18,7 @@ class ClientAdapter
     protected $reqJSON;
     protected $reqArray;
     protected $response;
+    protected $request;
     protected $router;
 
     public static function create( array $conf, Router $router = NULL )
@@ -75,30 +76,32 @@ class ClientAdapter
 
     public function request( AnyType $dto )
     {
+        $this->request;
         if( $this->reqXML !== NULL ) {
-            return $dto->fromXmlReader( $this->reqXML );
+            $this->request = $dto->fromXmlReader( $this->reqXML );
         } else if( $this->reqJSON !== NULL ) {
-            return $dto->fromJSONArray( $this->reqJSON );
+            $this->request = $dto->fromJSONArray( $this->reqJSON );
         } else {
-            return $dto->fromMarkupArray( $this->reqArray );
+            $this->request = $dto->fromMarkupArray( $this->reqArray );
         }
+        return $this->request;
     }
 
-    public function response( AnyType $adapter = NULL, $code = 200, $pi = NULL )
+    public function response( AnyType $response = NULL, $code = 200, $pi = NULL )
     {
-        if( $this->router && $this->router->redirect( $adapter ) ) return;
-        if( $adapter === NULL ) {
+        if( $this->router && $this->router->redirect( $this->request, $response ) ) return;
+        if( $response === NULL ) {
             header( $this->responseHeader( 204 ) );
         } else {
             header( $this->responseHeader( $code ) );
             switch( $this->accept() ) {
                 case "json":
                     header( "Content-type: application/json; charset: utf-8" );
-                    echo $adapter->toJSON();
+                    echo $response->toJSON();
                     break;
                 default:
                     header( "Content-type: application/xml; charset: utf-8" );
-                    echo $adapter->toXmlStr( $adapter::NS, $adapter::ROOT, $pi );
+                    echo $response->toXmlStr( $response::NS, $response::ROOT, $pi );
             }
         }
         //exit;

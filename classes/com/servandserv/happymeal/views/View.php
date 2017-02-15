@@ -75,7 +75,7 @@
 		{
 		    $xw->startElementNS( NULL, $xmlname, $xmlns );
 		    if( $this->getSessionId() ) $xw->writeElement( "sessionId", $this->getSessionId() );
-		    if( $this->getEnv() ) $this->getEnv->toXmlWriter( $xw );
+		    if( $this->getEnv() ) $this->getEnv()->toXmlWriter( $xw );
 		    if( $this->getToken() ) $this->getToken()->toXmlWriter( $xw, "Token" );
 		    if( $this->getReferrer() ) $this->getReferrer()->toXmlWriter( $xw, "Referrer" );
 		    if( $this->getCallback() ) $this->getCallback()->toXmlWriter( $xw, "Callback" );

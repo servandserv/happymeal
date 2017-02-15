@@ -31,8 +31,12 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
     public function fromXmlStr( $xmlstr )
     {
         $xr = new \XMLReader();
-        $xr->XML( $xmlstr );
-        return $this->fromXmlReader( $xr );
+        try {
+            $xr->XML( $xmlstr );
+            return $this->fromXmlReader( $xr );
+        } catch( \Exception $e ) {
+            throw new \Exception( $e->getMessage().": $xmlstr" );
+        }
     }
 
 	public function toXmlStr( $xmlns=null, $xmlname=null, $pi = null ) {

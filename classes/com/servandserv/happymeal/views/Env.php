@@ -22,7 +22,7 @@
 		
 		public function toXmlWriter( \XMLWriter $xw, $xmlname = self::ROOT, $xmlns = self::NS )
 		{
-		    $xw->startElementNS( $xmlname, $xmlns );
+		    $xw->startElementNS( NULL, $xmlname, $xmlns );
 		    foreach( $this->params as $param ) {
 		        $param->toXmlWriter( $xw );
 		    }

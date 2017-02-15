@@ -11,29 +11,24 @@ use com\servandserv\happymeal\errors\Error;
 class ViewFactory implements Router
 {
 
-    const CACHETIME = 300;
-
     private $rep;
     private $referrer;
     private $callback;
+    private $token;
     private $env;
 
     public function __construct( StateRepository $rep, array $params = [] )
     {
         $this->rep = $rep;
-        //if( !isset( $_SESSION["routing"] ) ) {
-        //    $_SESSION["routing"] = [];
-        //}
-        //if( !isset( $_SESSION["tokens"] ) ) {
-        //    $_SESSION["tokens"] = [];
-        //}
+        //clean old tokens
+        $this->emptyTrash();
         $referrerId = filter_input( INPUT_GET, "__referrer__" );
         $this->referrer = $rep->findToken( $referrerId );
         $callbackId = filter_input( INPUT_GET, "__callback__" );
         $this->callback = $rep->findToken( $callbackId );
         $this->env = new Env();
         foreach( $params as $k => $v ) {
-            $this->env->setParam( $this->createParam( $k, $v ) );
+            $this->env->setParam( new Param( $k, $v ) );
         }
     }
 
@@ -46,18 +41,17 @@ class ViewFactory implements Router
     {
         return $this->callback;
     }
-
+    
     public function createView( TokenType $token, array $state = [] )
     {
         $sn = filter_input( INPUT_SERVER, "SCRIPT_NAME" );
-        $request = (new Request() )->setMethod( "GET" )->setUrl( $sn );
-        // all request params
-        foreach( $_REQUEST as $k => $v ) {
-            $request->setParam( self::createParam( $k, $v ) );
+        $query = new Query( $sn );
+        // all query params
+        foreach( $_GET as $k => $v ) {
+            $query->setParam( new Param( $k, $v ) );
         }
         $token->setId( self::createTokenId( $sn ) )
-            ->setCreated( microtime( true ) )
-            ->setRequest( $request );
+            ->setQuery( $query );
         try {
             $this->rep->registerToken( $token );
             $view = ( new View() )
@@ -73,20 +67,13 @@ class ViewFactory implements Router
                     ( new Error )->setDescription( "Access denied" ) 
                 ));
         }
-        //clean old tokens
-        $this->delOlderThen( $token->getCreated() - self::CACHETIME );
-
+        
         return $view;
     }
     
     public static function createTokenId( $salt )
     {
         return hash_hmac( "md5", microtime( true ), $salt );
-    }
-
-    public static function createParam( $k, $v )
-    {
-        return ( new Param() )->setName( $k )->setValue( $v );
     }
 
     public function del( $tokenId )
@@ -96,25 +83,26 @@ class ViewFactory implements Router
         }
     }
     
-    public function delOlderThen( $ts )
+    public function emptyTrash()
     {
-        $this->rep->delOlderThen( $ts );
+        $this->rep->emptyTrash();
     }
+    
 
     public function createToken( $referrerId )
     {
         return $this->rep->findToken( $referrerId );
     }
 
-    public function redirect( AnyType $result = NULL )
+    public function redirect( AnyType $request = NULL, AnyType $response = NULL )
     {
-        if( $this->referrer && method_exists( $this->referrer, "redirect" ) ) {
-            // check if errors
-            if( $result && is_a( $result, 'com\servandserv\happymeal\Errors' ) ) {
-                $this->referrer->setErrors( $result );
-                $this->rep->registerToken( $this->referrer );
+        if( $this->referrer ) {
+            $this->referrer->setrequest( $request );
+            $this->referrer->setResponse( $response );
+            $this->rep->registerToken( $this->referrer );
+            if( method_exists( $this->referrer, "redirect" ) ) {
+                return $this->referrer->redirect( $request, $response );
             }
-            return $this->referrer->redirect( $result );
         }
         return FALSE;
     }

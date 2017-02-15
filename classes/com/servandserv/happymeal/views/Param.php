@@ -32,7 +32,7 @@
 		
 		public function toXmlWriter( \XMLWriter $xw, $xmlname = self::ROOT, $xmlns = self::NS )
 		{
-		    $xw->startElementNS( $xmlname, $xmlns );
+		    $xw->startElementNS( NULL, $xmlname, $xmlns );
 		    $xw->writeAttribute( "name", $this->getName() );
 		    $xw->text( $this->getValue() );
 		    $xw->endElement();

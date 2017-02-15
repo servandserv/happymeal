@@ -5,7 +5,7 @@
     xmlns:err="urn:com:servandserv:happymeal:errors"
     targetNamespace="urn:com:servandserv:happymeal:views">
     
-<xsd:import schemaLocation="errors.xsd" namespace="urn:com:servandserv:happymeal:errors" />
+<!--xsd:import schemaLocation="errors.xsd" namespace="urn:com:servandserv:happymeal:errors" />
 
 <xsd:element name="View">
     <xsd:complexType>
@@ -48,8 +48,9 @@
         </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
-        <xsd:element name="id" type="xsd:string" minOccurs="1" />
-        <xsd:element name="created" type="xsd:integer" minOccurs="1" />
+        <xsd:element name="id" type="xsd:string" />
+        <xsd:element name="created" type="xsd:integer" />
+        <xsd:element name="expired" type="xsd:integer" />
         <xsd:element ref="Request" />
         <xsd:element ref="err:Errors" />
     </xsd:sequence>
@@ -72,6 +73,6 @@
             <xsd:element name="value" type="xsd:string" />
         </xsd:sequence>
     </xsd:complexType>
-</xsd:element>
+</xsd:element-->
 
 </xsd:schema>

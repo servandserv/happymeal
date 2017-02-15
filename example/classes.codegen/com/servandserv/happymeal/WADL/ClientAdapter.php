@@ -37,7 +37,12 @@ class ClientAdapter
                     strpos( $_SERVER["CONTENT_TYPE"], "/xml" ) !== FALSE ) {
                     $xr = new \XMLReader();
                     if( $xr->XML( $GLOBALS["HTTP_RAW_POST_DATA"] ) ) {
-                        $cli->reqXML = $xr;
+                        try {
+                            new \SimpleXMLElement( $GLOBALS["HTTP_RAW_POST_DATA"] );
+                            $cli->reqXML = $xr;
+                        } catch ( \Exception $e ) {
+                            $cli->throwException( "Error on XML format", 400 );
+                        } 
                     } else $cli->throwException( "Error on XML request decode", 400 );
                 } else if( array_key_exists( "CONTENT_TYPE", $_SERVER ) &&
                     strpos( $_SERVER["CONTENT_TYPE"], "/json" ) !== FALSE ) {
@@ -81,9 +86,7 @@ class ClientAdapter
 
     public function response( AnyType $adapter = NULL, $code = 200, $pi = NULL )
     {
-        if( $this->router ) {
-            $this->router->redirect( $adapter );
-        }
+        if( $this->router && $this->router->redirect( $adapter ) ) return;
         if( $adapter === NULL ) {
             header( $this->responseHeader( 204 ) );
         } else {
@@ -98,7 +101,7 @@ class ClientAdapter
                     echo $adapter->toXmlStr( $adapter::NS, $adapter::ROOT, $pi );
             }
         }
-        exit;
+        //exit;
     }
 
     public function throwException( $message, $code )

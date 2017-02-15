@@ -107,7 +107,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 	    $nss = $this->nssFromMarkupArray( $vars, $nss );
         $tree = array();
         foreach( $vars as $k=>$v ) {
-            if(preg_match(\com\servandserv\happymeal\MarkupArrayAdaptor::XPATH,$k,$m)) {
+            if($v!=NULL&&preg_match(\com\servandserv\happymeal\MarkupArrayAdaptor::XPATH,$k,$m)) {
                 $nodes = preg_split("/\\" . \com\servandserv\happymeal\MarkupArrayAdaptor::XPATH_DELIMITER . "/", $k, -1, PREG_SPLIT_NO_EMPTY);
                 $this->treeFromPath( $nodes, $tree, $v, $nss, NULL );
             }

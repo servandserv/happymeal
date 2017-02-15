@@ -40,5 +40,3 @@
 			$this->assertMaxOccurs( 'getError','Error','unbounded' );
 		}
 	}
-	
-
