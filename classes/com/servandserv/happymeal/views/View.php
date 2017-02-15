@@ -34,7 +34,7 @@
 			$this->callback = $val;
 			return $this;
 		}
-		public function setErrors ( \com\servandserv\happymeal\Errors $val ) {
+		public function setErrors ( \com\servandserv\happymeal\errors\Errors $val ) {
 			$this->errors = $val;
 			return $this;
 		}

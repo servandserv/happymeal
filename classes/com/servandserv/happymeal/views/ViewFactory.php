@@ -3,9 +3,9 @@
 namespace com\servandserv\happymeal\views;
 
 use \com\servandserv\happymeal\views\TokenType;
-use \com\servandserv\happymeal\XML\Schema\AnyType;
-use \com\servandserv\happymeal\WADL\Router;
-use \com\servandserv\happymeal\Errors;
+use \com\servandserv\happymeal\xml\schema\AnyType;
+use \com\servandserv\happymeal\wadl\Router;
+use \com\servandserv\happymeal\errors\Errors;
 use com\servandserv\happymeal\errors\Error;
 
 class ViewFactory implements Router

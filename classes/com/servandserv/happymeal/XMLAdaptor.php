@@ -33,7 +33,7 @@ interface XMLAdaptor
 	*
 	* Build Object from XML string
 	* @param \XMLReader $xr
-	* @return \com\servandserv\happymeal\XML\Schema\AnyType
+	* @return \com\servandserv\happymeal\xml\schema\AnyType
 	*/
     public function fromXmlStr($source);
     
@@ -41,7 +41,7 @@ interface XMLAdaptor
 	*
 	* Build Object from XMLReader
 	* @param \XMLReader $xr
-	* @return \com\servandserv\happymeal\XML\Schema\AnyType
+	* @return \com\servandserv\happymeal\xml\schema\AnyType
 	*/
 	public function fromXmlReader(\XMLReader &$xr);
 }

@@ -14,22 +14,22 @@ $nss = $uniques = array();
 
 $base = $argv[1];
 if( !$argv[1] || !file_exists( $base ) || !is_dir( $base ) ) {
-    print ("Base directory '".$base."' is not directory\r\n" );
-    exit( 1 );
+    trigger_error("Base directory '".$base."' is not directory\r\n" );
 }
+// path to generated classes
 $buildDir = $base.DIRECTORY_SEPARATOR.$argv[2];
 if( !$argv[2] || !file_exists( $buildDir ) || !is_dir( $buildDir ) ) {
-    print ("Codegen directory '".$buildDir."' is not directory\r\n" );
-    exit( 1 );
+    trigger_error ("Codegen directory '".$buildDir."' is not directory\r\n" );
 }
+// path schemas
 $schemasPath = $argv[3];
 if( !$schemasPath ) {
-    print "Schemas path empty\r\n";
-    exit( 1 );
+    trigger_error( "Schemas path empty\r\n" );
 }
 $schemas = explode( " ", $schemasPath );
 // imported xsd schema files
 $imports = array();
+// collect all schemas xsd files in imports array
 foreach( $schemas as $schema ) {
     if( file_exists( $schema ) ) {
         $fullname = realpath( $schema );
@@ -37,8 +37,7 @@ foreach( $schemas as $schema ) {
         $fullname = realpath( $base.DIRECTORY_SEPARATOR.$schema );
         $fullname = preg_replace( "/\/{2,}/", "/", $fullname ); //убираем двойные слэши чтобы однозначно идентифицировать адрес импортируемого ресурса
         if( !file_exists( $fulname ) ) {
-            print "Schema file $fullname not exists\r\n";
-            exit( 1 );
+            trigger_error( "Schema file $fullname not exists\r\n" );
         }
     }
     if( is_dir( $fullname ) ) {
@@ -89,22 +88,24 @@ function getNotImported( $imports )
     return FALSE;
 }
 
+
 function import2assoc( $path, \XMLWriter &$xw )
 {
     global $base, $imports, $nss, $nss_replacements, $tree;
 
     if( isset( $imports[$path] ) && $imports[$path] !== FALSE ) return array();
     if( !$xmlstr = file_get_contents( $path ) ) {
-        print "Can't read schemas file '$path'\r\n";
-        exit( 1 );
+        trigger_error( "Can't read schemas file '$path'\r\n" );
     }
-
-    $xr = new XMLReader();
-    if( !$xr->XML( $xmlstr ) ) {
-        print "Error on parse schema XML $path\r\n";
-        exit( 1 );
+    
+    try {
+        $xr = new XMLReader();
+        $xr->XML( $xmlstr );
+        $tree[] = xml2assoc( $xr, $path, $xw );
+    } catch( \Exception $e ) {
+        trigger_error( "Error on parse schema XML $path\r\n" );
     }
-    $tree[] = xml2assoc( $xr, $path, $xw );
+    
 }
 
 // parse schema files
@@ -153,8 +154,11 @@ function xml2assoc( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_pa
                                 if( $xr->localName == "name" && !$xr->prefix ) {
                                     $node["attributes"]["schemaName"] = $xr->value;
 
+                                    // php class namespace
                                     $packagename = create_package_ns( $xr->value, $target );
+                                    // php class name - for complex types
                                     $classname = create_class_name( $xr->value, $packagename );
+                                    // php prop name - for simple types
                                     $propname = create_prop_name( $xr->value, $target, $node["localName"] );
                                     //$node["attributes"]["package"] = $packagename;
                                     $node["attributes"]["getter"] = "get".$propname;
@@ -163,6 +167,7 @@ function xml2assoc( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_pa
                                     $node["attributes"]["propName"] = PROPERTY_PREFIX.$propname;
                                     $node["attributes"]["targetNS"] = $target;
                                     $node["attributes"]["classNS"] = create_class_ns( $packagename, $ns_path, $classname );
+                                    //$node["attributes"]["classNS"] = str_replace( ":", "\\", $packagename );
                                     $node["attributes"]["class"] = $node["attributes"]["classNS"]."\\".$classname;
                                     $node["attributes"]["filePath"] = $buildDir.DIRECTORY_SEPARATOR.
                                         str_replace( "\\", DIRECTORY_SEPARATOR, $node["attributes"]["class"] );
@@ -171,30 +176,31 @@ function xml2assoc( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_pa
                                 if( in_array( $xr->localName, array( "type", "base", "itemType" ) ) && !$xr->prefix ) {
                                     $packagetypename = create_package_ns( $xr->value, $target );
                                     $typename = create_class_name( $xr->value, $packagetypename );
-                                    $node["attributes"]["typeClassNS"] = create_class_ns( $packagetypename, "",
-                                        $typename );
+                                    $node["attributes"]["typeClassNS"] = create_class_ns( $packagetypename, "", $typename );
+                                    //$node["attributes"]["typeClassNS"] = str_replace( ":", "\\", $packagetypename );
                                     $node["attributes"]["typeClassName"] = $typename;
-                                    $node["attributes"]["typeClass"] = $node["attributes"]["typeClassNS"].
-                                        "\\".$typename;
-                                    $node["attributes"]["mode"] = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS';
+                                    $node["attributes"]["typeClass"] = $node["attributes"]["typeClassNS"]."\\".$typename;
+                                    $node["attributes"]["mode"] = 'XMLAdaptor::CONTENTS';
+                                    //$uid = $node["attributes"]["typeClass"];
                                 }
                                 if( $xr->localName == "ref" && !$xr->prefix ) {
                                     $packagerefname = create_package_ns( $xr->value, $target );
                                     $refname = create_class_name( $xr->value, $packagerefname );
                                     $node["attributes"]["refClassNS"] = create_class_ns( $packagerefname, "", $refname );
+                                    //$node["attributes"]["refClassNS"] = str_replace( ":", "\\", $packagerefname );
                                     $node["attributes"]["refClassName"] = $refname;
-                                    $node["attributes"]["refClass"] = $node["attributes"]["refClassNS"].
-                                        "\\".$refname;
-                                    $node["attributes"]["mode"] = '\com\servandserv\happymeal\XMLAdaptor::ELEMENT';
+                                    $node["attributes"]["refClass"] = $node["attributes"]["refClassNS"]."\\".$refname;
+                                    $node["attributes"]["mode"] = 'XMLAdaptor::ELEMENT';
+                                    //$uid = $node["attributes"]["refClass"];
                                 }
                                 if( $xr->localName == "substitutionGroup" && !$xr->prefix ) {
                                     $package_subs_name = create_package_ns( $xr->value, $target );
                                     $subs_name = create_class_name( $xr->value );
-                                    $node["attributes"]["subsClassNS"] = create_class_ns( $package_subs_name, "",
-                                        $subs_name );
+                                    $node["attributes"]["subsClassNS"] = create_class_ns( $package_subs_name, "", $subs_name );
+                                    //$node["attributes"]["subsClassNS"] = str_replace( ":", "\\", $package_subs_name );
                                     $node["attributes"]["subsClassName"] = $subs_name;
-                                    $node["attributes"]["subsClass"] = $node["attributes"]["subsClassNS"].
-                                        "\\".$subs_name;
+                                    $node["attributes"]["subsClass"] = $node["attributes"]["subsClassNS"]."\\".$subs_name;
+                                    //$uid = $node["attributes"]["subsClass"];
                                 }
                             }
 
@@ -211,9 +217,11 @@ function xml2assoc( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_pa
                             $node["content"] = "";
                             $xw->endElement();
                         } else {
-                            if( isset( $classname ) )
-                                    $new_path = $ns_path != "" ? $ns_path."\\".$classname : $classname;
-                            else $new_path = $ns_path;
+                            if( isset( $classname ) ) {
+                                $new_path = ( $ns_path != "" ) ? $ns_path."\\".strtolower($classname) : strtolower($classname);
+                            } else {
+                                $new_path = $ns_path;
+                            }
                             $node["content"] = xml2assoc( $xr, $path, $xw, $target, $new_path );
                         }
                         if( $uid != NULL && !isset( $uniques[$uid] ) ) $uniques[$uid] = $node;
@@ -252,65 +260,67 @@ function replace_ns( $ns )
 }
 
 /**
+ * class namespace
  * пространство имен класса
  * если имя класса является точным(без учета регистра) повторением последнего
  * отрезка пространства имен, то усекаем пространство имен
  *
+ * namesapace\parent Parent Child => namespace\parent\child
  */
+
 function create_class_ns( $package, $ns_path, $val )
 {
     global $nss, $local_nss;
-
-    if( strtoupper( substr( $package, -( strlen( "\\".$ns_path ) ) ) ) == strtoupper( "\\".$ns_path ) ) {
-        $package = substr( $package, 0, strlen( $package ) - ( strlen( "\\".$ns_path ) ) );
-    }
-    $class_ns = $package.( $ns_path != "" ? "\\".$ns_path : "" );
+    
+    //if( strtolower( substr( $package, -( strlen( $ns_path ) ) ) ) == strtolower( $ns_path ) ) {
+    //    $package = substr( $package, 0, strlen( $package ) - ( strlen( "\\".$ns_path ) ) );
+    //}
+    $class_ns = $package.( ( $ns_path != "" ) ? "\\".$ns_path : "" );
     // Предотвращаем двойное усечение
-    if( !strtoupper( substr( $ns_path, - ( strlen( "\\".$val ) ) ) ) == strtoupper( "\\".$val ) ) {
-        if( strtoupper( substr( $class_ns, - ( strlen( "\\".$val ) ) ) ) == strtoupper( "\\".$val ) ) {
-            $class_ns = substr( $class_ns, 0, strlen( $class_ns ) - ( strlen( "\\".$val ) ) );
+    //if( !strtolower( substr( $ns_path, - ( strlen( $val ) ) ) ) == strtolower( $val ) ) {
+    //    if( strtolower( substr( $class_ns, - ( strlen( $val ) ) ) ) == strtolower( $val ) ) {
+    //        $class_ns = substr( $class_ns, 0, strlen( $class_ns ) - ( strlen( "\\".$val ) ) );
             //$class_ns = str_replace("\\".$val,"", $class_ns );
-        }
-    }
+    //    }
+    //}
     return str_replace( "\\\\", "\\", $class_ns );
 }
 
 /**
- * пространство имен php для определенного пространства имен схемы
- * заменяем глобальные пространства имен на локальные
- * заменяем локальное пространство имен на кусок имени после urn:ru:ilb:meta: на пустую строку
- * заменяем : на \
- * добавляем заданное пространство имен проекта
+ * 
+ * package namesapce
+ * change global namespaces to local substitutes from conf file
+ * change ':' symbol in namespace for '\'
  *
  */
 function create_package_ns( $val, $target )
 {
 
     global $nss, $local_nss;
-
+    
+    // chack if attribute name has namespace prefix
     $comma = strpos( $val, ":" );
     if( $comma !== false ) {
-        // атрибут name cодержит префикс пространства имен
-        // поэтому надо изменить таргет на соответствующий тому пространству
+        // get prefix
         $pref = substr( $val, 0, $comma );
-        // если не известный префикс, то надо падать с ошибкой
-        if( !isset( $nss[$target][$pref] ) ) throw new Exception( "Undefined namespace prefix \"$pref\"" );
+        // if unknown prefix namespace trigger error
+        if( !isset( $nss[$target][$pref] ) ) trigger_error( "Undefined namespace prefix \"$pref\"" );
         else {
-            // если известный то заменяем таргет на соответствующее пространство имен
+            // change target namespace to prefix namespace
             $target = $nss[$target][$pref];
         }
-        // имя класса очищаем от префикса
+        // clean name from prefix, get localName of the element
         $val = substr( $val, $comma + 1 );
     }
-    // заменяем глобальные пространства на локальные
+    // change global namespaces to local substitutions
     $target = replace_ns( $target );
-    // у локаьных убираем начальный кусок
+    // cut local path
     foreach( $local_nss as $local_ns ) {
         $target = str_replace( $local_ns, "", $target );
     }
-    // заменим сепараторы
+    // change namespace separator
     $target = str_replace( ":", "\\", $target );
-    // ели речь идет о пространстве имен XML\Schema то указываем для
+    //
     if( $target == XML_SCHEMA_TARGET_NS ) {
         return XML_SCHEMA_NS;
     } else {
@@ -318,11 +328,11 @@ function create_package_ns( $val, $target )
     }
 }
 
-// Имя класса. указано в атрибуте name узла
-// убираем префикс в атрибуте
-// заменяем первую букву оставшейся строки на прописную
-// заменяем -  на _
-// имена совпадающие с зарезервированными словами заменяем на имя+Type
+// get class name
+// cut prefix
+// change first symbol to CAPITAL version
+// change symbol '-' to '_'
+// if the name in reserved system names add word Type to name
 function create_class_name( $val, $packagename )
 {
 
@@ -339,19 +349,16 @@ function create_class_name( $val, $packagename )
     if( in_array( strtolower( $val ), $class_name_restrictions ) ) {
         $val = $val."Type";
     }
-    if( $packagename == 'com\servandserv\happymeal\XML\Schema' && in_array( strtolower( $val ), $base_types_replacements ) ) {
+    if( $packagename == 'com\servandserv\happymeal\xml\schema' && in_array( strtolower( $val ), $base_types_replacements ) ) {
         $val = $val."Type";
     }
+    
     return $val;
 }
 
 /**
- *
- * Построение имени для свойства класса.
- * Просто брать наименование элемента из атрибута name нельзя,
- * потому как в одном узле могут быть элементы имеющие одно наименование,
- * но относящиеся к разным пространствам имен, поэтому
- * используем префикс для указания имени
+ * get property name
+ * use prefix to avoid names collision
  *
  */
 function create_prop_name( $val, $target, $ln )
@@ -368,8 +375,9 @@ function create_prop_name( $val, $target, $ln )
     }
     $val = strtoupper( $pref ).strtoupper( substr( $val, 0, 1 ) ).substr( $val, 1 );
     if( in_array( strtolower( $val ), $class_name_restrictions ) ) {
-        $val = "x".$val;
+        $val = $val."Type";
     }
+    
     return $val;
 }
 

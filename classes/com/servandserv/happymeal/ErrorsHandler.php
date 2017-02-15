@@ -2,6 +2,8 @@
 
 namespace com\servandserv\happymeal;
 
+use \com\servandserv\happymeal\errors\Error;
+
 /**
  * errors container
  */
@@ -15,7 +17,7 @@ class ErrorsHandler
 		$this->clean();
 	}
 
-	public function handleError ( \com\servandserv\happymeal\Errors\Error $err ) 
+	public function handleError ( Error $err ) 
 	{
 		$this->errors->setError( $err );
 	}
@@ -32,7 +34,7 @@ class ErrorsHandler
 	
 	public function clean () 
 	{
-		$this->errors = \com\servandserv\happymeal\Bindings::create('com\servandserv\happymeal\Errors');
+		$this->errors = \com\servandserv\happymeal\Bindings::create( 'com\servandserv\happymeal\errors\Errors' );
 	}
 	
 }

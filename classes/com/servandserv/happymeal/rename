@@ -1,0 +1,3 @@
+find . -type f -exec sed -i 's/XML\\Schema/xml\\schema/g' {} +
+find . -type f -exec sed -i 's/wadl/wadl/g' {} +
+find . -type f -exec sed -i 's/errors\\ErrorsHandler/ErrorsHandler/g' {} +

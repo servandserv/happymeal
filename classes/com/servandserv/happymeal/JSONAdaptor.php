@@ -23,14 +23,14 @@ interface JSONAdaptor
 	/**
 	 *
 	 * @param string $json json string
-	 * @return \com\servandserv\happymeal\XML\Schema\AnyType
+	 * @return \com\servandserv\happymeal\xml\schema\AnyType
 	 */
 	public function fromJSON( $json );
 	
 	/**
 	 *
 	 * @param array $json result of json_decode($json, true)
-	 * @return \com\servandserv\happymeal\XML\Schema\AnyType
+	 * @return \com\servandserv\happymeal\xml\schema\AnyType
 	 */
 	public function fromJSONArray( array $arr );
 }

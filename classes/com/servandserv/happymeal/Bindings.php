@@ -41,7 +41,7 @@ class Bindings
     public static function create( $className, $args = array(), callable $callback = NULL )
     {
         if( isset( self::$classMapping[$className] ) ) {
-            $cl = new \ReflectionClass(self::$classMapping[$className]);
+            $cl = new \ReflectionClass( self::$classMapping[$className] );
             $obj = call_user_func_array( array( &$cl, 'newInstance' ), $args );
         } else {
             $cl = new \ReflectionClass($className);
