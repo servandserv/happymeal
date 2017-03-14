@@ -156,10 +156,11 @@ class AnyComplexType extends AnyType
         $arr = [];
         foreach($this->__props as $k=>$prop) {
             $val = call_user_func( array( $this, $prop["getter"] ) );
-            if($prop["class"]) {
+            if( $prop["class"] ) {
                 $vals = is_array( $val ) ? $val : array( $val );
                 foreach( $vals as $val ) {
-                    if(!$prop["array"]) {
+                    if( $val === null ) continue;
+                    if( !$prop["array"] ) {
                         $arr[$prop["nodeName"]] = $val->toJSONArray();
                     } else {
                         $arr[$prop["nodeName"]][] = $val->toJSONArray();

@@ -25,7 +25,7 @@ class ClientAdapter
     {
         $cli = new self();
         $cli->router = $router;
-        $rm = filter_input( INPUT_SERVER, "REQUEST_METHOD" ); // request method
+        $rm = $_SERVER["REQUEST_METHOD"]; // request method
         foreach( $conf as $name => $method ) {
             if( strtolower( $name ) !== strtolower( $rm ) ) {
                 continue;
@@ -116,10 +116,11 @@ class ClientAdapter
 
     private function accept()
     {
+        if( !isset( $_SERVER["HTTP_ACCEPT"] ) ) return "xml";
         $json = $xml = 0;
 
         $parts = preg_split( '/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/',
-                             filter_input( INPUT_SERVER, "HTTP_ACCEPT" ), 0,
+                             $_SERVER["HTTP_ACCEPT"], 0,
                                            PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE );
         foreach( $parts as $part ) {
             $quality = 1.0;
@@ -142,7 +143,7 @@ class ClientAdapter
 
     private function responseHeader( $code )
     {
-        return filter_input( INPUT_SERVER, "SERVER_PROTOCOL" )." ".$code;
+        return ( isset( $_SERVER["SERVER_PROTOCOL"] ) ? $_SERVER["SERVER_PROTOCOL"] : "HTTP/1.1" )." ".$code;
     }
 
 }
