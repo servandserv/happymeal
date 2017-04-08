@@ -96,11 +96,11 @@ class ClientAdapter
             header( $this->responseHeader( $code ) );
             switch( $this->accept() ) {
                 case "json":
-                    header( "Content-type: application/json; charset: utf-8" );
+                    header( "Content-type: application/json;charset=UTF-8" );
                     echo $response->toJSON();
                     break;
                 default:
-                    header( "Content-type: application/xml; charset: utf-8" );
+                    header( "Content-type: application/xml;charset=UTF-8" );
                     echo $response->toXmlStr( $response::NS, $response::ROOT, $pi );
             }
         }
