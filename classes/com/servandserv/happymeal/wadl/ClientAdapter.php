@@ -104,7 +104,6 @@ class ClientAdapter
                     echo $response->toXmlStr( $response::NS, $response::ROOT, $pi );
             }
         }
-        //exit;
     }
 
     public function throwException( $message, $code )

@@ -12,20 +12,21 @@ class ViewFactory implements Router
 {
 
     private $rep;
+    private $referrerId;
     private $referrer;
+    private $callbackId;
     private $callback;
+    private $query;
     private $token;
     private $env;
 
     public function __construct( StateRepository $rep, array $params = [] )
     {
         $this->rep = $rep;
-        //clean old tokens
-        $this->emptyTrash();
-        $referrerId = filter_input( INPUT_GET, "__referrer__" );
-        $this->referrer = $rep->findToken( $referrerId );
-        $callbackId = filter_input( INPUT_GET, "__callback__" );
-        $this->callback = $rep->findToken( $callbackId );
+        $this->referrerId = filter_input( INPUT_GET, "__referrer__" );
+        $this->referrer = $rep->findToken( $this->referrerId );
+        $this->callbackId = filter_input( INPUT_GET, "__callback__" );
+        $this->callback = $rep->findToken( $this->callbackId );
         $this->env = new Env();
         foreach( $params as $k => $v ) {
             $this->env->setParam( new Param( $k, $v ) );
@@ -44,6 +45,10 @@ class ViewFactory implements Router
     
     public function createView( TokenType $token, array $state = [] )
     {
+        //clean old tokens
+        // можно удалять продухшиетокены только при перестроении view
+        // иначе можно получить ссылку на несуществующий токен при отправке формы которая была открыта давно
+        $this->emptyTrash();
         $sn = filter_input( INPUT_SERVER, "SCRIPT_NAME" );
         $query = new Query( $sn );
         // all query params
@@ -97,7 +102,7 @@ class ViewFactory implements Router
     public function redirect( AnyType $request = NULL, AnyType $response = NULL )
     {
         if( $this->referrer ) {
-            $this->referrer->setrequest( $request );
+            $this->referrer->setRequest( $request );
             $this->referrer->setResponse( $response );
             $this->rep->registerToken( $this->referrer );
             if( method_exists( $this->referrer, "redirect" ) ) {
@@ -106,5 +111,4 @@ class ViewFactory implements Router
         }
         return FALSE;
     }
-
 }
