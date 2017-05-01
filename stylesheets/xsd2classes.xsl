@@ -99,9 +99,9 @@
 			</xsl:call-template>
 		</xsl:for-each>
 		<xsl:text disable-output-escaping="yes">
-		public function __construct() 
+		public function __construct( $simpleContent = NULL ) 
 		{
-			parent::__construct();</xsl:text>
+			parent::__construct( $simpleContent );</xsl:text>
 			<xsl:for-each select="$props/tmp:property">
 			    <xsl:text disable-output-escaping="yes">
 			$this->__props["</xsl:text>
@@ -1500,7 +1500,9 @@
 			</xsl:when>
 			<!--  наследование через неименованый комплексный тип и простой контент -->
 			<xsl:when test="tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass">
-				<xsl:value-of select="tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass" />
+			    <xsl:value-of select="$anyComplexType" />
+			    <!-- нельзя делать простым типом -->
+				<!--xsl:value-of select="tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass" /-->
 			</xsl:when>
 			<xsl:when test="tmp:complexContent/tmp:extension/@typeClass">
 				<xsl:value-of select="tmp:complexContent/tmp:extension/@typeClass" />
@@ -1590,6 +1592,8 @@
 			</xsl:when>
 			<xsl:when test="@minOccurs"><xsl:value-of select="@minOccurs" /></xsl:when>
 			<xsl:when test="parent::*/@minOccurs"><xsl:value-of select="parent::*/@minOccurs" /></xsl:when>
+			<xsl:when test="local-name() = 'attribute' and not(@use)">0</xsl:when>
+			<xsl:when test="local-name() = 'attribute' and @use = 'optional'">0</xsl:when>
 			<xsl:otherwise>1</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>

@@ -2,77 +2,71 @@
 <xsd:schema elementFormDefault="qualified"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns="urn:com:servandserv:happymeal:views"
-    xmlns:err="urn:com:servandserv:happymeal:errors"
     targetNamespace="urn:com:servandserv:happymeal:views">
+
+
+<!-- Atoms -->
+<xsd:element name="Label">
+    <xsd:complexType>
+        <xsd:attributeGroup ref="coreattrs" />
+        <xsd:attribute name="id" type="xsd:IDREF" />
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="Input">
+    <xsd:complexType>
+        <xsd:attributeGroup ref="coreattrs" />
+        <xsd:attribute name="name" type="xsd:string" />
+        <xsd:attribute name="type" type="inputTypeType" />
+        <xsd:attribute name="checked" type="xsd:boolean" />
+        <xsd:attribute name="disabled" type="xsd:boolean" />
+        <xsd:attribute name="readonly" type="xsd:boolean" />
+        <xsd:attribute name="size" type="xsd:integer" />
+        <xsd:attribute name="maxlength" type="xsd:integer" />
+        <xsd:attribute name="alt" type="xsd:string" />
+        <xsd:attribute name="tabindex" type="xsd:integer" />
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:element name="Button">
+    <xsd:complexType>
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attributeGroup ref="coreattrs" />
+                <xsd:attribute name="name" type="xsd:string" use="required" />
+                <xsd:attribute name="type" type="buttonTypeType" use="required" />
+                <xsd:attribute name="disabled" type="xsd:boolean" />
+                <xsd:attribute name="tabindex" type="xsd:integer" />
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+</xsd:element>
+
+<xsd:attributeGroup name="coreattrs">
+    <xsd:attribute name="id" type="xsd:ID" />
+    <xsd:attribute name="class" type="xsd:string" />
+    <xsd:attribute name="style" type="xsd:string" />
+    <xsd:attribute name="title" type="xsd:string" />
+</xsd:attributeGroup>
+
+<xsd:simpleType name="buttonTypeType">
+    <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="button" />
+        <xsd:enumeration value="submit" />
+        <xsd:enumeration value="reset" />
+    </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:simpleType name="inputTypeType">
+    <xsd:restriction base="xsd:string">
+        <xsd:enumeration value="text" />
+        <xsd:enumeration value="password" />
+        <xsd:enumeration value="checkbox" />
+        <xsd:enumeration value="radio" />
+        <xsd:enumeration value="file" />
+        <xsd:enumeration value="hidden" />
+    </xsd:restriction>
+</xsd:simpleType>
     
-<!--xsd:import schemaLocation="errors.xsd" namespace="urn:com:servandserv:happymeal:errors" />
-
-<xsd:element name="View">
-    <xsd:complexType>
-        <xsd:sequence>
-            <xsd:element name="sessionId" type="xsd:string" minOccurs="1" />
-            <xsd:element ref="Env" />
-            <xsd:element name="Token" type="TokenType" minOccurs="1" />
-            <xsd:element name="Referrer" type="TokenType" minOccurs="0" />
-            <xsd:element name="Callback" type="TokenType" minOccurs="0" />
-            <xsd:element ref="err:Error" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-    </xsd:complexType>
-</xsd:element>
-
-<xsd:element name="Env">
-    <xsd:annotation>
-        <xsd:documentation>
-            Container for environment parameters
-        </xsd:documentation>
-    </xsd:annotation>
-    <xsd:complexType>
-        <xsd:sequence>
-            <xsd:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-    </xsd:complexType>
-</xsd:element>
-
-<xsd:element name="Tokens">
-    <xsd:complexType>
-        <xsd:sequence>
-            <xsd:element name="Token" type="TokenType" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-    </xsd:complexType>
-</xsd:element>
-
-<xsd:complexType name="TokenType">
-    <xsd:annotation>
-        <xsd:documentation>
-            Use TokenType for temporary data (manage user interface flow)
-        </xsd:documentation>
-    </xsd:annotation>
-    <xsd:sequence>
-        <xsd:element name="id" type="xsd:string" />
-        <xsd:element name="created" type="xsd:integer" />
-        <xsd:element name="expired" type="xsd:integer" />
-        <xsd:element ref="Request" />
-        <xsd:element ref="err:Errors" />
-    </xsd:sequence>
-</xsd:complexType>
-
-<xsd:element name="Request">
-    <xsd:complexType>
-        <xsd:sequence>
-            <xsd:element name="method" type="xsd:string" />
-            <xsd:element name="url" type="xsd:string" />
-            <xsd:element ref="Param" minOccurs="0" maxOccurs="unbounded" />
-        </xsd:sequence>
-    </xsd:complexType>
-</xsd:element>
-
-<xsd:element name="Param">
-    <xsd:complexType>
-        <xsd:sequence>
-            <xsd:element name="name" type="xsd:string" />
-            <xsd:element name="value" type="xsd:string" />
-        </xsd:sequence>
-    </xsd:complexType>
-</xsd:element-->
-
+    
 </xsd:schema>

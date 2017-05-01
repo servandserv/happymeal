@@ -43,7 +43,7 @@ class ViewFactory implements Router
         return $this->callback;
     }
     
-    public function createView( TokenType $token, array $state = [] )
+    public function createView( TokenType $token, array $state = [], callable $cb = null )
     {
         //clean old tokens
         // можно удалять продухшиетокены только при перестроении view
@@ -72,6 +72,8 @@ class ViewFactory implements Router
                     ( new Error )->setDescription( "Access denied" ) 
                 ));
         }
+        
+        if( $cb !== NULL ) $cb( $view );
         
         return $view;
     }

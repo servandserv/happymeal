@@ -12,8 +12,9 @@ class AnyComplexType extends AnyType
 	const ANY_VALUE=0;
 	const NOT_NULL=1;
 	
-	public function __construct()
+	public function __construct( $text = NULL )
 	{
+	    if( $text ) $this->__text( $text );
 	    $this->_props = [];
 	}
 	
@@ -40,6 +41,7 @@ class AnyComplexType extends AnyType
 		if( $mode & XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
 		$this->attributesToXmlWriter( $xw, $xmlns );
 		$this->elementsToXmlWriter( $xw, $xmlns );
+		if( $this->__text() ) $xw->text( $this->__text );
 		if( $mode & XMLAdaptor::ENDELEMENT ) $xw->endElement();
 	}
 	
@@ -51,7 +53,9 @@ class AnyComplexType extends AnyType
 	                $val = call_user_func( array( $this, $prop["getter"] ) );
 	                if( $prop["xmlns"] !== $xmlns ) {
 	                    $xw->writeAttributeNS( $prop["nodeName"], "ns".$counter, $prop["xmlns"], $val );
-	                } else {
+	                } elseif( $val !== NULL ) {
+	                    $xw->writeAttribute( $prop["nodeName"], $val );
+	                } elseif( $val === NULL && $prop["minOccurs"] == 1) {
 	                    $xw->writeAttribute( $prop["nodeName"], $val );
 	                }
 	            }

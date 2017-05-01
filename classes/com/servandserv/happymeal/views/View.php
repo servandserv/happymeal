@@ -1,6 +1,9 @@
 <?php
 	namespace com\servandserv\happymeal\views;
-		
+	
+	use \com\servandserv\happymeal\xml\schema\AnyType;
+	use \com\servandserv\happymeal\errors\Errors;
+	
 	class View {
 			
 		const NS = "urn:com:servandserv:happymeal:views";
@@ -13,48 +16,68 @@
 		protected $referrer = null;
 		protected $callback = null;
 		protected $errors;
+		protected $html;
 		
-		public function setSessionId ( $val ) {
+		public function setSessionId ( $val ) 
+		{
 			$this->sessionId = $val;
 			return $this;
 		}
-		public function setEnv ( \com\servandserv\happymeal\views\Env $val ) {
+		public function setEnv ( Env $val ) 
+		{
 			$this->env = $val;
 			return $this;
 		}
-		public function setToken ( \com\servandserv\happymeal\views\TokenType $val ) {
+		public function setToken ( TokenType $val ) 
+		{
 			$this->token = $val;
 			return $this;
 		}
-		public function setReferrer ( \com\servandserv\happymeal\views\TokenType $val = NULL ) {
+		public function setReferrer ( TokenType $val = NULL ) {
 			$this->referrer = $val;
 			return $this;
 		}
-		public function setCallback ( \com\servandserv\happymeal\views\TokenType $val = NULL ) {
+		public function setCallback ( TokenType $val = NULL ) {
 			$this->callback = $val;
 			return $this;
 		}
-		public function setErrors ( \com\servandserv\happymeal\errors\Errors $val ) {
+		public function setErrors (  Errors $val ) {
 			$this->errors = $val;
 			return $this;
 		}
-		public function getSessionId() {
+		public function setHTML( AnyType $any )
+		{
+		    $this->html = $any;
+		    return $this;
+		}
+		
+		public function getSessionId() 
+		{
 			return $this->sessionId;
 		}
-		public function getEnv() {
+		public function getEnv() 
+		{
 			return $this->env;
 		}
-		public function getToken() {
+		public function getToken() 
+		{
 			return $this->token;
 		}
-		public function getReferrer() {
+		public function getReferrer() 
+		{
 			return $this->referrer;
 		}
-		public function getCallback() {
+		public function getCallback() 
+		{
 			return $this->callback;
 		}
-		public function getErrors() {
+		public function getErrors() 
+		{
 		    return $this->errors;
+		}
+		public function getHTML() 
+		{
+		    return $this->html;
 		}
 		
 		public function toXmlStr( $xmlns = self::NS, $xmlname = self::ROOT, $pi = NULL )
@@ -80,6 +103,7 @@
 		    if( $this->getReferrer() ) $this->getReferrer()->toXmlWriter( $xw, "Referrer" );
 		    if( $this->getCallback() ) $this->getCallback()->toXmlWriter( $xw, "Callback" );
 		    if( $this->getErrors() ) $this->getErrors()->toXmlWriter( $xw );
+		    if( $this->getHTML() ) $this->getHTML()->toXmlWriter( $xw );
 		    $xw->endElement();
 		}
 	}
