@@ -16,7 +16,7 @@
 		protected $referrer = null;
 		protected $callback = null;
 		protected $errors;
-		protected $html;
+		protected $components = [];
 		
 		public function setSessionId ( $val ) 
 		{
@@ -45,9 +45,9 @@
 			$this->errors = $val;
 			return $this;
 		}
-		public function setHTML( AnyType $any )
+		public function setComponent( AnyType $any )
 		{
-		    $this->html = $any;
+		    $this->components[] = $any;
 		    return $this;
 		}
 		
@@ -75,9 +75,9 @@
 		{
 		    return $this->errors;
 		}
-		public function getHTML() 
+		public function getComponents() 
 		{
-		    return $this->html;
+		    return $this->components;
 		}
 		
 		public function toXmlStr( $xmlns = self::NS, $xmlname = self::ROOT, $pi = NULL )
@@ -103,7 +103,14 @@
 		    if( $this->getReferrer() ) $this->getReferrer()->toXmlWriter( $xw, "Referrer" );
 		    if( $this->getCallback() ) $this->getCallback()->toXmlWriter( $xw, "Callback" );
 		    if( $this->getErrors() ) $this->getErrors()->toXmlWriter( $xw );
-		    if( $this->getHTML() ) $this->getHTML()->toXmlWriter( $xw );
+		    if( !empty( $this->getComponents() ) ) {
+		        $xw->startElement( "Components" );
+		        $components = $this->getComponents();
+		        foreach( $components as $component ) {
+		            $component->toXmlWriter( $xw, $component::ROOT, $component::NS );
+		        }
+		        $xw->endElement();
+		    }
 		    $xw->endElement();
 		}
 	}

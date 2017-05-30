@@ -44,7 +44,7 @@ class SessionRepository implements StateRepository
     public function emptyTrash()
     {
         foreach( $_SESSION["tokens"] as $id => $token ) {
-            if( time() > $token->getExpired() ) {
+            if( !$token->getExpired() || time() > $token->getExpired() ) {
                 unset( $_SESSION["tokens"][$id] );
             }
         }

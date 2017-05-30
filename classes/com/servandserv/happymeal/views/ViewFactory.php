@@ -45,7 +45,7 @@ class ViewFactory implements Router
     
     public function createView( TokenType $token, array $state = [], callable $cb = null )
     {
-        //clean old tokens
+        // clean old tokens
         // можно удалять продухшиетокены только при перестроении view
         // иначе можно получить ссылку на несуществующий токен при отправке формы которая была открыта давно
         $this->emptyTrash();

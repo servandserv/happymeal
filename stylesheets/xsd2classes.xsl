@@ -368,7 +368,7 @@
 			<xsl:copy-of select="tmp:annotation" />
 		</xsl:element>
 	</xsl:template>
-	
+
 	<!-- PROPERTIES -->
 	<xsl:template name="PROPERTY">
 		<xsl:param name="p" />
@@ -1513,7 +1513,7 @@
 			</xsl:when>
 			<!-- Это затычка на случай когда элемент объявлен в схеме без типа и внутри него не ничего что бы указывало
 			на сложный тип делаем их по умолчанию наследниками простой строки -->
-			<xsl:when test="not(descendant::tmp:element) and not(descendant::tmp:attribute) and not(descendant::tmp:complexType)">
+			<xsl:when test="not(descendant::tmp:element) and not(descendant::tmp:attribute) and not(descendant::tmp:complexType) and not(descendant::tmp:any)">
 				<xsl:value-of select="$anySimpleType" />
 			</xsl:when>
 			<!--  все остальыне наследники комплексного типа -->
