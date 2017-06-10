@@ -81,21 +81,31 @@ class AnyComplexTypeValidator extends AnyTypeValidator
 
     protected function assertChoice( array $getters )
     {
-        $choice = 0;
+        $notempty = [];
         foreach( $getters as $getter ) {
             if( !method_exists( $this->tdo, $getter ) ) return;
             $val = $this->tdo->{$getter}();
-            if( $this->tdo->{$getter}() ) $choice++;
+            if( is_array( $val ) && !empty( $val ) ) $notempty[] = $getter;
+            elseif( !is_array( $val ) && $val !== NULL ) $notempty[] = $getter;
         }
-        if( $choice <= 1 ) return;
+        if( count( $notempty ) <= 1 ) return;
+        $haystack = $needles = [];
+        foreach( $this->__props as $k=>$prop ) {
+            if( in_array( $prop["getter"], $getters ) ) {
+                $haystack[] = $prop["nodeName"];
+            }
+            if( in_array( $prop["getter"], $notempty ) ) {
+                $needles[] = $prop["nodeName"];
+            }
+        }
         $this->handleError(
             Bindings::create( self::ERROR_CLASS )
                 ->setTargetNS( $this->targetNS )
                 ->setClassNS( $this->classNS.":".$this->className )
                 ->setName( $this->nodeName )
                 ->setRule( self::ASSERT_CHOICE )
-                ->setAssetion( 1 )
-                ->setValue( $choice ) );
+                ->setAssertion( implode( "|", $haystack ) )
+                ->setValue( implode( ",", $needles ) ) );
     }
 
     protected function assertFixed( $getter, $node, $fixed )

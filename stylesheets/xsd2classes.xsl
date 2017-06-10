@@ -41,7 +41,7 @@
 
 	<!-- CLASSES -->
 	
-	<!--  -->
+	<!--  build classes -->
 	<xsl:template match="tmp:*" mode="DATA-CLASS">
 		<xsl:apply-templates select="tmp:*" mode="DATA-CLASS" />
 	</xsl:template>
@@ -58,10 +58,12 @@
 		<xsl:variable name="first-ancestor">
 			<xsl:apply-templates select="." mode="FIRST_ANCESTOR" />
 		</xsl:variable>
-		<!--xsl:message>
-			<xsl:text>??? </xsl:text>
-			<xsl:value-of select="$first-ancestor" />
-		</xsl:message-->
+		<xsl:message>
+		    <xsl:value-of select="@class" />
+			<xsl:text> first ancestor - </xsl:text>
+			<xsl:apply-templates select="." mode="TYPE_CLASS" />
+			<!--xsl:value-of select="$first-ancestor" /-->
+		</xsl:message>
 		<xsl:if test="not(starts-with($first-ancestor,$xmlSchemaNS)) or $first-ancestor=$anyComplexType">
 			<!--  only complex types  -->
 			<xsl:text disable-output-escaping="yes">
@@ -1397,15 +1399,16 @@
 		<xsl:variable name="elements">
 			<xsl:for-each select="tmp:element">
 				<xsl:text>'</xsl:text>
-				<!--xsl:choose>
-					<xsl:when test="@propName">
-						<xsl:value-of select="@propName" />
-					</xsl:when>
-					<xsl:when test="@refClassName">
-						<xsl:value-of select="@refClassName" />
-					</xsl:when>
-				</xsl:choose-->
-				<xsl:value-of select="@getter" />
+				<xsl:choose>
+				    <!-- допускаются референтные ссылки только на узлы непоредственно расположенные в руте дерева -->
+				    <xsl:when test="@refClass">
+				        <xsl:variable name="ref" select="@refClass" />
+				        <xsl:value-of select="//tmp:schema/tmp:*[@class = $ref]/@getter" />
+				    </xsl:when>
+				    <xsl:otherwise>
+				        <xsl:value-of select="@getter" />
+				    </xsl:otherwise>
+				</xsl:choose>
 				<xsl:text>'</xsl:text>
 				<xsl:if test="position()!=last()">,</xsl:if>
 			</xsl:for-each>
@@ -1499,30 +1502,38 @@
 				<xsl:value-of select="tmp:list/@typeClass" />
 			</xsl:when>
 			<!--  наследование через неименованый комплексный тип и простой контент -->
+			<xsl:when test="tmp:simpleContent/tmp:extension/@typeClass and (not(starts-with(tmp:simpleContent/tmp:extension/@typeClass,$xmlSchemaNS)) or tmp:simpleContent/tmp:extension/@typeClass=$anyComplexType)">
+			    <xsl:value-of select="tmp:simpleContent/tmp:extension/@typeClass" />
+			</xsl:when>
+			<xsl:when test="tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass and (not(starts-with(tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass,$xmlSchemaNS)) or tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass=$anyComplexType)">
+			    <xsl:value-of select="tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass" />
+			</xsl:when>
+			<xsl:when test="tmp:simpleContent/tmp:extension/@typeClass">
+			    <xsl:value-of select="$anyComplexType" />
+			</xsl:when>
 			<xsl:when test="tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass">
 			    <xsl:value-of select="$anyComplexType" />
-			    <!-- нельзя делать простым типом -->
-				<!--xsl:value-of select="tmp:complexType/tmp:simpleContent/tmp:extension/@typeClass" /-->
 			</xsl:when>
+			<!-- наследование через неименованый комплексный тип и сложный контент -->
 			<xsl:when test="tmp:complexContent/tmp:extension/@typeClass">
 				<xsl:value-of select="tmp:complexContent/tmp:extension/@typeClass" />
 			</xsl:when>
-			<!-- наследование через неименованый комплексный тип и сложный контент -->
 			<xsl:when test="tmp:complexType/tmp:complexContent/tmp:extension/@typeClass">
 				<xsl:value-of select="tmp:complexType/tmp:complexContent/tmp:extension/@typeClass" />
 			</xsl:when>
 			<!-- Это затычка на случай когда элемент объявлен в схеме без типа и внутри него не ничего что бы указывало
 			на сложный тип делаем их по умолчанию наследниками простой строки -->
-			<xsl:when test="not(descendant::tmp:element) and not(descendant::tmp:attribute) and not(descendant::tmp:complexType) and not(descendant::tmp:any)">
+			<xsl:when test="not(descendant::tmp:element) and not(descendant::tmp:attribute) and not(descendant::tmp:attributeGroup) and not(descendant::tmp:complexType) and not(descendant::tmp:any)">
 				<xsl:value-of select="$anySimpleType" />
 			</xsl:when>
-			<!--  все остальыне наследники комплексного типа -->
+			<!-- make others as Complex Type -->
 			<xsl:otherwise>
 			    <xsl:value-of select="$anyComplexType" />
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 	
+	<!-- search first ancestor type for type -->
 	<xsl:template match="tmp:*" mode="FIRST_ANCESTOR">
 		<xsl:variable name="classNS" select="@classNS" />
 		<xsl:variable name="typeClass">
