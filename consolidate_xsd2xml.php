@@ -138,7 +138,7 @@ function xml2assoc( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_pa
                             "prefix" => $xr->prefix,
                             "localName" => $xr->localName
                         );
-
+                        $node_hash = sha1( $target.$ns_path.$xr->readOuterXml() );
                         $node["attributes"] = [];
                         $uid = NULL;
                         if( $xr->hasAttributes ) {
@@ -212,7 +212,8 @@ function xml2assoc( \XMLReader $xr, $path, \XMLWriter &$xw, $target = "", $ns_pa
                         foreach( $node["attributes"] as $k => $v ) {
                             $xw->writeAttribute( $k, $v );
                         }
-                        $xw->writeAttribute( "_ID", md5( $counter++ ) );
+                        //$xw->writeAttribute( "_ID", md5( $counter++ ) );
+                        $xw->writeAttribute( "_ID", $node_hash );
                         if( $xr->isEmptyElement ) {
                             $node["content"] = "";
                             $xw->endElement();
