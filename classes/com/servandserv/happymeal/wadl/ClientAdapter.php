@@ -67,7 +67,7 @@ class ClientAdapter
 
             if( !$media ) $cli->throwException( "Unsupported Media Type", 415 );
 
-            $cli->response = $method["response"];
+            $cli->response = isset( $method["response"] ) ? $methos["response"] : [];
 
             return $cli;
         }
@@ -119,8 +119,8 @@ class ClientAdapter
         $json = $xml = 0;
 
         $parts = preg_split( '/\s*(?:,*("[^"]+"),*|,*(\'[^\']+\'),*|,+)\s*/',
-                             $_SERVER["HTTP_ACCEPT"], 0,
-                                           PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE );
+            $_SERVER["HTTP_ACCEPT"], 0,
+            PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE );
         foreach( $parts as $part ) {
             $quality = 1.0;
             $params = preg_split( '/;\s*q=/i', $part, 0, PREG_SPLIT_NO_EMPTY );
