@@ -27,7 +27,7 @@ interface XMLAdaptor
 	* @param string $xmlns element namespace
 	* @param int $mode
 	*/
-	public function toXmlWriter(\XMLWriter &$xw,$xmlname=NULL,$xmlns=NULL,$mode=\com\servandserv\happymeal\XMLAdaptor::ELEMENT);
+	public function toXmlWriter(\XMLWriter &$xw,$xmlname=NULL,$xmlns=NULL,$mode=XMLAdaptor::ELEMENT);
 
     /**
 	*
