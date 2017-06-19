@@ -2,8 +2,6 @@
 
 namespace com\servandserv\happymeal\views;
 
-use \com\servandserv\happymeal\views\TokenType;
-
 interface StateRepository
 {
     public function getStateId();

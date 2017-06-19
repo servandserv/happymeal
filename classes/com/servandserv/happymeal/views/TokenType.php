@@ -3,7 +3,6 @@
 	
 	use \com\servandserv\happymeal\wadl\Router;
 	use \com\servandserv\happymeal\xml\schema\AnyType;
-	use \com\servandserv\happymeal\views\Query;
 	/**
 	 * Use TokenType for temporary data (manage user interface flow)
 	 * 

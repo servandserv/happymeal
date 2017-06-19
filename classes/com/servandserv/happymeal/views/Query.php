@@ -17,7 +17,7 @@
 			$this->url = $val;
 			return $this;
 		}
-		public function setParam( \com\servandserv\happymeal\views\Param $val ) {
+		public function setParam( Param $val ) {
 			$this->params[$val->getName()] = $val;
 			return $this;
 		}

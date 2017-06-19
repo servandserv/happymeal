@@ -2,8 +2,6 @@
 
 namespace com\servandserv\happymeal\views;
 
-use \com\servandserv\happymeal\views\TokenType;
-
 class SessionRepository implements StateRepository
 {
     public function __construct()

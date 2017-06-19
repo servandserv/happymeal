@@ -2,7 +2,6 @@
 
 namespace com\servandserv\happymeal\views;
 
-use \com\servandserv\happymeal\views\TokenType;
 use \com\servandserv\happymeal\xml\schema\AnyType;
 use \com\servandserv\happymeal\wadl\Router;
 use \com\servandserv\happymeal\errors\Errors;
