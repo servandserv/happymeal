@@ -67,7 +67,7 @@ class ClientAdapter
 
             if( !$media ) $cli->throwException( "Unsupported Media Type", 415 );
 
-            $cli->response = isset( $method["response"] ) ? $methos["response"] : [];
+            $cli->response = isset( $method["response"] ) ? $method["response"] : [];
 
             return $cli;
         }
