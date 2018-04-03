@@ -5,7 +5,7 @@ namespace com\servandserv\happymeal\views;
 use \com\servandserv\happymeal\xml\schema\AnyType;
 use \com\servandserv\happymeal\wadl\Router;
 use \com\servandserv\happymeal\errors\Errors;
-use com\servandserv\happymeal\errors\Error;
+use \com\servandserv\happymeal\errors\Error;
 
 class ViewFactory implements Router
 {
@@ -15,6 +15,7 @@ class ViewFactory implements Router
     private $referrer;
     private $callbackId;
     private $callback;
+    private $onCallbackFn;
     private $query;
     private $token;
     private $env;
@@ -67,9 +68,7 @@ class ViewFactory implements Router
         } catch( \Exception $e ) {
             $view = ( new View() )
                 ->setSessionId( $this->rep->getStateId() )
-                ->setErrors( ( new Errors() )->setError(
-                    ( new Error )->setDescription( "Access denied" ) 
-                ));
+                ->setError( ( new Error )->setDescription( "Access denied" ) );
         }
         
         if( $cb !== NULL ) $cb( $view );

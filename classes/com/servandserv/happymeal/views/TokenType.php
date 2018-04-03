@@ -73,7 +73,10 @@
 		{
 		    return FALSE;
 		}
-		
+		public function onCallback( View $view )
+		{
+		    return FALSE;
+		}
 		
 		public function toXmlStr( $xmlns = self::NS, $xmlname = self::ROOT, $pi = NULL )
 		{

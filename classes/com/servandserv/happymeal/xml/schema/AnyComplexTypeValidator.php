@@ -117,7 +117,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
             Bindings::create( self::ERROR_CLASS )
                 ->setTargetNS( $this->targetNS )
                 ->setClassNS( $this->classNS.":".$this->className )
-                ->setName( $this->node )
+                ->setName( $node )
                 ->setRule( self::ASSERT_FIXED )
                 ->setAssertion( $fixed )
                 ->setValue( $val ) );

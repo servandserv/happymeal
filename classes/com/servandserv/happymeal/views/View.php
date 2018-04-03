@@ -3,6 +3,7 @@
 	
 	use \com\servandserv\happymeal\xml\schema\AnyType;
 	use \com\servandserv\happymeal\errors\Errors;
+	use \com\servandserv\happymeal\errors\Error;
 	
 	class View {
 			
@@ -18,6 +19,10 @@
 		protected $errors;
 		protected $components = [];
 		
+		public function __construct()
+		{
+		    $this->errors = new Errors();
+		}
 		public function setSessionId ( $val ) 
 		{
 			$this->sessionId = $val;
@@ -44,6 +49,10 @@
 		public function setErrors (  Errors $val ) {
 			$this->errors = $val;
 			return $this;
+		}
+		public function setError( Error $err ) {
+		    $this->errors->setError( $err );
+		    return $this;
 		}
 		public function setComponent( AnyType $any )
 		{
