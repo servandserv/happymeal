@@ -2,12 +2,14 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class NameTypeValidator extends TokenTypeValidator 
 {
 
 	const PATTERN = "/^[_:A-Za-z][-.:\w]+$/";
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\NameType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( NameType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

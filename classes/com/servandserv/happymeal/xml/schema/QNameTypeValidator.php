@@ -2,12 +2,14 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class QNameTypeValidator extends AnySimpleTypeValidator 
 {
 
 	const PATTERN = "/^([_A-Za-z][-.\w]+|[_A-Za-z][-.\w]+:[_A-Za-z][-.\w]+)$/";
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\QNameType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( QNameType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

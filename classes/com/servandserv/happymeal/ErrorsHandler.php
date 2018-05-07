@@ -2,7 +2,7 @@
 
 namespace com\servandserv\happymeal;
 
-use \com\servandserv\happymeal\errors\Error;
+use \com\servandserv\data\happymeal\Error;
 
 /**
  * errors container
@@ -34,7 +34,7 @@ class ErrorsHandler
 	
 	public function clean () 
 	{
-		$this->errors = \com\servandserv\happymeal\Bindings::create( 'com\servandserv\happymeal\errors\Errors' );
+		$this->errors = \com\servandserv\happymeal\Bindings::create( 'com\servandserv\data\happymeal\Errors' );
 	}
 	
 }

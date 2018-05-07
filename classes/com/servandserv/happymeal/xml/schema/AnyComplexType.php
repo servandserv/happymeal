@@ -4,7 +4,6 @@ namespace com\servandserv\happymeal\xml\schema;
 
 use \com\servandserv\happymeal\Bindings;
 use \com\servandserv\happymeal\ErrorsHandler;
-use \com\servandserv\happymeal\XMLAdaptor;
 
 class AnyComplexType extends AnyType 
 {
@@ -37,12 +36,12 @@ class AnyComplexType extends AnyType
 	* @param string $xmlns Пространство имен
 	* @param int $mode
 	*/
-	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = XMLAdaptor::ELEMENT ) {
-		if( $mode & XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
+	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = self::ELEMENT ) {
+		if( $mode & self::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
 		$this->attributesToXmlWriter( $xw, $xmlns );
 		$this->elementsToXmlWriter( $xw, $xmlns );
 		if( $this->__text() ) $xw->text( $this->__text );
-		if( $mode & XMLAdaptor::ENDELEMENT ) $xw->endElement();
+		if( $mode & self::ENDELEMENT ) $xw->endElement();
 	}
 	
 	protected function attributesToXmlWriter( \XMLWriter &$xw, $xmlns = self::NS ) {
@@ -75,14 +74,14 @@ class AnyComplexType extends AnyType
 	                    if( $prop["xmlns"] == $xmlns ) {
 	                        $xw->startElement( $prop["nodeName"] );
 	                        if($prop["class"]) {
-	                            $val->toXmlWriter( $xw, $prop["nodeName"], $prop["xmlns"], XMLAdaptor::CONTENTS );
+	                            $val->toXmlWriter( $xw, $prop["nodeName"], $prop["xmlns"], self::CONTENTS );
 	                        } else {
 	                            $xw->text( $val );
 	                        }
 	                        $xw->endElement();
 	                    } else {
 	                        if($prop["class"]) {
-	                            $val->toXmlWriter( $xw, $prop["nodeName"], $prop["xmlns"], XMLAdaptor::ELEMENT );
+	                            $val->toXmlWriter( $xw, $prop["nodeName"], $prop["xmlns"], self::ELEMENT );
 	                        } else {
 	                            $xw->writeElement( $prop["nodeName"], $val );
 	                        }
@@ -92,8 +91,6 @@ class AnyComplexType extends AnyType
 	        }
 	    }
 	}
-	
-	
 	
 	public function fromXmlReader ( \XMLReader &$xr ) {
 		while ( $xr->nodeType != \XMLReader::ELEMENT ) $xr->read();

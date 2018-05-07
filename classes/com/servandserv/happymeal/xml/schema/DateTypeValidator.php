@@ -2,6 +2,8 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class DateTypeValidator extends AnySimpleTypeValidator 
 {
 
@@ -9,7 +11,7 @@ class DateTypeValidator extends AnySimpleTypeValidator
 	const PATTERN = "/^-?[0-9]{4}-(0[0-9]|1[0-2])-([0-2][0-9]|3[01])$/";
 	//const PATTERN = "/^(18|19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/";
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\DateType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( DateType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

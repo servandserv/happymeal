@@ -5,7 +5,7 @@ namespace com\servandserv\happymeal;
 abstract class Validator 
 {
 
-    const ERROR_CLASS = 'com\servandserv\happymeal\errors\Error';
+    const ERROR_CLASS = 'com\servandserv\data\happymeal\Error';
 
     const ASSERT_MIN_OCCURS = "ASSERT_MIN_OCCURS";
     const ASSERT_MAX_OCCURS = "ASSERT_MAX_OCCURS";
@@ -33,7 +33,7 @@ abstract class Validator
 		$this->validationHandler = $handler;
 	}
 
-	protected function handleError ( \com\servandserv\happymeal\errors\Error $error ) 
+	protected function handleError ( \com\servandserv\data\happymeal\Error $error ) 
 	{
 		if( is_object( $this->validationHandler ) ) {
 			$this->validationHandler->handleError( $error );

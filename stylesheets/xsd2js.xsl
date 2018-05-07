@@ -20,6 +20,10 @@
 	
 	<xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
 	<xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
+	<xsl:variable name="anyComplexType" select="'com\servandserv\happymeal\xml\schema\AnyComplexType'" />
+	<xsl:variable name="anySimpleType" select="'com\servandserv\happymeal\xml\schema\AnySimpleType'" />
+	<xsl:variable name="anyType" select="'com\servandserv\happymeal\xml\schema\AnyType'" />
+	<xsl:variable name="xmlSchemaNS" select="'com\servandserv\happymeal\xml\schema'" />
 	
 	<xsl:variable name="NS" select="/tmp:schema/@namespace" />
 
@@ -37,7 +41,7 @@
 			</xsl:variable>
 			<xsl:message><xsl:value-of select="@class" /> as <xsl:value-of select="$first-ancestor" /></xsl:message>
 			<xsl:choose>
-				<xsl:when test="not(starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema')) or $first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType'">
+				<xsl:when test="not(starts-with($first-ancestor,$xmlSchemaNS)) or $first-ancestor = $anyComplexType">
 					<!-- Сложные типы -->
 					<xsl:apply-templates select="." mode="COMPLEX" />
 				</xsl:when>
@@ -57,7 +61,7 @@
 	<xsl:template match="tmp:element[@name]" mode="COMPLEX">
 		<xsl:variable name="class" select="@class" />
 		<xsl:variable name="object" select="translate(@class,'\','.')" />
-		<xsl:variable name="prototype">com\servandserv\happymeal\XML\Schema\AnyComplexType</xsl:variable>
+		<xsl:variable name="prototype" select="$anyComplexType" />
 		<xsl:variable name="props">
 			<xsl:apply-templates select="." mode="TYPE" />
 		</xsl:variable>
@@ -158,7 +162,7 @@
 	<xsl:template match="tmp:element[@name]" mode="SIMPLE">
 		<xsl:variable name="class" select="@class" />
 		<xsl:variable name="object" select="translate(@class,'\','.')" />
-		<xsl:variable name="prototype">com\servandserv\happymeal\XML\Schema\AnySimpleType</xsl:variable>
+		<xsl:variable name="prototype" select="$anySimpleType" />
 	h.Locator( "<xsl:value-of select="$object" />", function() {
 		
 		<xsl:text disable-output-escaping="yes">
@@ -442,7 +446,7 @@
 			<xsl:attribute name="minOccurs"><xsl:value-of select="$minOccurs" /></xsl:attribute>
 			<xsl:attribute name="classNS"><xsl:value-of select="@classNS" /></xsl:attribute>
 			<xsl:choose>
-				<xsl:when test="starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema') and not($first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType')">
+				<xsl:when test="starts-with($first-ancestor,$xmlSchemaNS) and not($first-ancestor = $anyComplexType)">
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:attribute name="class">
@@ -470,9 +474,9 @@
 			<xsl:element name="restriction">
 			    <xsl:apply-templates select="." mode="RESTRICTIONS" />
 			    <xsl:choose>
-  			        <xsl:when test="starts-with($first-ancestor,'com\servandserv\happymeal\XML\Schema') and not($first-ancestor = 'com\servandserv\happymeal\XML\Schema\AnyComplexType')">
+  			        <xsl:when test="starts-with($first-ancestor,$xmlSchemaNS) and not($first-ancestor = $anyComplexType)">
     			        <xsl:element name="simple">
-	                        <xsl:attribute name="value"><xsl:value-of select="substring-after($first-ancestor,'com\servandserv\happymeal\XML\Schema\')" /></xsl:attribute>
+	                        <xsl:attribute name="value"><xsl:value-of select="substring-after($first-ancestor,$xmlSchemaNS)" /></xsl:attribute>
 	                    </xsl:element>
 	                </xsl:when>
 	                <xsl:otherwise>
@@ -545,11 +549,11 @@
 			<!-- Это затычка на случай когда элемент объявлен в схеме без типа и внутри него не ничего что бы указывало
 			на сложный тип делаем их по умолчанию наследниками простой строки -->
 			<xsl:when test="not(descendant::tmp:element) and not(descendant::tmp:attribute) and not(descendant::tmp:complexType)">
-				<xsl:text>com\servandserv\happymeal\XML\Schema\AnySimpleType</xsl:text>
+			    <xsl:value-of select="$anySimpleType" />
 			</xsl:when>
 			<!--  все остальыне наследники комплексного типа -->
 			<xsl:otherwise>
-				<xsl:text>com\servandserv\happymeal\XML\Schema\AnyComplexType</xsl:text>
+			    <xsl:value-of select="$anyComplexType" />
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>

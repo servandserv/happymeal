@@ -2,12 +2,14 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
-use \com\servandserv\happymeal\MarkupArrayAdaptor;
-use \com\servandserv\happymeal\JSONAdaptor;
-use \com\servandserv\happymeal\XMLAdaptor;
+//use \com\servandserv\data\MarkupArrayAdaptor;
+//use \com\servandserv\data\JSONAdaptor;
+//use \com\servandserv\data\XMLAdaptor;
+use \com\servandserv\data\DataAdaptor;
+
 use \com\servandserv\happymeal\ErrorsHandler;
 
-class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor 
+class AnyType implements DataAdaptor
 {
 	const ROOT = "anyType";
 	const NS = "http://www.w3.org/2001/XMLSchema";
@@ -73,10 +75,10 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 		return $this;
 	}
 
-	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = XMLAdaptor::ELEMENT ) {
-		if( $mode & XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
+	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = self::ELEMENT ) {
+		if( $mode & self::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
 		if( $this->__text ) $xw->text( $this->__text );
-		if( $mode & XMLAdaptor::ENDELEMENT ) $xw->endElement();
+		if( $mode & self::ENDELEMENT ) $xw->endElement();
 	}
 	
 	public function fromJSON( $json )
@@ -112,8 +114,8 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 	    $nss = $this->nssFromMarkupArray( $vars, $nss );
         $tree = array();
         foreach( $vars as $k=>$v ) {
-            if( $v != NULL && preg_match( MarkupArrayAdaptor::XPATH,$k,$m ) ) {
-                $nodes = preg_split( "/\\" . MarkupArrayAdaptor::XPATH_DELIMITER . "/", $k, -1, PREG_SPLIT_NO_EMPTY);
+            if( $v != NULL && preg_match( self::XPATH,$k,$m ) ) {
+                $nodes = preg_split( "/\\" . self::XPATH_DELIMITER . "/", $k, -1, PREG_SPLIT_NO_EMPTY);
                 $this->treeFromPath( $nodes, $tree, $v, $nss, NULL );
             }
         }
@@ -133,7 +135,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
 	protected function nssFromMarkupArray( array $vars, array $nss ) 
     {
         foreach( $vars as $k=>$v ) {
-            if( preg_match( MarkupArrayAdaptor::NSS, $k, $m ) ) {
+            if( preg_match( self::NSS, $k, $m ) ) {
                 $nss[$k] = $v;
             }
         }
@@ -149,7 +151,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
      *
      *  [price] => Array (
      *       [prefix] => 
-     *       [ns] => urn:com:servandserv:Form:Model
+     *       [ns] => urn:com:servandserv:data:model
      *       [localName] => price
      *       [elements] => Array
      *           (
@@ -165,13 +167,13 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
      *
      *  [atom:Link] => Array (
      *      [prefix] => atom
-     *      [ns] => urn:com:servandserv:XML:Atom:Link
+     *      [ns] => urn:com:servandserv:xml:atom:Link
      *      [localName] => Link
      *      [elements] => Array (
      *           [0] => Array (
      *               [atom:href] => Array (
      *                   [prefix] => atom
-     *                   [ns] => urn:com:servandserv:XML:Atom:Link
+     *                   [ns] => urn:com:servandserv:xml:atom:Link
      *                   [localName] => href
      *                   [elements] => Array
      *                       (
@@ -186,7 +188,7 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
      *   )
      * 
      *
-     * @param $path array of param name parts see \com\servandserv\happymeal\MarkupArrayAdaptor::XPATH
+     * @param $path array of param name parts see self::XPATH
      * @param $tree array destination tree
      * @param $v mixed param value
      * @param $nss array target namespaces
@@ -198,12 +200,12 @@ class AnyType implements MarkupArrayAdaptor, JSONAdaptor, XMLAdaptor
         // get first node
         $node = array_shift( $path );
         if( substr($node,0,5) === "xmlns" ) return;
-        $name = preg_split("/\\" . MarkupArrayAdaptor::NS_DELIMITER . "/", $node, -1, PREG_SPLIT_NO_EMPTY);
+        $name = preg_split("/\\" . self::NS_DELIMITER . "/", $node, -1, PREG_SPLIT_NO_EMPTY);
         if( count( $name ) > 1 ) {
             $prefix = $name[0];
             array_shift( $name );
         }
-        $pos = preg_split("/\\" . MarkupArrayAdaptor::POS_DELIMITER . "/", $name[0], -1 );
+        $pos = preg_split("/\\" . self::POS_DELIMITER . "/", $name[0], -1 );
         $localName = $pos[0];
         $nodeType = "elements";
         $position = 0;

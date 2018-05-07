@@ -2,6 +2,8 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class DurationTypeValidator extends AnySimpleTypeValidator 
 {
 
@@ -9,7 +11,7 @@ class DurationTypeValidator extends AnySimpleTypeValidator
 	const PATTERN = "/^([\-\+])?P(?:([0-9]+)Y)?(?:([0-9]+)M)?(?:([0-9]+)D)?(?:T(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]+(?:\.[0-9]+)?)?S)?)?$/";
 	//const PATTERN = "/^([\-\+])?P(?:([0-9]+)Y)?(?:([0-9]+)M)?(?:([0-9]+)D)?(?:T(?:([0-9]+)H)?(?:([0-9]+)M)?(?:([0-9]+(?:\.[0-9]+)?)?S)?)$/";
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\DurationType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( DurationType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

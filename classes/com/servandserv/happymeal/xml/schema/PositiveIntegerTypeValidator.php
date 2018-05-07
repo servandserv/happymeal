@@ -2,12 +2,14 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class PositiveIntegerTypeValidator extends NonNegativeIntegerTypeValidator 
 {
 
 	const MININCLUSIVE = 1;
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\PositiveIntegerType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( PositiveIntegerType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

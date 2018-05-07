@@ -14,9 +14,4 @@ class AnyURITypeValidator extends AnySimpleTypeValidator
 		parent::__construct( $tdo, $handler );
 	}
 
-	public function validate () 
-	{
-		
-	}
-
 }

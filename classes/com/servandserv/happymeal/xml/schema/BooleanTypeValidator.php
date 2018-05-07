@@ -4,13 +4,13 @@ namespace com\servandserv\happymeal\xml\schema;
 
 const WHITESPACE = "collapse";
 
-use \com\servandserv\happymeal\errors\Error;
+use \com\servandserv\happymeal\ErrorsHandler;
 use \com\servandserv\happymeal\Bindings;
 
-class BooleanTypeValidator extends \com\servandserv\happymeal\xml\schema\AnySimpleTypeValidator 
+class BooleanTypeValidator extends AnySimpleTypeValidator 
 {
 
-	public function __construct ( \com\servandserv\happymeal\xml\schema\BooleanType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( BooleanType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

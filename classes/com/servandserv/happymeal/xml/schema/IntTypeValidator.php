@@ -2,13 +2,15 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class IntTypeValidator extends LongTypeValidator 
 {
 
 	const MININCLUSIVE = -2147483648;
 	const MAXINCLUSIVE = 2147483647;
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\IntType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( IntType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

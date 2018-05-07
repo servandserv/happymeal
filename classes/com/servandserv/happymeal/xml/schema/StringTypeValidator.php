@@ -2,11 +2,13 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class StringTypeValidator extends AnySimpleTypeValidator 
 {
 	const WHITESPACE = "preserve";
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\StringType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( StringType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

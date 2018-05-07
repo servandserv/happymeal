@@ -2,12 +2,14 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class TokenTypeValidator extends NormalizedStringTypeValidator 
 {
 
 	const WHITESPACE = "collapse";
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\TokenType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( TokenType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

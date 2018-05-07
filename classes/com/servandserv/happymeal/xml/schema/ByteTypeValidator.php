@@ -2,13 +2,15 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class ByteTypeValidator extends ShortTypeValidator 
 {
 
 	const MININCLUSIVE = -128;
 	const MAXINCLUSIVE = 127;
 	
-	public function __construct ( \com\servandserv\happymeal\xml\schema\ByteType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( ByteType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

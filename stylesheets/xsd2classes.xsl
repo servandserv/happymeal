@@ -74,8 +74,6 @@
 		<xsl:if test="tmp:annotation">
 			<xsl:text disable-output-escaping="yes">
 	
-	use \com\servandserv\happymeal\XMLAdaptor;
-	
 	/**
 	 * </xsl:text>
 		<xsl:value-of select="normalize-space(tmp:annotation/tmp:documentation)" /><xsl:text>
@@ -170,8 +168,6 @@
 		<xsl:if test="tmp:annotation">
 			<xsl:text disable-output-escaping="yes">
 	
-	use \com\servandserv\happymeal\XMLAdaptor;
-	
 	/**
 	 * </xsl:text>
 		<xsl:value-of select="normalize-space(tmp:annotation/tmp:documentation)" /><xsl:text>
@@ -209,8 +205,6 @@
 		<xsl:if test="tmp:annotation">
 			<xsl:text disable-output-escaping="yes">
 	
-	use \com\servandserv\happymeal\XMLAdaptor;
-	
 	/**
 	 * </xsl:text>
 		<xsl:value-of select="normalize-space(tmp:annotation/tmp:documentation)" /><xsl:text>
@@ -247,7 +241,7 @@
 		* @param string $xmlns namespace
 		* @param int $mode
 		*/
-		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = XMLAdaptor::ELEMENT ) 
+		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = self::ELEMENT ) 
 		{
 			parent::toXmlWriter($xw,$xmlname,$xmlns,$mode);
 		}
@@ -580,7 +574,7 @@
 		public function validateType( \com\servandserv\happymeal\ErrorsHandler $handler ) {
 			$validator = \com\servandserv\happymeal\Bindings::create('</xsl:text>
             <xsl:choose>
-                <xsl:when test="@mode = '\com\servandserv\happymeal\XMLAdaptor::CONTENTS' and @typeClass">
+                <xsl:when test="@mode = 'XMLAdaptor::CONTENTS' and @typeClass">
                     <xsl:value-of select="@typeClass" />
                 </xsl:when>
                 <xsl:otherwise>
@@ -623,12 +617,12 @@
 		* @param string $xmlns Пространство имен
 		* @param int $mode
 		*/
-		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = XMLAdaptor::ELEMENT ) 
+		public function toXmlWriter ( \XMLWriter &amp;$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = self::ELEMENT ) 
 		{
-			if( $mode &amp; XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
+			if( $mode &amp; self::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
 			$this->attributesToXmlWriter( $xw, $xmlns );
 			$this->elementsToXmlWriter( $xw, $xmlns );
-			if( $mode &amp; XMLAdaptor::ENDELEMENT ) $xw->endElement();
+			if( $mode &amp; self::ENDELEMENT ) $xw->endElement();
 		}
 				
 		/**
@@ -790,7 +784,7 @@
         			$xw->startElement( '</xsl:text>
 	        			<xsl:value-of select="@name" />
 	        			<xsl:text disable-output-escaping="yes">');
-					$prop->toXmlWriter( $xw, NULL, NULL, XMLAdaptor::CONTENTS );
+					$prop->toXmlWriter( $xw, NULL, NULL, self::CONTENTS );
 					$xw->endElement();</xsl:text>
 	        		</xsl:when>
         			<xsl:otherwise>

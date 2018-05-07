@@ -4,22 +4,13 @@ namespace com\servandserv\happymeal\xml\schema;
 
 class ShortType extends IntType 
 {
-	
 	const ROOT = "short";
 	const NS = "http://www.w3.org/2001/XMLSchema";
 	const PREF = NULL;
+	const VALIDATOR_CLASS = "com\servandserv\happymeal\xml\schema\ShortTypeValidator";
 	
-	public function validateType ( \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = AnyType::ELEMENT ) 
 	{
-		$validator = \com\servandserv\happymeal\Bindings::create("com\servandserv\happymeal\xml\schema\ShortTypeValidator",array( $this, $handler ));
-		$validator->validate();
+	    parent::toXmlWriter( $xw, $xmlname, $xmlns, $mode );
 	}
-	
-	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = \com\servandserv\happymeal\XMLAdaptor::ELEMENT ) 
-	{
-		if( $mode & \com\servandserv\happymeal\XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
-		$xw->text( $this->__text() );
-		if( $mode & \com\servandserv\happymeal\XMLAdaptor::ENDELEMENT ) $xw->endElement();
-	}
-	
 }

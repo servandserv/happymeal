@@ -2,10 +2,12 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
+use \com\servandserv\happymeal\ErrorsHandler;
+
 class IDTypeValidator extends NCNameTypeValidator 
 {
 
-	public function __construct ( \com\servandserv\happymeal\xml\schema\IDType $tdo, \com\servandserv\happymeal\ErrorsHandler $handler ) 
+	public function __construct ( IDType $tdo, ErrorsHandler $handler ) 
 	{
 		parent::__construct( $tdo, $handler );
 	}

@@ -2,7 +2,6 @@
 
 namespace com\servandserv\happymeal\xml\schema;
 
-use \com\servandserv\happymeal\XMLAdaptor;
 use \com\servandserv\happymeal\ErrorsHandler;
 use \com\servandserv\happymeal\Bindings;
 
@@ -12,6 +11,7 @@ class AnySimpleType extends AnyType
 	const ROOT = "anySimpleType";
 	const NS = "http://www.w3.org/2001/XMLSchema";
 	const PREF = NULL;
+	const VALIDATOR_CLASS = "com\servandserv\happymeal\xml\schema\AnySimpleTypeValidator";
 	
 	public function __construct( $val = NULL ) 
 	{
@@ -21,10 +21,7 @@ class AnySimpleType extends AnyType
 	
 	public function validateType ( ErrorsHandler $handler ) 
 	{
-	    Bindings::create(
-		    'com\servandserv\happymeal\xml\schema\AnySimpleTypeValidator',
-		    array( $this, $handler )
-		)->validate();
+	    Bindings::create( static::VALIDATOR_CLASS, array( $this, $handler ) )->validate();
 	}
 	
 	public function equals( AnyType $obj ) 
@@ -32,11 +29,9 @@ class AnySimpleType extends AnyType
 		return $this->__text() === $obj->__text();
 	}
 	
-	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = XMLAdaptor::ELEMENT ) 
+	public function toXmlWriter ( \XMLWriter &$xw, $xmlname = self::ROOT, $xmlns = self::NS, $mode = AnyType::ELEMENT ) 
 	{
-		if( $mode & XMLAdaptor::STARTELEMENT ) $xw->startElementNS( NULL, $xmlname, $xmlns );
-		if( $prop = $this->__text() ) $xw->text( $prop ) ;
-		if( $mode & XMLAdaptor::ENDELEMENT ) $xw->endElement();
+	    parent::toXmlWriter( $xw, $xmlname, $xmlns, $mode );
 	}
 	
 	public function fromXmlReader ( \XMLReader &$xr ) 
