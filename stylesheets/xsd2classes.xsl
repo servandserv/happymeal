@@ -445,11 +445,17 @@
 		</xsl:choose>
         <xsl:text disable-output-escaping="yes"> $val </xsl:text>
         <xsl:if test="$p/@minOccurs='0' and not($p/@array)">
-            <xsl:text>= NULL </xsl:text>
+            <xsl:text>= NULL</xsl:text>
         </xsl:if>
-        <xsl:text disable-output-escaping="yes">) 
-        {</xsl:text>
-		<xsl:choose>
+        <!--xsl:text disable-output-escaping="yes"> ) 
+        {</xsl:text-->
+        <xsl:text disable-output-escaping="yes">, callable $cb = NULL ) 
+        {
+            return parent::__setProp( '</xsl:text>
+            <xsl:value-of select="$p/@propName" />
+            <xsl:text disable-output-escaping="yes">', $val, $cb );
+        }</xsl:text>
+		<!--xsl:choose>
 			<xsl:when test="$p/@array">
 				<xsl:text disable-output-escaping="yes">
 			$this-></xsl:text><xsl:value-of select="$p/@propName" /><xsl:text disable-output-escaping="yes">[] = $val;</xsl:text>
@@ -461,7 +467,7 @@
 		</xsl:choose>
 		<xsl:text disable-output-escaping="yes">
 			return $this;
-		}</xsl:text>
+		}</xsl:text-->
 		<xsl:if test="$p/@array">
 			<xsl:text disable-output-escaping="yes">
 		/**
@@ -524,11 +530,17 @@
 		 */
 		public function </xsl:text>
 		<xsl:value-of select="$p/@getter" />
-		<xsl:choose>
+		<!--xsl:choose>
 			<xsl:when test="$p/@array">
 		<xsl:text>($index = NULL, callable $cb = NULL) 
-		{</xsl:text> 
-		<xsl:text disable-output-escaping="yes">
+		{</xsl:text--> 
+		<xsl:text>( callable $cb = NULL, $mode = ARRAY_FILTER_USE_BOTH ) 
+		{
+		    return parent::__getProp( '</xsl:text>
+		    <xsl:value-of select="$p/@propName" />
+		    <xsl:text disable-output-escaping="yes">', $cb, $mode );
+		}</xsl:text> 
+		<!--xsl:text disable-output-escaping="yes">
 			if( $index !== NULL ) {
 				$res = isset($this-></xsl:text>
 				<xsl:value-of select="$p/@propName" />
@@ -555,7 +567,7 @@
 			<xsl:text disable-output-escaping="yes">;
 		}</xsl:text>
 			</xsl:otherwise>
-		</xsl:choose>
+		</xsl:choose-->
 	</xsl:template>
 	
 	<!-- VALIDATION 

@@ -22,6 +22,49 @@ class AnyComplexType extends AnyType
 		return $this == $obj;
 	}
 	
+	/**
+	 * get property
+	 *
+	 * @param $prop property name
+	 * $param $cb callback filtering function
+	 *
+	 */
+	
+	protected function __getProp( $prop, callable $cb = NULL, $mode = ARRAY_FILTER_USE_BOTH )
+	{
+	    //if( !property_exists( $this, $prop ) ) return NULL;
+	    if( $cb ) {
+	        if( is_array( $this->$prop ) ) {
+	            return array_filter( $this->$prop, $cb, $mode );
+	        } else {
+	            return $cb( $this->$prop, NULL );
+	        }
+	    } else {
+	        return $this->$prop;
+	    }
+	}
+	
+	protected function __setProp( $prop, $val, callable $cb = NULL )
+	{
+	    //if( !property_exists( $this, $prop ) ) return $this;
+	    if( is_array( $this->$prop ) ) {
+	        if( $cb ) {
+	            $filtered = array_filter( $this->$prop, $cb, ARRAY_FILTER_USE_BOTH );
+	            if( !empty( $filtered ) ) {
+	                $filtered[0] = $val;
+	            } else {
+	                $this->{$prop}[] = $val;
+	            }
+	        } else {
+	            $this->{$prop}[] = $val;
+	        }
+	    } else {
+	        $this->$prop = $val;
+	    }
+	    
+	    return $this;
+	}
+	
 	public function validateType ( ErrorsHandler $handler ) 
 	{
 		$validator = Bindings::create('com\servandserv\happymeal\xml\schema\AnyComplexTypeValidator',array( $this, $handler ));
