@@ -108,7 +108,7 @@ if [ "$command" == "xsd2code" ]; then
     cp -pR $happymealPath"/classes/com" ${iniPath}/${codegenPath}
 
     # create project classes (add hapymeal schemas to schemas path)
-    php $happymealPath"/consolidate_xsd2xml.php" "${iniPath}" "${codegenPath}" "${schemasPath} ${happymealPath}/api/schemas" > "$tmpDir"/consolidated.xml
+    php5.6 $happymealPath"/consolidate_xsd2xml.php" "${iniPath}" "${codegenPath}" "${schemasPath} ${happymealPath}/api/schemas" > "$tmpDir"/consolidated.xml
     if [ ! $? -eq 0 ];then
         cat "$tmpDir"/consolidated.xml
         exit 1

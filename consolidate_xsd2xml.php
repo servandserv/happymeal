@@ -55,7 +55,7 @@ foreach( $schemas as $schema ) {
 
 //print_r( $imports );exit(1);
 // create consolidated xml file with all imported schemas
-$xw = new XMLWriter();
+$xw = new \XmlWriter();
 $xw->openMemory();
 $xw->setIndent( true );
 $xw->setIndentString( " " );
