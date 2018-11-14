@@ -410,39 +410,45 @@
 		<xsl:text disable-output-escaping="yes">
 		/**
 		 * @param </xsl:text>
-		<xsl:choose>
-			<xsl:when test="not($p/@class)">
-				<xsl:value-of select="substring-after($p/@prototype,$xmlSchemaNS)" />
-			</xsl:when>
-            <xsl:when test="$p/@abstract">
-				<xsl:value-of select="$p/@abstract" />
-			</xsl:when>
-            <xsl:when test="$p/@mode = 'XMLAdaptor::CONTENTS' and $p/@typeClass">
-                <xsl:value-of select="$p/@typeClass" />
-            </xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select="$p/@class" />
-			</xsl:otherwise>
-		</xsl:choose> 
+		<xsl:variable name="schemaTypeOf">
+		    <xsl:choose>
+			    <xsl:when test="not($p/@class)">
+				    <xsl:value-of select="substring-after($p/@prototype,$xmlSchemaNS)" />
+			    </xsl:when>
+                <xsl:when test="$p/@abstract">
+				    <xsl:value-of select="$p/@abstract" />
+			    </xsl:when>
+                <xsl:when test="$p/@mode = 'XMLAdaptor::CONTENTS' and $p/@typeClass">
+                    <xsl:value-of select="$p/@typeClass" />
+                </xsl:when>
+			    <xsl:otherwise>
+				    <xsl:value-of select="$p/@class" />
+			    </xsl:otherwise>
+		    </xsl:choose>
+		</xsl:variable>
+		<xsl:variable name="phpTypeOf">
+		    <xsl:choose>
+                <xsl:when test="$p/@prototype = $anyType">
+				    <xsl:text>\</xsl:text><xsl:value-of select="$p/@prototype" />
+			    </xsl:when>
+                <xsl:when test="$p/@mode = 'XMLAdaptor::CONTENTS' and $p/@typeClass">
+                    <xsl:text>\</xsl:text><xsl:value-of select="$p/@typeClass" />
+                </xsl:when>
+			    <xsl:when test="$p/@abstract">
+				    <xsl:text>\</xsl:text><xsl:value-of select="$p/@abstract" />
+			    </xsl:when>
+			    <xsl:when test="$p/@class">
+				    <xsl:text>\</xsl:text><xsl:value-of select="$p/@class" />
+			    </xsl:when>
+		    </xsl:choose>
+		</xsl:variable>
+		<xsl:value-of select="$schemaTypeOf" />
 		<xsl:text disable-output-escaping="yes"> $val
 		 */
 		public function </xsl:text>
 		<xsl:value-of select="$p/@setter" />
 		<xsl:text> ( </xsl:text>
-		<xsl:choose>
-            <xsl:when test="$p/@prototype = $anyType">
-				<xsl:text>\</xsl:text><xsl:value-of select="$p/@prototype" />
-			</xsl:when>
-            <xsl:when test="$p/@mode = 'XMLAdaptor::CONTENTS' and $p/@typeClass">
-                <xsl:text>\</xsl:text><xsl:value-of select="$p/@typeClass" />
-            </xsl:when>
-			<xsl:when test="$p/@abstract">
-				<xsl:text>\</xsl:text><xsl:value-of select="$p/@abstract" />
-			</xsl:when>
-			<xsl:when test="$p/@class">
-				<xsl:text>\</xsl:text><xsl:value-of select="$p/@class" />
-			</xsl:when>
-		</xsl:choose>
+		<xsl:value-of select="$phpTypeOf" />
         <xsl:text disable-output-escaping="yes"> $val </xsl:text>
         <xsl:if test="$p/@minOccurs='0' and not($p/@array)">
             <xsl:text>= NULL</xsl:text>
@@ -472,20 +478,7 @@
 			<xsl:text disable-output-escaping="yes">
 		/**
 		 * @param </xsl:text>
-			<xsl:choose>
-				<xsl:when test="not($p/@class)">
-					<xsl:value-of select="substring-after($p/@prototype,$xmlSchemaNS)" />
-				</xsl:when>
-                 <xsl:when test="$p/@mode = 'XMLAdaptor::CONTENTS' and $p/@typeClass">
-                    <xsl:value-of select="$p/@typeClass" />
-                </xsl:when>
-				<xsl:when test="$p/@abstract">
-					<xsl:value-of select="$p/@abstract" />
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="$p/@class" />
-				</xsl:otherwise>
-			</xsl:choose>
+		    <xsl:value-of select="$schemaTypeOf" />
 			<xsl:text>[]</xsl:text>
 			<xsl:text disable-output-escaping="yes">
 		 */
@@ -497,7 +490,22 @@
             </xsl:if>
             <xsl:text disable-output-escaping="yes"> ) 
         {
-			$this-></xsl:text>
+            </xsl:text>
+            <xsl:if test="not($phpTypeOf='')">
+            <xsl:text disable-output-escaping="yes">foreach( $vals as $val ) {
+                if( $val instanceof </xsl:text>
+                    <xsl:value-of select="$phpTypeOf" />
+                    <xsl:text disable-output-escaping="yes"> === FALSE ) {
+                    throw new \Exception( 'One of elements in Array passed to </xsl:text>
+                    <xsl:value-of select="$phpTypeOf" />::<xsl:value-of select="$p/@setter" />
+                    <xsl:text disable-output-escaping="yes">() must be an instance of </xsl:text>
+                    <xsl:value-of select="$phpTypeOf" />
+                    <xsl:text disable-output-escaping="yes">, instance of '.get_class( $val ).' given, called in '.__FILE__.' on line '.__LINE__ );
+                }
+            }
+            </xsl:text>
+            </xsl:if>
+			<xsl:text disable-output-escaping="yes">$this-></xsl:text>
 			<xsl:value-of select="$p/@propName" />
 			<xsl:text disable-output-escaping="yes"> = $vals;
 			return $this;
