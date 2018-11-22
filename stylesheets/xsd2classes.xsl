@@ -158,7 +158,7 @@
 		tmp:simpleType[tmp:restriction/@base='xsd:string' and tmp:restriction/tmp:enumeration]
 		
 	-->
-	<xsl:template match="tmp:simpleType[tmp:restriction/@base='xsd:string' and tmp:restriction/tmp:enumeration]" mode="DATA-CLASS">
+	<xsl:template match="tmp:simpleType[tmp:restriction/tmp:enumeration] | tmp:attribute[tmp:simpleType/tmp:restriction/tmp:enumeration]" mode="DATA-CLASS">
 		<xsl:text disable-output-escaping="yes">
 
 #path: </xsl:text><xsl:value-of select="@filePath" /><xsl:text disable-output-escaping="yes">.php
@@ -170,9 +170,9 @@
 	
 	/**
 	 * </xsl:text>
-		<xsl:value-of select="normalize-space(tmp:annotation/tmp:documentation)" /><xsl:text>
+		<xsl:value-of select="normalize-space(.//tmp:annotation/tmp:documentation)" /><xsl:text>
 	 * </xsl:text>
-			<xsl:copy-of select="tmp:annotation/tmp:appinfo" />
+			<xsl:copy-of select=".//tmp:annotation/tmp:appinfo" />
 			<xsl:text disable-output-escaping="yes">
 	 */</xsl:text>
 		</xsl:if>
@@ -182,7 +182,7 @@
 			<xsl:text disable-output-escaping="yes"> 
 	{
 			</xsl:text>
-			<xsl:for-each select="tmp:restriction/tmp:enumeration">
+			<xsl:for-each select=".//tmp:restriction/tmp:enumeration">
 				<xsl:text disable-output-escaping="yes">
 		const _</xsl:text>
 					<xsl:value-of select="translate(translate(@value, '.-\/', '____'),$smallcase,$uppercase)" />
