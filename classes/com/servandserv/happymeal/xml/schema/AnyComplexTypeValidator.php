@@ -42,7 +42,7 @@ class AnyComplexTypeValidator extends AnyTypeValidator
     {
         if( !method_exists( $this->tdo, $getter ) ) return;
         $val = $this->tdo->{$getter}();
-        if( !$val && intval( $minOccurs ) !== 0 ) {
+        if( $val===NULL && intval( $minOccurs ) !== 0 ) {
             $this->handleError(
                 Bindings::create( self::ERROR_CLASS )
                     ->setTargetNS( $this->targetNS )
