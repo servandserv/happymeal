@@ -25,8 +25,7 @@ namespace com\servandserv\happymeal\xml;
  *
  * @author dab@bystrobank.ru
  */
-class Output 
-{
+class Output {
 
     /**
      * @var filehandle для file:// streamwrapper-а
@@ -55,138 +54,137 @@ class Output
      * @param boolean $forceValidation NULL - валидация если в домашнем каталоге, TRUE: форсировать проверку по схеме/tidy всегда, FALSE - не проверять по схеме/tidy
      * @param string $htmlContentType миме-тип для вывода html, по-умолчанию text/html, для вывода html+xul передать application/xml
      */
-    public static function tryHTML( $data, $documentURI = NULL, $profiling = NULL ) {
+    public static function tryHTML($data, $documentURI = NULL, $profiling = NULL) {
         $outputDom = NULL;
         $xsltResult = NULL;
         $debug = FALSE;
         $xsltProfiler = NULL;
 
-        if ( self::$done == TRUE ) {
+        if (self::$done == TRUE) {
             trigger_error("XML_Output::tryHTML() called twice?");
         }
 
-        if( $profiling === TRUE ) {
+        if ($profiling === TRUE) {
             //профайлер XSLT доступен только после 5.3
             if (version_compare(PHP_VERSION, '5.3.0', '>')) {
                 //разводим файлы по разным хостам - для отладки достаточно
-                $xsltProfiler = "/tmp/XML_Output_profiling_" . $_SERVER["REMOTE_ADDR"] . "_" . (isset($_SERVER["USER"]) ? $_SERVER["USER"] : (isset($_SERVER["UID"]) ? $_SERVER["UID"] : posix_getuid())) . ".txt";
+                $xsltProfiler = "/tmp/XML_Output_profiling_".$_SERVER["REMOTE_ADDR"]."_".(isset($_SERVER["USER"]) ? $_SERVER["USER"] : (isset($_SERVER["UID"]) ? $_SERVER["UID"] : posix_getuid())).".txt";
             }
         }
 
         //$debug=FALSE;
         $xsltStart = $xsltStop = 0; //минипрофайлер
         $outputDom = new \DOMDocument();
-        $outputDom->loadXML( $data );
+        $outputDom->loadXML($data);
         if ($documentURI) {
             $outputDom->documentURI = $documentURI;
         }
         $matches = NULL;
         //добываем имя стиля из хмл-а (или xmlreader?)
-        if ( $outputDom->firstChild->nodeType == XML_PI_NODE && $outputDom->firstChild->target == "xml-stylesheet" ) {
-            if ( preg_match( "/href\s*=\s*\"(.+)\"/", $outputDom->firstChild->data, $matches ) ) {
+        if ($outputDom->firstChild->nodeType == XML_PI_NODE && $outputDom->firstChild->target == "xml-stylesheet") {
+            if (preg_match("/href\s*=\s*\"(.+)\"/", $outputDom->firstChild->data, $matches)) {
                 $oldHeaders = headers_list();
                 //время трансформации считаем общее - вместе с загрузкой документов
-                $xsltStart = microtime( TRUE );
+                $xsltStart = microtime(TRUE);
                 $xsl = new \DomDocument();
-                $xsl->load( $matches[1] );
+                $xsl->load($matches[1]);
 
                 $proc = new \XSLTProcessor();
 
-                if ( $xsltProfiler ) {
-                    $proc->setProfiling( $xsltProfiler );
+                if ($xsltProfiler) {
+                    $proc->setProfiling($xsltProfiler);
                 }
-                $proc->importStyleSheet( $xsl );
+                $proc->importStyleSheet($xsl);
 
                 //регистрируем на себя обращения к файлам
-                stream_wrapper_unregister( "file" ) or die(__FILE__ . __LINE__);
-                stream_wrapper_register( "file", '\com\servandserv\happymeal\xml\Output' ) or die(__FILE__ . __LINE__);
+                stream_wrapper_unregister("file") or die(__FILE__.__LINE__);
+                stream_wrapper_register("file", '\com\servandserv\happymeal\xml\Output') or die(__FILE__.__LINE__);
 
                 //вешаем на обработчик выхода ловушку - если вложенный скрипт попытается сделать exit или die
-                register_shutdown_function( array( '\com\servandserv\happymeal\xml\Output', "checkDone" ) );
+                register_shutdown_function(array('\com\servandserv\happymeal\xml\Output', "checkDone"));
 
                 //на время трансформации ставим свой специальный обработчик ошибок
-                set_error_handler( array( '\com\servandserv\happymeal\xml\Output', "xsltErrorHandler" ) );
-                $xsltResult = $proc->transformToXML( $outputDom );
+                set_error_handler(array('\com\servandserv\happymeal\xml\Output', "xsltErrorHandler"));
+                $xsltResult = $proc->transformToXML($outputDom);
                 restore_error_handler();
 
-                if ( self::$xsltErrors != NULL ) {
+                if (self::$xsltErrors != NULL) {
                     //а сообщаем об ошибках как обычно
-                    trigger_error( "XSLTProcessor::transformToXml(): " . self::$xsltErrors );
+                    trigger_error("XSLTProcessor::transformToXml(): ".self::$xsltErrors);
                 }
 
                 //ставим маркер что управление нам вернули
                 self::$done = TRUE;
-                unset( $proc, $xsl );
+                unset($proc, $xsl);
                 //восстанавливаем дефолтный streamwrapper для file://
-                stream_wrapper_restore( "file" ) or die(__FILE__ . __LINE__);
+                stream_wrapper_restore("file") or die(__FILE__.__LINE__);
 
                 //закончили трансформацию
-                $xsltStop = microtime( TRUE );
+                $xsltStop = microtime(TRUE);
 
-                if ( $xsltProfiler ) {
+                if ($xsltProfiler) {
                     //ничего секретного там нет - даем всем почитать
-                    chmod( $xsltProfiler, 0644 );
+                    chmod($xsltProfiler, 0644);
                 }
 
                 //сравним хедеры до и после
-                $diffHeaders = array_diff( headers_list(), $oldHeaders );
+                $diffHeaders = array_diff(headers_list(), $oldHeaders);
                 //сбрасываем все хедеры которых "тут не стояло"
-                foreach ( $diffHeaders as $h ) {
-                    $matches = explode( ":", $h );
-                    header_remove( $matches[0] );
+                foreach ($diffHeaders as $h) {
+                    $matches = explode(":", $h);
+                    header_remove($matches[0]);
                 }
                 //сбросим текущие чтобы добавить старые
-                foreach ( $oldHeaders as $h ) {
-                    $matches = explode( ":", $h );
-                    header_remove( $matches[0] );
+                foreach ($oldHeaders as $h) {
+                    $matches = explode(":", $h);
+                    header_remove($matches[0]);
                 }
                 //востановим старые как были
                 foreach ($oldHeaders as $h) {
-                    header( $h, FALSE );
+                    header($h, FALSE);
                 }
-                unset( $diffHeaders, $oldHeaders, $h );
+                unset($diffHeaders, $oldHeaders, $h);
             }
         } else {
             // шаблон не найден отваливаемся
-            trigger_error( "Stylesheet not found" );
+            trigger_error("Stylesheet not found");
         }
         self::$done = TRUE;
 
-        unset( $outputDom );
+        unset($outputDom);
 
         //сообщаем клиенту что контент различен в зависимости от заголовка Accept - для кэширования нужно
-        header( "Vary: Accept" );
+        header("Vary: Accept");
         unset($data);
         header("Content-type: text/html;charset=UTF-8");
         //header("Content-Length: ".mb_strlen($xsltResult,"ASCII"));
         //результат - сборная солянка из вывода нескольких скриптов и шаблонов
         //явно кешированием управлять не пытаемся: ставим хедеры на текущее время
         //TODO возможно и хитро проанализировать хедеры всех составляющих и вычислить общий
-        header("Last-Modified: " . gmdate(DATE_RFC1123));
+        header("Last-Modified: ".gmdate(DATE_RFC1123));
         //header("Etag: XML_Output_" . $_SERVER["UNIQUE_ID"]);
         echo $xsltResult;
     }
-    
+
     /**
-    public static function transform($data) {
-        $outputDom = new DOMDocument();
-        $outputDom->loadXML($data);
-        $xsltResult = NULL;
-        $matches = NULL;
-        if ($outputDom->firstChild->nodeType == XML_PI_NODE &&
-                $outputDom->firstChild->target == "xml-stylesheet") {
-            if (preg_match("/href\s*=\s*\"(.+)\"/", $outputDom->firstChild->data, $matches)) {
-                $xsl = new DomDocument();
-                $xsl->load($matches[1]);
-                $proc = new XSLTProcessor();
-                $proc->importStyleSheet($xsl);
-                $xsltResult = $proc->transformToXML($outputDom);
-            }
-        }
-        return $xsltResult;
-    }
-    */
-    
+      public static function transform($data) {
+      $outputDom = new DOMDocument();
+      $outputDom->loadXML($data);
+      $xsltResult = NULL;
+      $matches = NULL;
+      if ($outputDom->firstChild->nodeType == XML_PI_NODE &&
+      $outputDom->firstChild->target == "xml-stylesheet") {
+      if (preg_match("/href\s*=\s*\"(.+)\"/", $outputDom->firstChild->data, $matches)) {
+      $xsl = new DomDocument();
+      $xsl->load($matches[1]);
+      $proc = new XSLTProcessor();
+      $proc->importStyleSheet($xsl);
+      $xsltResult = $proc->transformToXML($outputDom);
+      }
+      }
+      return $xsltResult;
+      }
+     */
     /**
      * вывод XML документа из файла
      * TODO: валидация по схеме в отладочном режиме
@@ -194,23 +192,22 @@ class Output
      * @param type $filename имя файла
      */
     /**
-    public static function sendXMLFile($filename) {
-        header("Content-type: application/xml;charset=UTF-8");
-        readfile($filename);
-    }
-    */
-
+      public static function sendXMLFile($filename) {
+      header("Content-type: application/xml;charset=UTF-8");
+      readfile($filename);
+      }
+     */
     /**
      * вывод XML документа из строки
      * TODO: валидация по схеме в отладочном режиме
      * @param type $xmlstring XML строка
      */
     /**
-    public static function sendXML($xmlstring) {
-        header("Content-type: application/xml;charset=UTF-8");
-        echo $xmlstring;
-    }
-    */
+      public static function sendXML($xmlstring) {
+      header("Content-type: application/xml;charset=UTF-8");
+      echo $xmlstring;
+      }
+     */
 
     /**
      * Обработчик ошибок XSLT (см. PHP manual: set_error_handler)
@@ -220,9 +217,9 @@ class Output
      * @param string $errfile
      * @param integer $errline
      */
-    public static function xsltErrorHandler( $errno, $errstr, $errfile, $errline ) {
+    public static function xsltErrorHandler($errno, $errstr, $errfile, $errline) {
         //префикс чтоб не повторялся на каждую строку сообщения - откусим его
-        self::$xsltErrors .= ( str_replace( "XSLTProcessor::transformToXml(): ", "", $errstr ) . PHP_EOL );
+        self::$xsltErrors .= ( str_replace("XSLTProcessor::transformToXml(): ", "", $errstr).PHP_EOL );
     }
 
     /**
@@ -235,18 +232,18 @@ class Output
      * @param string $opened_path
      * @return boolean
      */
-    public function stream_open( $path, $mode, $options, &$opened_path ) {
+    public function stream_open($path, $mode, $options, &$opened_path) {
         //error_log("stream_open( $path, $mode, $options, $opened_path )\n",3,"/tmp/log");
         restore_error_handler();
         //чтобы добраться до реальной файловой системы восстанавливаем дефолтный
-        stream_wrapper_restore( "file" ) or die(__FILE__ . __LINE__);
+        stream_wrapper_restore("file") or die(__FILE__.__LINE__);
 
-        $url = parse_url( $path );
+        $url = parse_url($path);
         $pathinfo = NULL;
-        $url["path"] = self::parse_path( $url["path"], $pathinfo );
-        $pi = pathinfo( $url["path"] );
+        $url["path"] = self::parse_path($url["path"], $pathinfo);
+        $pi = pathinfo($url["path"]);
         //если файл .php - наш клиент - обрабатываем сами
-        if ( isset( $pi["extension"] ) && !strncmp( $pi["extension"], "php", 3 ) ) {
+        if (isset($pi["extension"]) && !strncmp($pi["extension"], "php", 3)) {
             //сохраняем окружение
             $oldServer = $_SERVER;
             $oldRequest = $_REQUEST;
@@ -254,21 +251,21 @@ class Output
             $oldPost = $_POST;
             $oldPwd = getcwd();
             $oldPath = get_include_path();
-            if ( $pathinfo ) {
+            if ($pathinfo) {
                 $_SERVER["PATH_INFO"] = $pathinfo;
             }
             //предполагаемое дефолтное значение
             $oldStatus = "200 OK";
             $hl = headers_list();
             for ($i = 0; $i < count($hl); $i++) {
-                if ( !strncmp( $hl[$i], "Status:", 7 ) ) {
+                if (!strncmp($hl[$i], "Status:", 7)) {
                     $oldStatus = substr($hl[$i], 8);
                 }
             }
             //устанавливаем окружение для скрипта
             //разбираем и подсовываем параметры
-            if ( isset( $url["query"] ) ) {
-                parse_str( $url["query"], $_GET );
+            if (isset($url["query"])) {
+                parse_str($url["query"], $_GET);
                 $_SERVER["QUERY_STRING"] = $url["query"];
             } else {
                 $_GET = array();
@@ -278,14 +275,14 @@ class Output
             $_POST = array(); //дожен быть пустым
             $_REQUEST = $_GET;
             //ставим переменные на скрипт, чтоб логика внутри правильно отработала
-            $d1 = dirname( __FILE__ );
-            $d2 = dirname( $url["path"] );
+            $d1 = dirname(__FILE__);
+            $d2 = dirname($url["path"]);
             $rd = "";
-            if ( $d1 != $d2 ) {
+            if ($d1 != $d2) {
                 //пути отличаются - вычисляем относительный путь чтоб подставить в урл
-                $rd = $this->RelativePath($d1, $d2) . DIRECTORY_SEPARATOR;
+                $rd = $this->RelativePath($d1, $d2).DIRECTORY_SEPARATOR;
             }
-            $_SERVER["PHP_SELF"] = dirname($_SERVER["PHP_SELF"]) . DIRECTORY_SEPARATOR . $rd . basename($url["path"]);
+            $_SERVER["PHP_SELF"] = dirname($_SERVER["PHP_SELF"]).DIRECTORY_SEPARATOR.$rd.basename($url["path"]);
             $_SERVER["SCRIPT_NAME"] = $_SERVER["PHP_SELF"];
             $_SERVER["SCRIPT_FILENAME"] = $url["path"];
             $_SERVER["SCRIPT_URL"] = $_SERVER["PHP_SELF"];
@@ -317,7 +314,7 @@ class Output
             $hl = headers_list();
             for ($i = 0; $i < count($hl); $i++) {
                 if (!strncmp($hl[$i], "Status:", 7) && substr($hl[$i], 8) != $oldStatus) {
-                    throw new Exception("invalid header '" . $hl[$i] . "'");
+                    throw new Exception("invalid header '".$hl[$i]."'");
                 }
             }
 
@@ -328,9 +325,9 @@ class Output
         }
 
         //снова устанавливаем себя чтоб поймать следующий запрошенный урл
-        stream_wrapper_unregister( "file" ) or die( __FILE__ . __LINE__ );
-        stream_wrapper_register( "file", get_class( $this ) ) or die(__FILE__ . __LINE__);
-        set_error_handler( array( '\com\servandserv\happymeal\xml\Output', "xsltErrorHandler" ) );
+        stream_wrapper_unregister("file") or die(__FILE__.__LINE__);
+        stream_wrapper_register("file", get_class($this)) or die(__FILE__.__LINE__);
+        set_error_handler(array('\com\servandserv\happymeal\xml\Output', "xsltErrorHandler"));
         return TRUE;
     }
 
@@ -362,13 +359,13 @@ class Output
         return fstat($this->handle);
     }
 
-    public function url_stat( $path, $flags ) {
+    public function url_stat($path, $flags) {
         restore_error_handler();
         //запрос stat проводим к реальной файловой системе
-        stream_wrapper_restore("file") or die(__FILE__ . __LINE__);
+        stream_wrapper_restore("file") or die(__FILE__.__LINE__);
         $stat = stat(self::parse_path(parse_url($path, PHP_URL_PATH)));
-        stream_wrapper_unregister("file") or die(__FILE__ . __LINE__);
-        stream_wrapper_register("file", get_class($this)) or die(__FILE__ . __LINE__);
+        stream_wrapper_unregister("file") or die(__FILE__.__LINE__);
+        stream_wrapper_register("file", get_class($this)) or die(__FILE__.__LINE__);
         set_error_handler(array('\com\servandserv\happymeal\xml\Output', "xsltErrorHandler"));
         return $stat;
     }
@@ -391,8 +388,8 @@ class Output
      * если вложенный скрипт завершился раньше и не вернул управление - ошибка
      */
     public static function checkDone() {
-        stream_wrapper_unregister("file") or die(__FILE__ . __LINE__);
-        stream_wrapper_restore("file") or die(__FILE__ . __LINE__);
+        stream_wrapper_unregister("file") or die(__FILE__.__LINE__);
+        stream_wrapper_restore("file") or die(__FILE__.__LINE__);
         if (self::$done != TRUE) {
             error_log("AHTUNG! restart php now!");
             //тут не прокатывает trigger_error() - зовем напрямую
@@ -440,15 +437,15 @@ class Output
         //Add on the ..
         for ($index = $lastCommonRoot + 1; $index < $adlen; $index++) {
             if (strlen($ad[$index]) > 0) {
-                $rp.=(".." . DIRECTORY_SEPARATOR);
+                $rp .= ("..".DIRECTORY_SEPARATOR);
             }
         }
 
         //Add on the folders
         for ($index = $lastCommonRoot + 1; $index < $rdlen - 1; $index++) {
-            $rp.=($rd[$index] . DIRECTORY_SEPARATOR);
+            $rp .= ($rd[$index].DIRECTORY_SEPARATOR);
         }
-        $rp.=($rd[$rdlen - 1]);
+        $rp .= ($rd[$rdlen - 1]);
 
         return $rp;
     }

@@ -7,34 +7,30 @@ use \com\servandserv\happymeal\errors\Error;
 /**
  * errors container
  */
-class ErrorsHandler 
-{
+class ErrorsHandler {
 
-	private $errors;
+    const ERRORS_DATA_OBJECT = 'com\servandserv\happymeal\errors\Errors';
 
-	public function __construct () 
-	{
-		$this->clean();
-	}
+    private $errors;
 
-	public function handleError ( Error $err ) 
-	{
-		$this->errors->setError( $err );
-	}
+    public function __construct() {
+        $this->clean();
+    }
 
-	public function getErrors () 
-	{
-		return $this->errors;
-	}
-	
-	public function hasErrors() 
-	{
-		return count( $this->errors->getError() ) > 0;
-	}
-	
-	public function clean () 
-	{
-		$this->errors = \com\servandserv\happymeal\Bindings::create( 'com\servandserv\happymeal\errors\Errors' );
-	}
-	
+    public function handleError(Error $err) {
+        $this->errors->setError($err);
+    }
+
+    public function getErrors() {
+        return $this->errors;
+    }
+
+    public function hasErrors() {
+        return count($this->errors->getError()) > 0;
+    }
+
+    public function clean() {
+        $this->errors = \com\servandserv\happymeal\Bindings::create(self::ERRORS_DATA_OBJECT);
+    }
+
 }
